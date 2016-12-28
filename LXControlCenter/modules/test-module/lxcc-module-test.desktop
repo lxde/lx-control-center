@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Module
+Icon=preferences-desktop
+Name=LX Control Center Test module
+GenericName=LXCC Test Module
+Comment=It's a comment
+Exec=main.py
+Categories=X-LX-Control-Center-Module;Settings;DesktopSettings;
+X-LX-Control-Center-Depends=;
+X-LX-Control-Center-Version=0.1
+X-LX-Control-Center-API-Version=0.1
+X-LX-Control-Center-Application-Replaces=;
+X-LX-Control-Center-Toolkit=GTK3

@@ -1,0 +1,8 @@
+# files added by intltool-prepare
+data/lx-control-center-gtk3.desktop.in
+data/lx-control-center-gtk2.desktop.in
+
+# files
+LXControlCenter/base.py
+LXControlCenter/item.py
+LXControlCenter/widgets/common.py

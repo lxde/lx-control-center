@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Module
+Icon=preferences-desktop
+Name=LXsession default applications
+GenericName=Default applications
+Comment=It's a comment
+Exec=main.py
+Categories=X-LX-Control-Center-Module;Settings;DesktopSettings;
+X-LX-Control-Center-Depends=lxsession;
+X-LX-Control-Center-Version=0.1
+X-LX-Control-Center-API-Version=0.1
+X-LX-Control-Center-Application-Replaces=lxsession-default-apps.desktop;
+X-LX-Control-Center-Toolkit=GTK3

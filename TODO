@@ -1,0 +1,8 @@
+* Create basic preferences UI for configure lxcc
+* Add black lists / white lits of applications
+* Option to Hide "Other" Category 
+* Make possible to modified items (name, description, categorie, availability)
+* Save modified items
+* Module : Check dependancy
+* Monitor file and directory changes
+* Load application for menu-cache (alternative to desktop files)
