@@ -41,6 +41,7 @@ class Main(Utils):
         self.settings_path = None
         self.loglevel_args = None
         self.logfile_args = None
+        # TODO Use a dict {"path": item} for fast searching
         self.items = []
         self.desktop_environments = []
         self.trigger_save_settings_file = False
@@ -78,6 +79,9 @@ class Main(Utils):
                                         "LXControlCenter/modules/"]
         self.modules_path = self.modules_path_default
 
+        self.categories_fixed_default = False
+        self.categories_fixed = self.categories_fixed_default
+
         self.categories_keys_default = {    _("DesktopSettings"):("DesktopSettings"),
                                             _("HardwareSettings"):("HardwareSettings"),
                                             _("Printing"):("Printing"),
@@ -105,7 +109,7 @@ class Main(Utils):
                                     }
         self.categories_triaged = self.categories_triaged_default
         
-
+        # UI - View
         self.window_size_w_default = 800
         self.window_size_w = self.window_size_w_default
 
@@ -132,6 +136,12 @@ class Main(Utils):
 
         self.icon_fallback_default = "gtk-stop"
         self.icon_fallback = self.icon_fallback_default
+
+        self.view_mode_default = "icons-all"
+        self.view_mode = self.view_mode_default
+
+        self.view_visual_effects_default = False
+        self.view_visual_effects = self.view_visual_effects_default
 
         # Parse command line arguments
         self.get_args_parameters()
@@ -210,19 +220,21 @@ class Main(Utils):
             self.version_config = self.load_setting(keyfile, "Configuration", "version_config", self.version_config_default, "float")
             self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
             self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
+            self.categories_fixed = self.load_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
 
             # Categories
-            if (keyfile.has_section("Categories")):
-                self.categories_keys.clear()
-                self.categories_triaged.clear()
-                tmp_categories_keys = keyfile.options("Categories")
-                for key in tmp_categories_keys:
-                    logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
-                    tmp_list = keyfile.get("Categories", key).split(";")
-                    tmp_list.pop()
-                    self.categories_keys[key] = tmp_list
-                    for cat in tmp_list:
-                        self.categories_triaged[cat] = key
+            if (self.categories_fixed == False):
+                if (keyfile.has_section("Categories")):
+                    self.categories_keys.clear()
+                    self.categories_triaged.clear()
+                    tmp_categories_keys = keyfile.options("Categories")
+                    for key in tmp_categories_keys:
+                        logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
+                        tmp_list = keyfile.get("Categories", key).split(";")
+                        tmp_list.pop()
+                        self.categories_keys[key] = tmp_list
+                        for cat in tmp_list:
+                            self.categories_triaged[cat] = key
 
             # Path
             self.applications_path = self.load_setting(keyfile, "Path","applications_path", self.applications_path_default, "list")
@@ -238,6 +250,8 @@ class Main(Utils):
             self.icon_not_theme_allow = self.load_setting(keyfile, "UI", "icon_not_theme_allow", self.icon_not_theme_allow_default, "boolean")
             self.icon_force_size = self.load_setting(keyfile, "UI", "icon_force_size", self.icon_force_size_default, "boolean")
             self.icon_fallback = self.load_setting(keyfile, "UI", "icon_fallback", self.icon_fallback_default, "string")
+            self.view_mode = self.load_setting(keyfile, "UI", "view_mode", self.view_mode_default, "string")
+            self.view_visual_effects = self.load_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
 
     def list_all_applications_from_dirs(self):
         """ List all applications from applications directories"""
@@ -368,11 +382,13 @@ class Main(Utils):
         self.save_setting(keyfile, "Configuration", "version_config", self.version_config, self.version_config_default, "float")
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
+        self.save_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean")
 
         # Categories
-        if (self.categories_keys != self.categories_keys_default):
-            for category in self.categories_keys:
-                self.save_setting(keyfile, "Categories",category, self.categories_keys[category], None, "list")
+        if (self.categories_fixed == False):
+            if (self.categories_keys != self.categories_keys_default):
+                for category in self.categories_keys:
+                    self.save_setting(keyfile, "Categories",category, self.categories_keys[category], None, "list")
 
         # Path
         self.save_setting(keyfile, "Path","applications_path", self.applications_path, self.applications_path_default, "list")
@@ -389,6 +405,8 @@ class Main(Utils):
         self.save_setting(keyfile, "UI", "icon_not_theme_allow", self.icon_not_theme_allow, self.icon_not_theme_allow_default, "boolean")
         self.save_setting(keyfile, "UI", "icon_force_size", self.icon_force_size, self.icon_force_size_default, "boolean")
         self.save_setting(keyfile, "UI", "icon_fallback", self.icon_fallback, self.icon_fallback_default, "generic")
+        self.save_setting(keyfile, "UI", "view_mode", self.view_mode, self.view_mode_default, "generic")
+        self.save_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects, self.view_visual_effects_default, "boolean")
 
         if (self.trigger_save_settings_file == True):
             self.save_file(keyfile)

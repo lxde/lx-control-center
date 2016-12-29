@@ -26,13 +26,17 @@ class UI(Main):
     def __init__(self):
         Main.__init__(self)
 
+        # Items visible in the view, to be display
         self.items_visible = []
+
+        # Items visible, triage by categories
         self.items_visible_by_categories = {}
 
         # Different mode of display the UI : 
         #  - main-UI => Icons view
         #  - pref-UI => Preferences view
         #  - edit-UI => Edit mode of the icons view
+        #  - category-UI => View of only 1 category 
         #  - module-UI ==> Display the current module loaded
         self.mode = "main-UI"
 
