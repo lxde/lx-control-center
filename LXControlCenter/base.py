@@ -93,21 +93,8 @@ class Main(Utils):
                                         }
         self.categories_keys = self.categories_keys_default
 
-
-        self.categories_triaged_default =   {
-                                                "DesktopSettings":_("DesktopSettings"),
-                                                "HardwareSettings":_("HardwareSettings"),
-                                                "Printing":_("Printing"),
-                                                "PackageManager":_("System"),
-                                                "TerminalEmulator":_("System"),
-                                                "FileManager":_("FileManager"),
-                                                "FileTools":_("FileManager"),
-                                                "Filesystem":_("FileManager"),
-                                                "Monitor":_("Monitor"),
-                                                "Security":_("Security"),
-                                                "Accessibility":_("Accessibility")
-                                    }
-        self.categories_triaged = self.categories_triaged_default
+        self.categories_triaged = {}
+        self.categories_triaged_generate()
         
         # UI - View
         self.window_size_w_default = 800
@@ -231,11 +218,9 @@ class Main(Utils):
                     tmp_categories_keys = keyfile.options("Categories")
                     for key in tmp_categories_keys:
                         logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
-                        tmp_list = keyfile.get("Categories", key).split(";")
-                        tmp_list.pop()
-                        self.categories_keys[key] = tmp_list
-                        for cat in tmp_list:
-                            self.categories_triaged[cat] = key
+                        self.categories_keys = self.load_setting(keyfile, "Configuration", key, self.categories_keys_default, "list")
+
+                    self.categories_triaged_generate()
 
             # Path
             self.applications_path = self.load_setting(keyfile, "Path","applications_path", self.applications_path_default, "list")
@@ -378,6 +363,16 @@ class Main(Utils):
             self.desktop_environments = new_list
         else:
             self.desktop_environments = self.desktop_environments_setting
+
+    def categories_triaged_generate(self):
+        for key in self.categories_keys.keys():
+            for item in self.categories_keys[key]:
+                if (len(item) > 1):
+                    self.categories_triaged[item] = key
+                else:
+                    to_add = self.categories_keys[key]
+                    self.categories_triaged[to_add] = key
+                    break
 
     def save_settings(self):
         keyfile = self.load_inifile(self.settings_path)
