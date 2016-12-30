@@ -142,9 +142,14 @@ class Item(Utils):
         logging.info("launch: trying execute : %s" % self.execute_command)
         if (self.type == "application"):
             try:
-                subprocess.Popen(self.execute_command)
+                command_to_excecute = self.execute_command.split(" ")
+                for i in command_to_excecute:
+                    if (i[0] == "%"):
+                        command_to_excecute.remove(i)
+
+                subprocess.Popen(command_to_excecute)
             except:
-                logging.info("launch: error launching %s" % self.execute_command)
+                logging.info("launch: error launching %s" % command_to_excecute)
         elif (self.type == "module"):
             python_version = sys.version_info
             module_path = os.path.join(os.path.dirname(self.path),self.execute_command)
