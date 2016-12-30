@@ -43,6 +43,8 @@ class Item(Utils):
         self.categories_list = []
         self.categories_array = categories_array
         self.icon = ""
+        # Icon type : themed, fix or fallback
+        self.icon_type = ""
         self.icon_original = ""
         self.try_exec = ""
         self.only_show_in = []
@@ -88,6 +90,7 @@ class Item(Utils):
         self.check_common()
 
         self.define_category_from_list()
+        self.define_icon_type()
 
     def load_application_from_path(self, path):
         keyfile = self.load_xdgfile(path)
@@ -122,6 +125,15 @@ class Item(Utils):
         else:
             max_category = max(tmp_dict.keys(), key=(lambda k: tmp_dict[k]))
             self.category = max_category
+
+    def define_icon_type(self):
+        if (len(self.icon) > 0):
+            if (self.icon[0] == "/"):
+                self.icon_type = "fix"
+            else:
+                self.icon_type = "themed"
+        else:
+            self.icon_type = "fallback"
 
     def check_common(self):
         if (self.name == None):

@@ -56,6 +56,8 @@ class Gtk3App(UI):
 
         self.action_group = Gtk.ActionGroup("actions")
 
+        self.theme = Gtk.IconTheme.get_default()
+
         # Function to launch at startup
         self.generate_view()
         self.build_toolbar()
@@ -109,7 +111,7 @@ class Gtk3App(UI):
         popup = uimanager.get_widget("/PopupMenu")
         self.menu_button.set_popup(popup)
 
-        pixbuf = Gtk.IconTheme.get_default().load_icon("open-menu-symbolic", 16, Gtk.IconLookupFlags.FORCE_SIZE)
+        pixbuf = self.theme.get_default().load_icon("open-menu-symbolic", 16, Gtk.IconLookupFlags.FORCE_SIZE)
         image = Gtk.Image.new_from_pixbuf(pixbuf)
         self.menu_button.add(image)
         self.header_bar.pack_start(self.menu_button)
@@ -193,35 +195,30 @@ class Gtk3App(UI):
             else:
                 icon_lookup_flags = Gtk.IconLookupFlags.GENERIC_FALLBACK
 
-            theme = Gtk.IconTheme.get_default()
+            self.define_icon_type_with_gtk_theme()
 
             for i in self.items_visible_by_categories[category]:
-                if (len(i.icon) > 0):
-                    if (self.icon_not_theme_allow == True):
-                        if (i.icon[0] == "/"):
-                            #Absolute path
-                            try:
-                                pixbuf = GdkPixbuf.Pixbuf.new_from_file(i.icon)
-                            except:
-                                pixbuf = theme.load_icon(   self.icon_fallback,
-                                                            self.icon_view_icons_size,
-                                                            icon_lookup_flags)
-                                logging.info("Error loading icon %s" % i.icon)                   
-                    else:
-                        try:
-                            pixbuf = theme.load_icon(   i.icon,
-                                                        self.icon_view_icons_size,
-                                                        icon_lookup_flags)
-                        except:
-                            pixbuf = theme.load_icon(   self.icon_fallback,
-                                                        self.icon_view_icons_size,
-                                                        icon_lookup_flags)
+                if (i.icon_type == "fix"):
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(i.icon)
+                elif (i.icon_type == "themed"):
+                    pixbuf = self.theme.load_icon(i.icon, self.icon_view_icons_size, icon_lookup_flags)
                 else:
-                    pixbuf = theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
+                    pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
 
                 liststore.append([pixbuf, i.name, i.path])
+
             hbox.add(iconview)
-                
+
+    def define_icon_type_with_gtk_theme(self):
+        for i in self.items_visible:
+            if (i.icon_type == "fix"):
+                if (self.icon_not_theme_allow == False):
+                    i.icon_type = "fallback"
+            elif (i.icon_type == "themed"):
+                if (self.theme.has_icon(i.icon) == False):
+                    i.icon_type = "fallback"
+
+
     def on_item_activated(self, icon_view, tree_path):
         logging.debug("on_item_activated: click activated")
         model = icon_view.get_model()

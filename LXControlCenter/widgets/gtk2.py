@@ -67,6 +67,9 @@ class Gtk2App(UI):
 
         self.action_group = Gtk.ActionGroup("actions")
 
+        #GTK2 specific
+        self.theme = Gtk.icon_theme_get_default()
+
         # Function to launch at startup
         self.generate_view()
         self.build_toolbar()
@@ -203,35 +206,28 @@ class Gtk2App(UI):
             else:
                 icon_lookup_flags = Gtk.ICON_LOOKUP_USE_BUILTIN
 
-            #GTK2 specific
-            theme = Gtk.icon_theme_get_default()
-        
+            self.define_icon_type_with_gtk_theme()
+
             for i in self.items_visible_by_categories[category]:
-                if (len(i.icon) > 0):
-                    if (self.icon_not_theme_allow == True):
-                        if (i.icon[0] == "/"):
-                            #Absolute path
-                            try:
-                                pixbuf = Gtk.gdk.pixbuf_new_from_file(i.icon)
-                            except:
-                                pixbuf = theme.load_icon( self.icon_fallback,
-                                                                                self.icon_view_icons_size,
-                                                                                icon_lookup_flags)
-                                logging.info("Error loading icon %s" % i.icon)                   
-                    else:
-                        try:
-                            pixbuf = theme.load_icon( i.icon,
-                                                                            self.icon_view_icons_size,
-                                                                            icon_lookup_flags)
-                        except:
-                            pixbuf = theme.load_icon( self.icon_fallback,
-                                                                            self.icon_view_icons_size,
-                                                                            icon_lookup_flags)
+                if (i.icon_type == "fix"):
+                    pixbuf = Gtk.gdk.pixbuf_new_from_file(i.icon)
+                elif (i.icon_type == "themed"):
+                    pixbuf = self.theme.load_icon(i.icon, self.icon_view_icons_size, icon_lookup_flags)
                 else:
-                    pixbuf = theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
+                    pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
 
                 liststore.append([pixbuf, i.name, i.path])
+
             hbox.add(iconview)
+
+    def define_icon_type_with_gtk_theme(self):
+        for i in self.items_visible:
+            if (i.icon_type == "fix"):
+                if (self.icon_not_theme_allow == False):
+                    i.icon_type = "fallback"
+            elif (i.icon_type == "themed"):
+                if (self.theme.has_icon(i.icon) == False):
+                    i.icon_type = "fallback"
 
     # GTK2 specific => enable single selection click
     def on_icon_view_selection_changed(self, widget, data=None):
