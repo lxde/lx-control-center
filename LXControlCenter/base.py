@@ -169,6 +169,7 @@ class Main(Utils):
         self.apply_try_exec_test()
         self.apply_no_exec_applications()
         self.apply_module_toolkit()
+        self.apply_items_categories()
 
     def get_args_parameters(self):
         parser = argparse.ArgumentParser(description='Launch LX Control Center')
@@ -363,6 +364,12 @@ class Main(Utils):
                 if (i.module_toolkit != None):
                     if (i.module_toolkit != self.toolkit):
                         i.activate = False
+
+    def apply_items_categories(self):
+        logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
+        for i in self.items:
+            i.category_array = self.categories_triaged
+            i.define_category_from_list()
 
     def desktop_environments_generate(self):
         if self.desktop_environments_setting == ["Auto"]:

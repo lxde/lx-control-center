@@ -82,10 +82,12 @@ class Item(Utils):
         self.comment_original = self.comment
         self.icon_original = self.icon
 
-        self.category = self.define_category_from_list(self.categories_list)
+        self.category = None
         self.version_config = 0.1
         # Check if there are the minimum informations
         self.check_common()
+
+        self.define_category_from_list()
 
     def load_application_from_path(self, path):
         keyfile = self.load_xdgfile(path)
@@ -104,20 +106,22 @@ class Item(Utils):
         self.module_toolkit = keyfile.get("X-LX-Control-Center-Toolkit", group="Desktop Entry", type="string")
         self.check_module()
 
-    def define_category_from_list(self, categories_list):
+    def define_category_from_list(self):
+        logging.debug("define_category_from_list: enter function with categories_list = %s" % self.categories_list)
+        logging.debug("define_category_from_list: enter function with categories_array = %s" % self.categories_array)
         tmp_dict = {}
-        for item in categories_list:
-            if (item in self.categories_array):
-                tmp = self.categories_array[item]
-                if (tmp in tmp_dict):
-                    tmp_dict[tmp] = tmp_dict[tmp] + 1
+        keys = self.categories_array.keys()
+        for item in self.categories_list:
+            if (item in keys):
+                if (item in tmp_dict.keys()):
+                    tmp_dict[item] = tmp_dict[item] + 1
                 else:
-                    tmp_dict[tmp] = 1
-        if (tmp_dict == {}):
-            return _("Other")
+                    tmp_dict[item] = 1
+        if (len(tmp_dict) == 0):
+            self.category = _("Other")
         else:
             max_category = max(tmp_dict.keys(), key=(lambda k: tmp_dict[k]))
-            return max_category
+            self.category = max_category
 
     def check_common(self):
         if (self.name == None):
