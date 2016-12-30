@@ -1,0 +1,9 @@
+{
+    "obconf": {"owner": "user", "title": "Configure Openbox", "icon": "obconf.png"},
+    "lxappearance": {"owner": "user", "title": "Configure theme and icons", "icon": "preferences-desktop-theme.svg"},
+    "pcmanfm --desktop-pref": {"owner": "user", "title": "Change the background", "icon": "preferences-desktop-wallpaper.svg"},
+    "lxrandr": {"owner": "user", "title": "Adjust the screen resolution", "icon": "display.svg"},
+    "xscreensaver-demo": {"owner": "user", "title": "Set up screensaver", "icon": "preferences-desktop-screensaver.svg"},
+    "autohint-onoff": {"owner": "user", "title": "Autohint On/Off", "icon": "preferences-desktop-font.png"},
+    "beesu drakfont": {"owner": "root", "title": "Configure font", "icon": "drakfont.png"}
+}

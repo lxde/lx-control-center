@@ -1,0 +1,16 @@
+{
+    "beesu harddrake2": {"owner": "root", "title": "Find and setup your hardware", "icon": "harddrake-mdk.png"},
+    "beesu XFdrake": {"owner": "root", "title": "Setup your videocard and monitor", "icon": "XFdrake-mdk.png"},
+    "drakkeyboard": {"owner": "root", "title": "Setup your keyboard", "icon": "keyboard-mdk.png"},
+    "fskbsetting": {"owner": "user", "title": "Configure keyboard layout", "icon": "keyboard.svg"},
+    "lxinput": {"owner": "user", "title": "Keyboard and Mouse", "icon": "input-keyboard.png"},
+    "mdvinput": {"owner": "user", "title": "Configure keyboard, mouse and touchpad", "icon": "preferences-desktop-keyboard-shortcuts.svg"},
+    "beesu mousedrake": {"owner": "root", "title": "Setup your mouse", "icon": "mousedrake-mdk.png"},
+    "beesu system-config-printer": {"owner": "root", "title": "Setup printers", "icon": "printer-mcc-mdk.png"},
+    "beesu drakscanner": {"owner": "root", "title": "Setup scanner", "icon": "scannerdrake.png"},
+    "beesu diskdrake": {"owner": "root", "title": "Manage your disks", "icon": "diskdrake_hd.png"},
+    "beesu draksound": {"owner": "root", "title": "Configure soundcard", "icon": "sound.png"},
+    "pavucontrol": {"owner": "root", "title": "Configure sound", "icon": "pavucontrol.svg"},
+    "beesu drakups": {"owner": "root", "title": "Setup UPS", "icon": "drakups-mdk.png"},
+    "xdg-open http://localhost:631/": {"owner": "user", "title": "Manage Printing", "icon": "cups.png"}
+}

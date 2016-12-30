@@ -1,0 +1,177 @@
+* {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+}
+html {
+    background: #FFF url(../../frontend/images/bg.png) repeat-x top;
+    color: #64676A;
+    font-family: "Droid Sans", sans-serif;
+    font-size: 14px;
+}
+body { background: url(../../frontend/images/clouds.png) top right no-repeat }
+.hidden { display: none }
+.logo-back {
+    bottom: 10px;
+    opacity: .6;
+    position: absolute;
+    right: 40px;
+    width: 155px;
+}
+.btn div > p {
+    color: #688200;
+    font-size: 20px;
+    margin: 5px 0 10px 0;
+}
+h2 {
+    color: #4B4B4B;
+    text-shadow: #FFF 1px 1px 0;
+}
+a {
+    color: #294F88;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+}
+a:hover { text-decoration: underline }
+ul { list-style-type: none }
+/* Main Menu */
+#main {
+    color: #4B4B4B;
+    margin: 0;
+    padding-top: 50px;
+    text-shadow: #FFF 1px 1px 0;
+}
+.main_menu {
+    height: 450px;
+    margin: 0 auto 0 auto;
+}
+.main_menu li {
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 130px;
+    margin: 10px;
+    width: 350px;
+}
+.main_menu img {
+    float: left;
+    margin: 10px;
+    padding: 12px;
+}
+/* Container */
+#container { border-top: 1px solid transparent }
+#side {
+    background: -webkit-gradient(linear,0 0,0 100%,from(#6FA1D5),to(#3E73AE));
+    border-right: 1px solid #3E73AE;
+    float: left;
+    position: absolute;
+    height: 99.9%;
+    text-shadow: #2D4B69 1px 1px 0;
+    width: 0;
+}
+#side li {
+    border: 1px;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    float: left;
+    padding-right: 10px;
+    width: 190px;
+    -webkit-transition: all .18s ease;
+}
+#side li:hover { background: rgba(0,0,0,.55) }
+#side li a {
+    background: url(../../frontend/images/arrow-right.gif) right center no-repeat;
+    color: #FFF;
+    float: left;
+    padding: 8px 20px 8px 10px;
+    text-decoration: none;
+    width: 150px;
+    -webkit-transition: all .18s ease;
+}
+#side li:hover a { padding-right: 32px }
+.side_menu {
+    margin: 0;
+    padding: 0;
+}
+#ajax {
+    background: url(../../frontend/images/clouds.png) top right no-repeat;
+    display: block;
+    position: absolute;
+    height: 99.9%;
+    width: 73%;
+    margin-left: 190px;
+    padding: 0 20px;
+}
+::-webkit-scrollbar {
+    border-radius: 1ex;
+    width: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: #6FA1D5 -webkit-gradient(linear,0% 0%, 0% 100%, from(rgba(250,250,250,.1)), to(rgba(180,180,180,.1)));
+    border: 1px solid #3E73AE;
+    border-top: 1px solid #FFF;
+    border-radius: 1ex;
+    margin-right: 10px;
+}
+#ajax ul {
+    float: left;
+    list-style-type: none;
+    margin: 20px 10px 30px 0;
+    overflow: auto;
+    padding: 0 10px 0 20px;
+    width: 95%;
+    height: 80%;
+}
+#ajax li {
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: block;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 4px;
+    padding-left: 32px;
+    -webkit-transition: all .18s ease;
+}
+#ajax li:hover {
+    background-color: rgba(247,247,247,.6);
+    border-color: #BBB;
+    border-radius: 3px;
+    padding-left: 45px;
+}
+footer {
+    bottom: 10px;
+    font-size: 13px;
+    padding-left: 10px;
+    position: absolute;
+}
+.main_menu li img {
+    height: 48px;
+    width: 48px;
+    -webkit-transition: all .15s ease;
+}
+.main_menu li:hover img {
+    height: 70px;
+    width: 70px;
+}
+.button {
+    background: #EFEFEF;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#DFDFDF));
+    border: 1px solid #E4E4E4;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px #888;
+    color: #333;
+    padding: 4px 10px;
+    position: absolute;
+}
+.button:hover {
+    border-color: #CCC;
+    box-shadow: 0 1px 2px #666;
+    text-decoration: none;
+}

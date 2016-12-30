@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <script src="./frontend/js/jquery.min.js"></script>
+    <script src="./frontend/js/jquery.easing.1.3.js"></script>
+    <script src="./frontend/js/advanced.js"></script>
+    <link href="./frontend/css/advanced.css" rel="stylesheet">
+</head>
+<body>
+    <article id="advanced_html">
+        <ul id="advanced_ul">$li_content</ul>
+        <footer>
+            <a href="javascript:showOptions()">$options</a> |
+            <a href="javascript:changeTitle('edit-item')">$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/advanced.svg" class="logo-back">
+    </article>
+    <article id="options_html" class="hidden">
+        <h2>$options</h2>
+        <p>
+            <h4>$mode</h4>
+            <input id="mode" type="radio" name="mode" $input_mode_id> $normal_mode
+            <input type="radio" name="mode" $input_mode> $advanced_mode<br>
+        </p>
+        <p>
+            <h4>$visual</h4>
+            <input id="visual_effects" type="checkbox" name="visual" $input_visual> $nice<br>
+            <small>$note_visual</small>
+        </p>
+        <p><a href="javascript:saveOptions()" class="button">$apply</a></p>
+        <img src="./frontend/images/menu/preferences.svg" class="logo-back">
+    </article>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+    "beesu drakconnect": {"owner": "root", "title": "Network connections", "icon": "drakconnect.png"},
+    "beesu vpnpptp": {"owner": "root", "title": "VPN PPTP/L2TP/OpenL2TP connection setup", "icon": "vpnpptp.png"},
+    "beesu drakproxy": {"owner": "root", "title": "Proxy settings", "icon": "drakproxy-mdk.png"},
+    "beesu system-config-nfs": {"owner": "root", "title": "Setup NFS share", "icon": "system-config-nfs.png"},
+    "beesu system-config-samba": {"owner": "root", "title": "Setup Samba share", "icon": "system-config-samba.png"},
+    "gigolo": {"owner": "user", "title": "Setup remote share connection", "icon": "gtk-network.svg"},
+    "beesu drakfirewall": {"owner": "root", "title": "Set up firewall", "icon": "drakfirewall.png"},
+    "beesu drakgw": {"owner": "root", "title": "Configure Internet share", "icon": "drakgw-mdk.png"},
+    "beesu drakhosts": {"owner": "root", "title": "Configure hostname", "icon": "drakhosts.png"}
+}

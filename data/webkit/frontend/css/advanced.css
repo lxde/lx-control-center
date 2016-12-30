@@ -1,0 +1,102 @@
+* {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+}
+html {
+    background: #FFF url(../../frontend/images/bg.png) repeat-x top;
+    color: #64676A;
+    font-family: "Droid Sans", sans-serif;
+    font-size: 14px;
+}
+body { background: url(../../frontend/images/clouds.png) top right no-repeat }
+.hidden { display: none }
+::-webkit-scrollbar {
+    border-radius: 1ex;
+    width: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: #6FA1D5 -webkit-gradient(linear,0% 0%, 0% 100%, from(rgba(250,250,250,.1)), to(rgba(180,180,180,.1)));
+    border: 1px solid #3E73AE;
+    border-radius: 1ex;
+    border-top: 1px solid #FFF;
+    margin-right: 10px;
+}
+a {
+    color: #294f88;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+}
+a:hover { text-decoration: underline }
+ul { list-style-type: none }
+.logo-back {
+    bottom: 10px;
+    opacity: .6;
+    position: absolute;
+    right: 40px;
+    width: 155px;
+}
+/* Container */
+#container { border-top: 1px solid transparent }
+#advanced_ul {
+    position: absolute;
+    height: 84%;
+    display: block;
+    margin-right: 10px;
+    overflow: auto;
+    padding: 0 10px;
+    background: url(../../frontend/images/clouds.png) top right no-repeat
+}
+.item {
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 4px;
+    margin-left: 45px;
+    padding-left: 32px;
+    width: 85%;
+    -webkit-transition: all .20s ease;
+}
+.item:hover {
+    background-color: rgba(247,247,247,.6);
+    border-color: #BBB;
+    border-radius: 3px;
+    padding-left: 45px;
+}
+#options_html { padding-left: 30px }
+footer {
+    bottom: 10px;
+    font-size: 13px;
+    position: absolute;
+    padding-left: 10px;
+}
+.red {
+    background-color: #CF5050;
+    border: 1px solid #B10C0C;
+    border-radius: 4px;
+}
+.button {
+    background: #EFEFEF;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#DFDFDF));
+    border: 1px solid #E4E4E4;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px #888;
+    color: #333;
+    padding: 4px 10px;
+}
+.button:hover {
+    border-color: #CCC;
+    box-shadow: 0 1px 2px #666;
+    text-decoration: none;
+}

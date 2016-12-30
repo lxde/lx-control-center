@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <script src="./frontend/js/default-faster.js"></script>
+    <link href="./frontend/css/default-faster.css" rel="stylesheet">
+</head>
+<body>
+    <section id="container" class="hidden">
+        <nav id="side">
+            <ul class="side_menu">
+                <li><a href="javascript:changeCategory('x0001x')">$x0001x</a>
+                <li><a href="javascript:changeCategory('x0002x')">$x0002x</a>
+                <li><a href="javascript:changeCategory('x0003x')">$x0003x</a>
+                <li><a href="javascript:changeCategory('x0004x')">$x0004x</a>
+                <li><a href="javascript:changeCategory('x0005x')">$x0005x</a>
+                <li><a href="javascript:changeCategory('x0006x')">$x0006x</a>
+                <li><a href="javascript:setContent('options')">$options</a>
+                <li><a href="javascript:back()">$back</a>
+            </ul>
+        </nav>
+        <div id="ajax"></div>
+    </section>
+
+    <nav id="main">
+        <ul class="main_menu">
+            <li class="btn" onclick="javascript:changeCategory('x0001x')">
+                <img src="./frontend/images/menu/x0001x.svg">
+                <div>
+                    <p>$x0001x</p>
+                    $x0007x<br>
+                    $x0008x<br>
+                    $x0009x
+                </div>
+            <li class="btn" onclick="javascript:changeCategory('x0002x')">
+                <img src="./frontend/images/menu/x0002x.svg">
+                <div>
+                    <p>$x0002x</p>
+                    $x0010x<br>
+                    $x0011x<br>
+                    $x0012x
+                </div>
+            <li class="btn" onclick="javascript:changeCategory('x0003x')">
+                <img src="./frontend/images/menu/x0003x.svg">
+                <div>
+                    <p>$x0003x</p>
+                    $x0013x<br>
+                    $x0014x<br>
+                    $x0015x
+                </div>
+            <li class="btn" onclick="javascript:changeCategory('x0004x')">
+                <img src="./frontend/images/menu/x0004x.svg">
+                <div>
+                    <p>$x0004x</p>
+                    $x0016x<br>
+                    $x0017x<br>
+                    $x0018x
+                </div>
+            <li class="btn" onclick="javascript:changeCategory('x0005x')">
+                <img src="./frontend/images/menu/x0005x.svg">
+                <div>
+                    <p>$x0005x</p>
+                    $x0019x<br>
+                    $x0020x<br>
+                    $x0021x
+                </div>
+            <li class="btn" onclick="javascript:changeCategory('x0006x')">
+                <img src="./frontend/images/menu/x0006x.svg">
+                <div>
+                    <p>$x0006x</p>
+                    $x0022x<br>
+                    $x0023x<br>
+                    $x0024x
+                </div>
+        </ul>
+        <footer><a href="javascript:setContent('options')">$options</a></footer>
+    </nav>
+
+    <article id="x0001x_html" class="hidden">
+        <h2>$x0001x</h2>
+        <ul id="x0001x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0001x.svg" class="logo-back">
+    </article>
+
+    <article id="x0002x_html" class="hidden">
+        <h2>$x0002x</h2>
+        <ul id="x0002x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0002x.svg" class="logo-back">
+    </article>
+
+    <article id="x0003x_html" class="hidden">
+        <h2>$x0003x</h2>
+        <ul id="x0003x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0003x.svg" class="logo-back">
+    </article>
+
+    <article id="x0004x_html" class="hidden">
+        <h2>$x0004x</h2>
+        <ul id="x0004x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0004x.svg" class="logo-back">
+    </article>
+
+    <article id="x0005x_html" class="hidden">
+        <h2>$x0005x</h2>
+        <ul id="x0005x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0005x.svg" class="logo-back">
+    </article>
+
+    <article id="x0006x_html" class="hidden">
+        <h2>$x0006x</h2>
+        <ul id="x0006x_ul"></ul>
+        <footer>
+            <a href='javascript:changeTitle("edit-item")'>$edit_items</a>
+        </footer>
+        <img src="./frontend/images/menu/x0006x.svg" class="logo-back">
+    </article>
+
+    <article id="options_html" class="hidden">
+        <h2>$options</h2>
+        <p>
+            <h4>$mode</h4>
+            <input id="mode" type="radio" name="mode" $input_mode_id> $normal_mode
+            <input type="radio" name="mode" $input_mode> $advanced_mode<br>
+        </p>
+        <p>
+            <h4>$visual</h4>
+            <input id="visual_effects" type="checkbox" name="visual" $input_visual> $nice<br>
+            <small>$note_visual</small>
+        </p>
+        <p><a href="javascript:saveOptions()" class="button">$apply</a></p>
+        <img src="./frontend/images/menu/preferences.svg" class="logo-back">
+    </article>
+    </body>
+</html>

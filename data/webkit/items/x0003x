@@ -1,0 +1,6 @@
+{
+    "beesu drakrpm": {"owner": "root", "title": "Add/Remove programs", "icon": "installremoverpm.png"},
+    "libfm-pref-apps": {"owner": "user", "title": "Set favorite applications", "icon": "graph.svg"},
+    "beesu drakrpm-update": {"owner": "root", "title": "Check system updates", "icon": "MandrivaUpdate.png"},
+    "beesu drakrpm-edit-media": {"owner": "root", "title": "Edit software sources", "icon": "rpmdrake-mdk.png"}
+}

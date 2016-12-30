@@ -1,0 +1,11 @@
+{
+    "beesu drakxservices": {"owner": "root", "title": "Configure system services", "icon": "service-mdk.png"},
+    "lxsession-edit": {"owner": "user", "title": "Desktop Session Settings", "icon": "xfwm4.png"},
+    "lxsession-default-apps": {"owner": "user", "title": "Default applications for LXSession", "icon": "preferences-system-windows.png"},
+    "draklocale": {"owner": "root", "title": "Configure locale", "icon": "localedrake.png"},
+    "drakclock": {"owner": "root", "title": "Configure date and time", "icon": "time-mdk.png"},
+    "beesu drakboot": {"owner": "root", "title": "Configure system boot", "icon": "drakboot-mdk.png"},
+    "beesu draklog": {"owner": "root", "title": "See system logs", "icon": "logdrake-mdk.png"},
+    "beesu /usr/sbin/drakedm": {"owner": "root", "title": "Choosing a display manager", "icon": "drakedm-mdk.png"},
+    "beesu msecgui": {"owner": "root", "title": "Configure system security", "icon": "security-mdk.png"}
+}

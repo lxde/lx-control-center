@@ -1,0 +1,83 @@
+* {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+}
+html {
+    background: #FFF url(../../frontend/images/bg.png) repeat-x top;
+    color: #64676A;
+    font-family: "Droid Sans", sans-serif;
+    font-size: 14px;
+}
+body { background: url(../../frontend/images/clouds.png) top right no-repeat }
+.hidden { display: none }
+a {
+    color: #294f88;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+}
+a:hover { text-decoration: underline }
+ul { list-style-type: none }
+.logo-back {
+    bottom: 10px;
+    opacity: .6;
+    position: absolute;
+    right: 40px;
+    width: 155px;
+}
+/* Container */
+#container { border-top: 1px solid transparent }
+#advanced_ul {
+    display: block;
+    position: absolute;
+    height: 84%;
+    margin-right: 10px;
+    overflow: auto;
+    padding: 0 10px;
+    background: url(../../frontend/images/clouds.png) top right no-repeat
+}
+.item {
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    display: block;
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin-bottom: 4px;
+    margin-left: 45px;
+    padding-left: 32px;
+    width: 85%;
+}
+.item:hover {
+    color: #2D4B69;
+    text-shadow: #EEE 1px 1px 0;
+}
+#options_html { padding-left: 30px }
+footer {
+    bottom: 10px;
+    font-size: 13px;
+    padding-left: 10px;
+    position: absolute;
+}
+.button {
+    background: #EFEFEF;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#DFDFDF));
+    border: 1px solid #E4E4E4;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px #888;
+    color: #333;
+    padding: 4px 10px;
+}
+.button:hover {
+    border-color: #CCC;
+    box-shadow: 0 1px 2px #666;
+    text-decoration: none;
+}

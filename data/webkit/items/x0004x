@@ -1,0 +1,8 @@
+{
+    "beesu drakuser": {"owner": "root", "title": "Add or remove user accounts", "icon": "user-mdk.png"},
+    "beesu drakauth": {"owner": "root", "title": "Authentication", "icon": "drakauth-mdk.png"},
+    "beesu drakguard": {"owner": "root", "title": "Set up Parental Control", "icon": "drakguard.png"},
+    "rmfromsudoers": {"owner": "user", "title": "Deleting a user from /etc/sudoers", "icon": "rmfromsudoers.png"},
+    "add2sudoers": {"owner": "user", "title": "Adding a user to /etc/sudoers", "icon": "add2sudoers.png"},
+    "beesu draksec": {"owner": "root", "title": "Permissions", "icon": "drakperm-mdk.png"}
+}
