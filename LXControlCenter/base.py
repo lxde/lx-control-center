@@ -82,19 +82,16 @@ class Main(Utils):
         self.categories_fixed_default = False
         self.categories_fixed = self.categories_fixed_default
 
-        self.categories_keys_default = {    _("DesktopSettings"):("DesktopSettings"),
-                                            _("HardwareSettings"):("HardwareSettings"),
-                                            _("Printing"):("Printing"),
+        self.categories_keys_default = {    _("DesktopSettings"):("DesktopSettings",),
+                                            _("HardwareSettings"):("HardwareSettings",),
+                                            _("Printing"):("Printing",),
                                             _("System"):("PackageManager","TerminalEmulator"),
                                             _("FileManager"):("FileManager","FileTools","Filesystem"),
-                                            _("Monitor"):("Monitor"),
-                                            _("Security"):("Security"),
-                                            _("Accessibility"):("Accessibility")
+                                            _("Monitor"):("Monitor",),
+                                            _("Security"):("Security",),
+                                            _("Accessibility"):("Accessibility",)
                                         }
         self.categories_keys = self.categories_keys_default
-
-        self.categories_triaged = {}
-        self.categories_triaged_generate()
         
         # UI - View
         self.window_size_w_default = 800
@@ -135,6 +132,9 @@ class Main(Utils):
 
         # Enable log
         self.set_log()
+
+        self.categories_triaged = {}
+        self.categories_triaged_generate()
 
         # Function to launch at startup
         self.load_configuration_file()
@@ -201,7 +201,7 @@ class Main(Utils):
 
         keyfile = self.load_inifile(self.settings_path)
 
-        if (keyfile):
+        if(os.path.exists(self.settings_path)):
             # Configuration
             self.keyword_categories_settings_list = self.load_setting(keyfile, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
             self.desktop_environments_setting = self.load_setting(keyfile, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
@@ -218,8 +218,8 @@ class Main(Utils):
                     tmp_categories_keys = keyfile.options("Categories")
                     for key in tmp_categories_keys:
                         logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
-                        self.categories_keys = self.load_setting(keyfile, "Configuration", key, self.categories_keys_default, "list")
-
+                        self.categories_keys[key] = self.load_setting(keyfile, "Categories", key, self.categories_keys_default, "list")
+                        logging.debug("load_settings: self.categories_keys = %s" % self.categories_keys)
                     self.categories_triaged_generate()
 
             # Path
@@ -485,7 +485,7 @@ class Main(Utils):
 
         if (os.path.exists(home_path) == False):
             logging.debug("save_file: File doesn't exist => create it")
-            file_to_create = open(self.settings_path,'x')
+            file_to_create = open(self.settings_path,'a')
             file_to_create.close()
 
         logging.debug("save_file: Save file on %s" % self.settings_path)
