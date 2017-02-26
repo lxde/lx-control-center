@@ -127,7 +127,7 @@ class Gtk2App(UI):
         model = icon_view.get_model()
         path = model[tree_path][2]
         logging.debug("on_item_activated: path = %s" % path)
-        for i in self.items:
+        for i in self.items_visible:
             logging.debug("on_item_activated: test item path = %s" % i.path)
             if (i.path == path):
                 i.launch()
