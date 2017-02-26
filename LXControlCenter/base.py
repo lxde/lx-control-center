@@ -261,7 +261,6 @@ class Main(Utils):
             logging.debug("load_items_conf: keyfile_item =%s" % keyfile_item)
             for setting in keyfile.options(keyfile_item):
                 logging.debug("load_items_conf: setting =%s" % setting)
-                # TODO Param all the varaible
                 if (setting == "name"):
                     self.items[keyfile_item].name = keyfile.get(keyfile_item, setting)
                     self.items[keyfile_item].changed = True
@@ -345,6 +344,7 @@ class Main(Utils):
                 for r in to_replace:
                     if (self.items[i].filename == r):
                         self.items[i].activate = False
+                        self.items[i].activate_original = False
 
     def apply_desktop_env_sort(self):
         for i in self.items:
@@ -352,12 +352,14 @@ class Main(Utils):
                 for desktop in self.desktop_environments:
                     if (desktop in self.items[i].not_show_in):
                         self.items[i].activate = False
+                        self.items[i].activate_original = False
 
             if (self.items[i].activate == True):
                 if (len(self.items[i].only_show_in) != 0):
                     for desktop in self.desktop_environments:
                         if (desktop not in self.items[i].only_show_in):
                             self.items[i].activate = False
+                            self.items[i].activate_original = False
 
     def apply_try_exec_test(self):
         for i in self.items:
@@ -365,19 +367,23 @@ class Main(Utils):
                 if (self.items[i].try_exec != ""):
                     if (os.path.exists(self.items[i].try_exec) == False):
                         self.items[i].activate = False
+                        self.items[i].activate_original = False
 
     def apply_no_exec_applications(self):
         for i in self.items:
             if (self.items[i].type == "application"):
                 if (self.items[i].execute_command is None):
                         self.items[i].activate = False
+                        self.items[i].activate_original = False
 
     def apply_applications_modules_suport(self):
         for i in self.items:    
             if (self.items[i].type == "module"):
                 self.items[i].activate = self.modules_support
+                self.items[i].activate_original = self.modules_support
             elif (self.items[i].type == "application"):
                 self.items[i].activate = self.applications_support
+                self.items[i].activate_original = self.modules_support
 
     def apply_module_toolkit(self):
         for i in self.items:
@@ -385,6 +391,7 @@ class Main(Utils):
                 if (self.items[i].module_toolkit != None):
                     if (self.items[i].module_toolkit != self.toolkit):
                         self.items[i].activate = False
+                        self.items[i].activate_original = False
 
     def apply_items_categories(self):
         logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)

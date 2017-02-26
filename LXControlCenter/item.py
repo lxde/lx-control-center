@@ -50,6 +50,7 @@ class Item(Utils):
         self.only_show_in = []
         self.not_show_in = []
         self.activate = True
+        self.activate_original = True
         self.changed = False
         self.check = True
 
