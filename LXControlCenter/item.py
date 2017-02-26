@@ -51,6 +51,8 @@ class Item(Utils):
         self.not_show_in = []
         self.activate = True
         self.activate_original = True
+        # TODO Implement
+        self.activate_reason = []
         self.changed = False
         self.check = True
 

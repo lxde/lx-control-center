@@ -265,7 +265,17 @@ class Gtk2App(UI):
         path = model[tree_path][2]
         logging.debug("on_item_edit_activated: path = %s" % path)
         #TODO Create widget for modification
+        self.item_edit_widget(path)
         icon_view.unselect_all()
+
+    def item_edit_widget(self, item_path):
+        # TODO Input Text for name
+        # TODO Input Text for comment
+        # TODO Icon image for icon
+        # TODO Checkbox for activate
+        # TODO reason for activate state
+        # TODO Button save
+        # TODO Button cancel
 
     def on_resize(self, widget, data=None):
         self.on_resize_common(self.window.get_size()[0], self.window.get_size()[1])
