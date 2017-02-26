@@ -146,16 +146,13 @@ class UI(Main):
         self.content_ui_vbox.add(module_class.main_box)
 
     def on_item_activated_common(self, path):
-        # TODO Simplify by launch directly (instead of a loop), since we have self.items[i]
-        for i in self.items:
-            logging.debug("on_item_activated: test item path = %s" % self.items[i].path)
-            if (self.items[i].path == path):
-                self.items[i].launch()
-                if (self.items[i].type == "module"):
-                    self.mode = "module-UI"
-                    self.module_active(self.items[i])
-                    self.draw_ui()
-                break
+        item_to_launch = self.items[path]
+        if (self.items[path].type == "module"):
+            self.mode = "module-UI"
+            self.module_active(self.items[path])
+            self.draw_ui()
+        else:
+            self.items[path].launch()
 
     def draw_ui(self):
         pass
