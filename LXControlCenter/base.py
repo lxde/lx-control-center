@@ -157,12 +157,14 @@ class Main(Utils):
         self.print_debug()
 
     def triage_items(self):
-        self.apply_applications_modules_suport()
-        self.apply_desktop_env_sort()
-        self.apply_try_exec_test()
-        self.apply_no_exec_applications()
-        self.apply_module_toolkit()
-        self.apply_items_categories()
+        for i in self.items:
+            self.apply_applications_modules_suport(i)
+            self.apply_desktop_env_sort(i)
+            self.apply_try_exec_test(i)
+            self.apply_no_exec_applications(i)
+            self.apply_module_toolkit(i)
+            self.apply_items_categories(i)
+
         self.load_items_conf()
 
     def get_args_parameters(self):
@@ -346,58 +348,52 @@ class Main(Utils):
                         self.items[i].activate = False
                         self.items[i].activate_original = False
 
-    def apply_desktop_env_sort(self):
-        for i in self.items:
-            if (len(self.items[i].not_show_in) != 0):
+    def apply_desktop_env_sort(self, i):
+        if (len(self.items[i].not_show_in) != 0):
+            for desktop in self.desktop_environments:
+                if (desktop in self.items[i].not_show_in):
+                    self.items[i].activate = False
+                    self.items[i].activate_original = False
+
+        if (self.items[i].activate == True):
+            if (len(self.items[i].only_show_in) != 0):
                 for desktop in self.desktop_environments:
-                    if (desktop in self.items[i].not_show_in):
+                    if (desktop not in self.items[i].only_show_in):
                         self.items[i].activate = False
                         self.items[i].activate_original = False
 
-            if (self.items[i].activate == True):
-                if (len(self.items[i].only_show_in) != 0):
-                    for desktop in self.desktop_environments:
-                        if (desktop not in self.items[i].only_show_in):
-                            self.items[i].activate = False
-                            self.items[i].activate_original = False
+    def apply_try_exec_test(self, i):
+        if (self.items[i].type == "application"):
+            if (self.items[i].try_exec != ""):
+                if (os.path.exists(self.items[i].try_exec) == False):
+                    self.items[i].activate = False
+                    self.items[i].activate_original = False
 
-    def apply_try_exec_test(self):
-        for i in self.items:
-            if (self.items[i].type == "application"):
-                if (self.items[i].try_exec != ""):
-                    if (os.path.exists(self.items[i].try_exec) == False):
-                        self.items[i].activate = False
-                        self.items[i].activate_original = False
+    def apply_no_exec_applications(self, i):
+        if (self.items[i].type == "application"):
+            if (self.items[i].execute_command is None):
+                    self.items[i].activate = False
+                    self.items[i].activate_original = False
 
-    def apply_no_exec_applications(self):
-        for i in self.items:
-            if (self.items[i].type == "application"):
-                if (self.items[i].execute_command is None):
-                        self.items[i].activate = False
-                        self.items[i].activate_original = False
+    def apply_applications_modules_suport(self, i):
+        if (self.items[i].type == "module"):
+            self.items[i].activate = self.modules_support
+            self.items[i].activate_original = self.modules_support
+        elif (self.items[i].type == "application"):
+            self.items[i].activate = self.applications_support
+            self.items[i].activate_original = self.modules_support
 
-    def apply_applications_modules_suport(self):
-        for i in self.items:    
-            if (self.items[i].type == "module"):
-                self.items[i].activate = self.modules_support
-                self.items[i].activate_original = self.modules_support
-            elif (self.items[i].type == "application"):
-                self.items[i].activate = self.applications_support
-                self.items[i].activate_original = self.modules_support
+    def apply_module_toolkit(self, i):
+        if (self.items[i].type == "module"):
+            if (self.items[i].module_toolkit != None):
+                if (self.items[i].module_toolkit != self.toolkit):
+                    self.items[i].activate = False
+                    self.items[i].activate_original = False
 
-    def apply_module_toolkit(self):
-        for i in self.items:
-            if (self.items[i].type == "module"):
-                if (self.items[i].module_toolkit != None):
-                    if (self.items[i].module_toolkit != self.toolkit):
-                        self.items[i].activate = False
-                        self.items[i].activate_original = False
-
-    def apply_items_categories(self):
+    def apply_items_categories(self, i):
         logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
-        for i in self.items:
-            self.items[i].category_array = self.categories_triaged
-            self.items[i].define_category_from_list()
+        self.items[i].category_array = self.categories_triaged
+        self.items[i].define_category_from_list()
 
     def desktop_environments_generate(self):
         if self.desktop_environments_setting == ["Auto"]:
