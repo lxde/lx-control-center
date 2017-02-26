@@ -41,8 +41,10 @@ class Main(Utils):
         self.settings_path = None
         self.loglevel_args = None
         self.logfile_args = None
-        # TODO Use a dict {"path": item} for fast searching
-        self.items = []
+
+        self.items = {}
+        self.items_conf_path = None
+
         self.desktop_environments = []
         self.trigger_save_settings_file = False
         self.module_activated = None
@@ -142,10 +144,14 @@ class Main(Utils):
 
         self.load_all_applications()
         self.load_all_modules()
+
         self.desktop_environments_generate()
 
         # Desactivate items
         self.triage_items()
+
+        # Load specific item conf
+        self.load_items_conf()
 
         # Debug if enable
         self.print_debug()
@@ -157,6 +163,7 @@ class Main(Utils):
         self.apply_no_exec_applications()
         self.apply_module_toolkit()
         self.apply_items_categories()
+        self.load_items_conf()
 
     def get_args_parameters(self):
         parser = argparse.ArgumentParser(description='Launch LX Control Center')
@@ -239,6 +246,35 @@ class Main(Utils):
             self.view_mode = self.load_setting(keyfile, "UI", "view_mode", self.view_mode_default, "string")
             self.view_visual_effects = self.load_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
 
+    def load_items_conf(self):
+        config_dirs = BaseDirectory.xdg_config_dirs
+
+        for path in config_dirs:
+            test_path = os.path.join(path,"lx-control-center","items.conf")
+            if(os.path.exists(test_path)):
+                self.items_conf_path = test_path
+                break
+
+        keyfile = self.load_inifile(self.items_conf_path)
+
+        for keyfile_item in keyfile.sections():
+            logging.debug("load_items_conf: keyfile_item =%s" % keyfile_item)
+            for setting in keyfile.options(keyfile_item):
+                logging.debug("load_items_conf: setting =%s" % setting)
+                # TODO Param all the varaible
+                if (setting == "name"):
+                    self.items[keyfile_item].name = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].changed = True
+                elif (setting == "comment"):
+                    self.items[keyfile_item].comment = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].changed = True
+                elif (setting == "icon"):
+                    self.items[keyfile_item].icon = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].changed = True
+                elif (setting == "activate"):
+                    self.items[keyfile_item].activate = keyfile.getboolean(keyfile_item, setting)
+                    self.items[keyfile_item].changed = True
+
     def list_all_applications_from_dirs(self):
         """ List all applications from applications directories"""
         logging.debug("list_all_applications_from_dirs: enter function")
@@ -273,7 +309,7 @@ class Main(Utils):
             item = Item(self.categories_triaged)
             item.load_application_from_path(i)
             if (item.check == True):
-                self.items.append(item)
+                self.items[item.path] = item
 
     def list_all_modules_from_dirs(self):
         return_list = []
@@ -302,59 +338,59 @@ class Main(Utils):
             item = Item(self.categories_triaged)
             item.load_module_from_path(i)
             if (item.check == True):
-                self.items.append(item)
+                self.items[item.path] = item
 
             to_replace = item.module_replace_application
             for i in self.items:
                 for r in to_replace:
-                    if (i.filename == r):
-                        i.activate = False
+                    if (self.items[i].filename == r):
+                        self.items[i].activate = False
 
     def apply_desktop_env_sort(self):
         for i in self.items:
-            if (len(i.not_show_in) != 0):
+            if (len(self.items[i].not_show_in) != 0):
                 for desktop in self.desktop_environments:
-                    if (desktop in i.not_show_in):
-                        i.activate = False
+                    if (desktop in self.items[i].not_show_in):
+                        self.items[i].activate = False
 
-            if (i.activate == True):
-                if (len(i.only_show_in) != 0):
+            if (self.items[i].activate == True):
+                if (len(self.items[i].only_show_in) != 0):
                     for desktop in self.desktop_environments:
-                        if (desktop not in i.only_show_in):
-                            i.activate = False
+                        if (desktop not in self.items[i].only_show_in):
+                            self.items[i].activate = False
 
     def apply_try_exec_test(self):
         for i in self.items:
-            if (i.type == "application"):
-                if (i.try_exec != ""):
-                    if (os.path.exists(i.try_exec) == False):
-                        i.activate = False
+            if (self.items[i].type == "application"):
+                if (self.items[i].try_exec != ""):
+                    if (os.path.exists(self.items[i].try_exec) == False):
+                        self.items[i].activate = False
 
     def apply_no_exec_applications(self):
         for i in self.items:
-            if (i.type == "application"):
-                if (i.execute_command is None):
-                        i.activate = False
+            if (self.items[i].type == "application"):
+                if (self.items[i].execute_command is None):
+                        self.items[i].activate = False
 
     def apply_applications_modules_suport(self):
         for i in self.items:    
-            if (i.type == "module"):
-                i.activate = self.modules_support
-            elif (i.type == "application"):
-                i.activate = self.applications_support
+            if (self.items[i].type == "module"):
+                self.items[i].activate = self.modules_support
+            elif (self.items[i].type == "application"):
+                self.items[i].activate = self.applications_support
 
     def apply_module_toolkit(self):
         for i in self.items:
-            if (i.type == "module"):
-                if (i.module_toolkit != None):
-                    if (i.module_toolkit != self.toolkit):
-                        i.activate = False
+            if (self.items[i].type == "module"):
+                if (self.items[i].module_toolkit != None):
+                    if (self.items[i].module_toolkit != self.toolkit):
+                        self.items[i].activate = False
 
     def apply_items_categories(self):
         logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
         for i in self.items:
-            i.category_array = self.categories_triaged
-            i.define_category_from_list()
+            self.items[i].category_array = self.categories_triaged
+            self.items[i].define_category_from_list()
 
     def desktop_environments_generate(self):
         if self.desktop_environments_setting == ["Auto"]:
@@ -473,6 +509,7 @@ class Main(Utils):
                     self.trigger_save_settings_file = True
 
     def save_file(self, keyfile):
+        #TODO more generic, for items_conf also
         dir_path = os.path.join(os.path.expanduser('~'), ".config","lx-control-center")
         home_path = os.path.join(dir_path, "settings.conf")
 
@@ -521,18 +558,18 @@ class Main(Utils):
         logging.debug("self.desktop_environments : %s" % self.desktop_environments)
         logging.debug("Print items")
         for i in self.items:
-            logging.debug("Item name : %s" % i.name)
-            logging.debug("Item filename : %s" % i.filename)
-            logging.debug("Item path : %s" % i.path)
-            logging.debug("Item category : %s" % i.category)
-            logging.debug("Item icon : %s" % i.icon)
-            logging.debug("Item only_show_in : %s" % i.only_show_in)
-            logging.debug("Item not_show_in : %s" % i.not_show_in)
-            logging.debug("Item execute : %s" % i.execute_command)
-            logging.debug("Item activate : %s" % i.activate)
-            logging.debug("Item changed : %s" % i.changed)
-            logging.debug("Item check : %s" % i.check)
-            logging.debug("Item module_replace_application : %s" % i.module_replace_application)
-            logging.debug("Item module_toolkit : %s" % i.module_toolkit)
+            logging.debug("Item name : %s" % self.items[i].name)
+            logging.debug("Item filename : %s" % self.items[i].filename)
+            logging.debug("Item path : %s" % self.items[i].path)
+            logging.debug("Item category : %s" % self.items[i].category)
+            logging.debug("Item icon : %s" % self.items[i].icon)
+            logging.debug("Item only_show_in : %s" % self.items[i].only_show_in)
+            logging.debug("Item not_show_in : %s" % self.items[i].not_show_in)
+            logging.debug("Item execute : %s" % self.items[i].execute_command)
+            logging.debug("Item activate : %s" % self.items[i].activate)
+            logging.debug("Item changed : %s" % self.items[i].changed)
+            logging.debug("Item check : %s" % self.items[i].check)
+            logging.debug("Item module_replace_application : %s" % self.items[i].module_replace_application)
+            logging.debug("Item module_toolkit : %s" % self.items[i].module_toolkit)
             logging.debug("=================")
 

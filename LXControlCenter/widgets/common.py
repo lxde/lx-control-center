@@ -64,9 +64,9 @@ class UI(Main):
         logging.debug("items_visible_generate: enter function")
         self.items_visible = []
         for i in self.items:
-            if (i.activate == True):
-                logging.debug("items_visible_generate: append %s in items_visible_generate" % i.path)
-                self.items_visible.append(i)
+            if (self.items[i].activate == True):
+                logging.debug("items_visible_generate: append %s in items_visible_generate" % self.items[i].path)
+                self.items_visible.append(self.items[i])
 
     def items_visible_by_categories_generate(self):
         logging.debug("items_visible_by_categories_generate: enter function")
@@ -128,13 +128,14 @@ class UI(Main):
         self.content_ui_vbox.add(module_class.main_box)
 
     def on_item_activated_common(self, path):
+        # Simplify by launch directly (instead of a loop), since we have self.items[i]
         for i in self.items:
-            logging.debug("on_item_activated: test item path = %s" % i.path)
-            if (i.path == path):
-                i.launch()
-                if (i.type == "module"):
+            logging.debug("on_item_activated: test item path = %s" % self.items[i].path)
+            if (self.items[i].path == path):
+                self.items[i].launch()
+                if (self.items[i].type == "module"):
                     self.mode = "module-UI"
-                    self.module_active(i)
+                    self.module_active(self.items[i])
                     self.draw_ui()
                 break
 
