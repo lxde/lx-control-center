@@ -454,7 +454,23 @@ class Main(Utils):
         self.save_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects, self.view_visual_effects_default, "boolean")
 
         if (self.trigger_save_settings_file == True):
-            self.save_file(keyfile)
+            self.save_file(keyfile, "settings")
+            self.trigger_save_settings_file = False
+
+        # items.conf
+        keyfile_items = self.load_inifile(self.items_conf_path)
+        logging.debug("save_settings: loading %s as a keyfile_items" % self.items_conf_path)
+
+        for i in self.items:
+            if (self.items[i].changed == True):
+                self.save_setting(keyfile_items, self.items[i].path, "name", self.items[i].name, self.items[i].name_original, "generic")
+                self.save_setting(keyfile_items, self.items[i].path, "icon", self.items[i].icon, self.items[i].icon_original, "generic")
+                self.save_setting(keyfile_items, self.items[i].path, "comment", self.items[i].comment, self.items[i].comment_original, "generic")
+                self.save_setting(keyfile_items, self.items[i].path, "activate", self.items[i].activate, self.items[i].activate_original, "boolean")
+
+        if (self.trigger_save_settings_file == True):
+            self.save_file(keyfile_items, "items")
+            self.trigger_save_settings_file = False
 
     def save_setting(self, keyfile, group, key, variable, default, type_to_set):
         logging.debug("save_setting: group, key and variable => %s, %s, %s" %(group, key, variable))
@@ -464,6 +480,7 @@ class Main(Utils):
                 logging.debug("save_setting: variable == default, existing key, removing")
                 keyfile.remove_option(group, key)
                 self.trigger_save_settings_file = True
+            # TODO Remove section if it's empty
         else:
             if (keyfile.has_section(group) == False):
                 keyfile.add_section(group)
@@ -515,10 +532,10 @@ class Main(Utils):
                     keyfile.set(group, key, str(variable))
                     self.trigger_save_settings_file = True
 
-    def save_file(self, keyfile):
-        #TODO more generic, for items_conf also
+    def save_file(self, keyfile, settings_type):
         dir_path = os.path.join(os.path.expanduser('~'), ".config","lx-control-center")
-        home_path = os.path.join(dir_path, "settings.conf")
+        file_path = settings_type + ".conf"
+        home_path = os.path.join(dir_path, file_path)
 
         if (self.settings_path != home_path):
             self.settings_path = home_path
@@ -529,11 +546,11 @@ class Main(Utils):
 
         if (os.path.exists(home_path) == False):
             logging.debug("save_file: File doesn't exist => create it")
-            file_to_create = open(self.settings_path,'a')
+            file_to_create = open(home_path,'a')
             file_to_create.close()
 
-        logging.debug("save_file: Save file on %s" % self.settings_path)
-        file_to_save = open(self.settings_path,'w')
+        logging.debug("save_file: Save file on %s" % home_path)
+        file_to_save = open(home_path,'w')
         keyfile.write(file_to_save)
         file_to_save.close()
 
