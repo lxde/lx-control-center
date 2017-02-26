@@ -166,13 +166,22 @@ class Gtk2App(UI):
         self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, "Configuration", "applications_support", 1)
 
     def build_edit_view(self):
-        #TODO
         self.clean_main_view()
+        self.build_generic_icon_view("all")
 
     def build_icon_view(self):
         self.clean_main_view()
+        self.build_generic_icon_view("visible")
 
-        for category in self.items_visible_by_categories:
+    def build_generic_icon_view(self, type_view):
+
+        items_to_draw = self.items_visible_by_categories
+
+        if (type_view == "all"):
+            items_to_draw = self.items_by_categories
+
+        for category in items_to_draw:
+            logging.debug("build_generic_icon_view - category loop: %s" % category)
             frame = Gtk.Frame(label=category)
             self.content_ui_vbox.add(frame)
 
@@ -208,30 +217,39 @@ class Gtk2App(UI):
 
             self.define_icon_type_with_gtk_theme()
 
-            for i in self.items_visible_by_categories[category]:
+            for i in items_to_draw[category]:
+                logging.debug("build_generic_icon_view - item loop: %s" % i.path)
                 if (i.icon_type == "fix"):
                     pixbuf = Gtk.gdk.pixbuf_new_from_file(i.icon)
                 elif (i.icon_type == "themed"):
-                    pixbuf = self.theme.load_icon(i.icon, self.icon_view_icons_size, icon_lookup_flags)
+                    try:
+                        pixbuf = self.theme.load_icon(i.icon, self.icon_view_icons_size, icon_lookup_flags)
+                    except:
+                        pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
                 else:
                     pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
+                logging.debug("build_generic_icon_view - item add: %s - %s" % (i.name, i.path))
+
+                # TODO grey icon if activate == False
 
                 liststore.append([pixbuf, i.name, i.path])
 
             hbox.add(iconview)
 
     def define_icon_type_with_gtk_theme(self):
-        for i in self.items_visible:
-            if (i.icon_type == "fix"):
+        for i in self.items:
+            if (self.items[i].icon_type == "fix"):
                 if (self.icon_not_theme_allow == False):
-                    i.icon_type = "fallback"
-            elif (i.icon_type == "themed"):
-                if (self.theme.has_icon(i.icon) == False):
-                    i.icon_type = "fallback"
+                    self.items[i].icon_type = "fallback"
+            elif (self.items[i].icon_type == "themed"):
+                if (self.theme.has_icon(self.items[i].icon) == False):
+                    self.items[i].icon_type = "fallback"
 
     # GTK2 specific => enable single selection click
     def on_icon_view_selection_changed(self, widget, data=None):
         self.on_item_activated(widget, widget.get_selected_items()[0])
+    def on_edit_view_selection_changed(self, widget, data=None):
+        self.on_item_edit_activated(widget, widget.get_selected_items()[0])
 
     def on_item_activated(self, icon_view, tree_path):
         logging.debug("on_item_activated: click activated")
@@ -239,6 +257,14 @@ class Gtk2App(UI):
         path = model[tree_path][2]
         logging.debug("on_item_activated: path = %s" % path)
         self.on_item_activated_common(path)
+        icon_view.unselect_all()
+
+    def on_item_edit_activated(self, icon_view, tree_path):
+        logging.debug("on_item_edit_activated: click activated")
+        model = icon_view.get_model()
+        path = model[tree_path][2]
+        logging.debug("on_item_edit_activated: path = %s" % path)
+        #TODO Create widget for modification
         icon_view.unselect_all()
 
     def on_resize(self, widget, data=None):

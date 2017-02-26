@@ -49,7 +49,7 @@
   - python3
   - pyqt5
 
- * Webkit (lx-control-center-webkitgtk2
+ * Webkit (lx-control-center-webkitgtk2)
   - python2
   - pygtk
   - python-webkit

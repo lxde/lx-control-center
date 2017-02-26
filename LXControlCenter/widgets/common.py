@@ -32,6 +32,9 @@ class UI(Main):
         # Items visible, triage by categories
         self.items_visible_by_categories = {}
 
+        # Items, triage by categories
+        self.items_by_categories = {}
+
         # Different mode of display the UI : 
         #  - main-UI => Icons view
         #  - pref-UI => Preferences view
@@ -58,6 +61,7 @@ class UI(Main):
         self.triage_items()
         self.items_visible_generate()
         self.items_visible_by_categories_generate()
+        self.items_by_categories_generate()
         self.icon_view_columns_generate()
 
     def items_visible_generate(self):
@@ -73,13 +77,27 @@ class UI(Main):
         self.items_visible_by_categories = {}
         non_order_dict = {}
         for i in self.items_visible:
-                if (i.category not in non_order_dict):
-                    empty_list = []
-                    non_order_dict[i.category] = empty_list
+            if (i.category not in non_order_dict):
+                empty_list = []
+                non_order_dict[i.category] = empty_list
 
-                non_order_dict[i.category].append(i)
+            non_order_dict[i.category].append(i)
 
         self.items_visible_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
+
+    def items_by_categories_generate(self):
+        # TODO Factorise with items_visble_by_categories_generate
+        logging.debug("items_by_categories_generate: enter function")
+        self.items_by_categories = {}
+        non_order_dict = {}
+        for i in self.items:
+            if (self.items[i].category not in non_order_dict):
+                empty_list = []
+                non_order_dict[self.items[i].category] = empty_list
+
+            non_order_dict[self.items[i].category].append(self.items[i])
+
+        self.items_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
 
     #TODO Sorting items inside categories
 
@@ -128,7 +146,7 @@ class UI(Main):
         self.content_ui_vbox.add(module_class.main_box)
 
     def on_item_activated_common(self, path):
-        # Simplify by launch directly (instead of a loop), since we have self.items[i]
+        # TODO Simplify by launch directly (instead of a loop), since we have self.items[i]
         for i in self.items:
             logging.debug("on_item_activated: test item path = %s" % self.items[i].path)
             if (self.items[i].path == path):
