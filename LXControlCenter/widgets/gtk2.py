@@ -199,7 +199,10 @@ class Gtk2App(UI):
             iconview.set_selection_mode(Gtk.SELECTION_SINGLE)
 
             #GTK2 spcific => enable single selection click
-            iconview.connect("selection_changed", self.on_icon_view_selection_changed)
+            if (self.mode == "main-UI"):
+                iconview.connect("selection_changed", self.on_icon_view_selection_changed)
+            elif (self.mode == "edit-UI"):
+                iconview.connect("selection_changed", self.on_edit_view_selection_changed)
 
             logging.debug("build_UI: get_item_width = %s" % iconview.get_item_width())
             logging.debug("build_UI: get_spacing = %s" % iconview.get_spacing())
@@ -252,9 +255,12 @@ class Gtk2App(UI):
 
     # GTK2 specific => enable single selection click
     def on_icon_view_selection_changed(self, widget, data=None):
-        self.on_item_activated(widget, widget.get_selected_items()[0])
+        if len(widget.get_selected_items()) == 1:
+            self.on_item_activated(widget, widget.get_selected_items()[0])
     def on_edit_view_selection_changed(self, widget, data=None):
-        self.on_item_edit_activated(widget, widget.get_selected_items()[0])
+        logging.debug("on_edit_view_selection_changed - selected: %s: " % widget.get_selected_items())
+        if len(widget.get_selected_items()) == 1:
+            self.on_item_edit_activated(widget, widget.get_selected_items()[0])
 
     def on_item_activated(self, icon_view, tree_path):
         logging.debug("on_item_activated: click activated")
