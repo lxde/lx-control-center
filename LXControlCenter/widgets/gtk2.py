@@ -230,9 +230,14 @@ class Gtk2App(UI):
                     pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
                 logging.debug("build_generic_icon_view - item add: %s - %s" % (i.name, i.path))
 
-                # TODO grey icon if activate == False
+                display_name = i.name
 
-                liststore.append([pixbuf, i.name, i.path])
+                if (i.activate == False):
+                    logging.debug("build_generic_icon_view - Grey inactive icons: %s - %s" % (i.name, i.path))
+                    pixbuf.saturate_and_pixelate(pixbuf,0.1, True)
+                    display_name = _("(Inactive) - ") + i.name
+
+                liststore.append([pixbuf, display_name, i.path])
 
             hbox.add(iconview)
 
@@ -276,6 +281,7 @@ class Gtk2App(UI):
         # TODO reason for activate state
         # TODO Button save
         # TODO Button cancel
+        pass
 
     def on_resize(self, widget, data=None):
         self.on_resize_common(self.window.get_size()[0], self.window.get_size()[1])
