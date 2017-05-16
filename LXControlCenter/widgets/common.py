@@ -133,7 +133,6 @@ class UI(Main):
         logging.debug("on_edit_mode_menu_click: Clicked")
         self.mode = "edit-UI"
         self.draw_ui()
-        pass
 
     def on_pref_mode_menu_click(self, widget, data=None):
         logging.debug("on_pref_mode_menu_click: Clicked")
@@ -159,10 +158,15 @@ class UI(Main):
 
     def on_resize_common(self, w, h):
         if (self.mode == "main-UI"):
-            logging.debug("on_resize: resize activated")
-            self.window_size_w = w
-            self.window_size_h = h
-            tmp_icons_col = self.icon_view_columns
-            self.icon_view_columns_generate()
-            if (self.icon_view_columns != tmp_icons_col):
-                self.draw_ui()
+            self.on_resize_function(w, h)
+        elif (self.mode == "edit-UI"):
+            self.on_resize_function(w, h)
+
+    def on_resize_function(self, w, h):
+        logging.debug("on_resize: resize activated")
+        self.window_size_w = w
+        self.window_size_h = h
+        tmp_icons_col = self.icon_view_columns
+        self.icon_view_columns_generate()
+        if (self.icon_view_columns != tmp_icons_col):
+            self.draw_ui()
