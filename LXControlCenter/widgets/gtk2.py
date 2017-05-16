@@ -96,6 +96,10 @@ class Gtk2App(UI):
             self.filem_pref.set_sensitive(True)
             self.filem_edit.set_sensitive(True)
             self.build_module_view()
+        elif (self.mode == "edit-item-UI"):
+            self.filem_icons.set_sensitive(True)
+            self.filem_pref.set_sensitive(True)
+            self.filem_edit.set_sensitive(True)
         self.window.show_all()
 
     def build_toolbar(self):
@@ -275,19 +279,86 @@ class Gtk2App(UI):
         model = icon_view.get_model()
         path = model[tree_path][2]
         logging.debug("on_item_edit_activated: path = %s" % path)
-        #TODO Create widget for modification
-        self.item_edit_widget(path)
+        self.build_edit_item_view(path)
         icon_view.unselect_all()
 
-    def item_edit_widget(self, item_path):
-        # TODO Input Text for name
-        # TODO Input Text for comment
+    def build_edit_item_view(self, path):
         # TODO Icon image for icon
-        # TODO Checkbox for activate
         # TODO reason for activate state
-        # TODO Button save
-        # TODO Button cancel
-        pass
+        self.clean_main_view()
+        self.mode = "edit-item-UI"
+        self.item_to_save = self.items[path]
+
+        box_name = Gtk.HBox()
+        label_name = Gtk.Label()
+        label_name.set_text(_("Name"))
+        box_name.pack_start(label_name, False, True, 3)
+        self.entry_name = Gtk.Entry()
+        self.entry_name.set_text(self.item_to_save.name)
+        box_name.pack_start(self.entry_name, True, True, 3)
+        self.content_ui_vbox.pack_start(box_name, False, True, 3)
+
+        box_comment = Gtk.HBox()
+        label_comment = Gtk.Label()
+        label_comment.set_text(_("Comment"))
+        box_comment.pack_start(label_comment, False, True, 3)
+        self.entry_comment = Gtk.Entry()
+        self.entry_comment.set_text(self.item_to_save.comment)
+        box_comment.pack_start(self.entry_comment, True, True, 3)
+        self.content_ui_vbox.pack_start(box_comment, False, True, 3)
+
+        box_activate = Gtk.HBox()
+        self.check_activate = Gtk.CheckButton()
+        self.check_activate.set_label(_("Activate ?"))
+        self.check_activate.set_active(self.item_to_save.activate)
+        box_activate.add(self.check_activate)
+        self.content_ui_vbox.pack_start(box_activate, False, True, 0)
+
+        box_buttons = Gtk.HBox()
+        save_button = Gtk.Button()
+        save_button.set_label(_("Save"))
+        save_button.connect("clicked", self.on_edit_item_save)
+        box_buttons.add(save_button)
+        default_button = Gtk.Button()
+        default_button.set_label(_("Set to default values"))
+        default_button.connect("clicked", self.on_edit_item_default)
+        box_buttons.add(default_button)
+        cancel_button = Gtk.Button()
+        cancel_button.set_label(_("Cancel"))
+        cancel_button.connect("clicked", self.on_edit_item_cancel)
+        box_buttons.add(cancel_button)
+        self.content_ui_vbox.pack_start(box_buttons, False, True, 0)
+
+        self.draw_ui()
+
+    def on_edit_item_save(self, button):
+        if (self.item_to_save.name != self.entry_name.get_text()):
+            self.item_to_save.name = self.entry_name.get_text()
+            self.item_to_save.changed = True
+
+        if (self.item_to_save.comment != self.entry_comment.get_text()):
+            self.item_to_save.comment = self.entry_comment.get_text()
+            self.item_to_save.changed = True
+
+        if (self.item_to_save.activate != self.check_activate.get_active()):
+            self.item_to_save.activate = self.check_activate.get_active()
+            self.item_to_save.changed = True
+
+        self.mode = "edit-UI"
+        self.build_edit_view()
+        self.draw_ui()
+
+    def on_edit_item_cancel(self, button):
+        self.mode = "edit-UI"
+        self.build_edit_view()
+        self.draw_ui()
+
+    def on_edit_item_default(self, button):
+        self.entry_name.set_text(self.item_to_save.name_original)
+        #self.item_to_save.icon = self.item_to_save.icon_original
+        self.entry_comment.set_text(self.item_to_save.comment_original)
+        self.check_activate.set_active(self.item_to_save.activate_original)
+        self.item_to_save.changed = True
 
     def on_resize(self, widget, data=None):
         self.on_resize_common(self.window.get_size()[0], self.window.get_size()[1])
