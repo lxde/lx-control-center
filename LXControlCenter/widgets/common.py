@@ -39,6 +39,7 @@ class UI(Main):
         #  - main-UI => Icons view
         #  - pref-UI => Preferences view
         #  - edit-UI => Edit mode of the icons view
+        #  - edit-item-UI => Edit an item, after clicking on a icon of edit mode
         #  - category-UI => View of only 1 category 
         #  - module-UI ==> Display the current module loaded
         self.mode = "main-UI"
