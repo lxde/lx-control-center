@@ -314,6 +314,20 @@ class Gtk2App(UI):
         box_activate.add(self.check_activate)
         self.content_ui_vbox.pack_start(box_activate, False, True, 0)
 
+        if (self.item_to_save.deactivate_reasons != []):
+            box_deactivate_reasons = Gtk.HBox()
+            deactivate_reasons_title = Gtk.Label()
+            deactivate_reasons_title.set_text(_("Reason(s) for deactivation"))
+            box_deactivate_reasons.add(deactivate_reasons_title)
+
+            deactivate_reasons_label = Gtk.Label()
+            label_to_display = ""
+            for label in self.item_to_save.deactivate_reasons:
+                label_to_display = label_to_display + label + "\n"
+            deactivate_reasons_label.set_text(label_to_display)
+            box_deactivate_reasons.add(deactivate_reasons_label)
+            self.content_ui_vbox.pack_start(box_deactivate_reasons, False, True, 3)
+
         box_buttons = Gtk.HBox()
         save_button = Gtk.Button()
         save_button.set_label(_("Save"))
