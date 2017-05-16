@@ -51,8 +51,7 @@ class Item(Utils):
         self.not_show_in = []
         self.activate = True
         self.activate_original = True
-        # TODO Implement
-        self.activate_reason = []
+        self.deactivate_reasons = []
         self.changed = False
         self.check = True
 
@@ -152,6 +151,10 @@ class Item(Utils):
             logging.warning("check_module: Module name %s, on %s is outdated with current version of lx-control-center. Please contact the module author" % (self.name, self.path))
         if (self.module_version == 0.0):
             self.check = False
+
+    def add_deactivate_reason(self, reason):
+        if (reason not in self.deactivate_reasons):
+            self.deactivate_reasons.append(reason)
             
     def launch(self):
         logging.info("launch: trying execute : %s" % self.execute_command)

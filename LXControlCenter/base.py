@@ -335,9 +335,9 @@ class Main(Utils):
     def load_all_modules (self):
         list_modules = self.list_all_modules_from_dirs()
         logging.debug("load_all_modules: %s :" % list_modules)
-        for i in list_modules:
+        for m in list_modules:
             item = Item(self.categories_triaged)
-            item.load_module_from_path(i)
+            item.load_module_from_path(m)
             if (item.check == True):
                 self.items[item.path] = item
 
@@ -347,6 +347,7 @@ class Main(Utils):
                     if (self.items[i].filename == r):
                         self.items[i].activate = False
                         self.items[i].activate_original = False
+                        self.items[i].add_deactivate_reason(_("Replaced by an active module"))
 
     def apply_desktop_env_sort(self, i):
         if (len(self.items[i].not_show_in) != 0):
@@ -354,6 +355,7 @@ class Main(Utils):
                 if (desktop in self.items[i].not_show_in):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
+                    self.items[i].add_deactivate_reason(_("Current environment in NotShow field"))
 
         if (self.items[i].activate == True):
             if (len(self.items[i].only_show_in) != 0):
@@ -361,6 +363,7 @@ class Main(Utils):
                     if (desktop not in self.items[i].only_show_in):
                         self.items[i].activate = False
                         self.items[i].activate_original = False
+                        self.items[i].add_deactivate_reason(_("Current environment not in OnlyShow field"))
 
     def apply_try_exec_test(self, i):
         if (self.items[i].type == "application"):
@@ -368,12 +371,14 @@ class Main(Utils):
                 if (os.path.exists(self.items[i].try_exec) == False):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
+                    self.items[i].add_deactivate_reason(_("Excecutable in TryExec doesn't exist"))
 
     def apply_no_exec_applications(self, i):
         if (self.items[i].type == "application"):
             if (self.items[i].execute_command is None):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
+                    self.items[i].add_deactivate_reason(_("Excecutable path doesn't exist"))
 
     def apply_applications_modules_suport(self, i):
         if (self.items[i].type == "module"):
@@ -389,6 +394,7 @@ class Main(Utils):
                 if (self.items[i].module_toolkit != self.toolkit):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
+                    self.items[i].add_deactivate_reason(_("Module is not compatible with current toolkit"))
 
     def apply_items_categories(self, i):
         logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
