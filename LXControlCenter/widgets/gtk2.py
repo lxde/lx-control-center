@@ -124,6 +124,7 @@ class Gtk2App(UI):
         for children in self.content_ui_vbox.get_children():
             self.content_ui_vbox.remove(children)
 
+    # Switch
     def create_switch_conf(self, grid, label, default, group, key, position):
         label_widget = Gtk.Label(label)
         switch_widget = Gtk.ToggleButton("?")
@@ -140,13 +141,6 @@ class Gtk2App(UI):
         grid.attach(label_widget, 0, 1, position, position + 1)
         grid.attach(switch_widget, 1, 2, position, position + 1)
 
-    def create_table_conf(self):
-        grid = Gtk.Table()
-        #grid.set_column_homogeneous(False)
-        #grid.set_row_homogeneous(False)
-        grid.set_col_spacings(0)
-        grid.set_row_spacings(0)
-        return grid
 
     def on_switch_click(self, switch, group, key):
         logging.debug("on_switch_click: Setting %s - %s to %s" % (group, key, switch.get_active()))
@@ -156,6 +150,29 @@ class Gtk2App(UI):
         else:
             switch.set_label("OFF")
         self.generate_view()
+
+    # SpinButton
+    def create_spinbutton_conf(self, grid, label, default, group, key, position):
+        label_widget = Gtk.Label(label)
+        adjustment = Gtk.Adjustment(value=default, lower=8, upper=128, step_incr=1, page_incr=1, page_size=0)
+        spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
+        spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key)
+        grid.attach(label_widget, 0, 1, position, position + 1)
+        grid.attach(spin_button_widget, 1, 2, position, position + 1)
+
+    def on_spinbutton_change(self, spinbutton, group, key):
+        logging.debug("on_spinbutton_change: Setting %s - %s to %s" % (group, key, spinbutton.get_value_as_int()))
+        self.set_setting(group, key, spinbutton.get_value_as_int())
+        self.generate_view()
+
+    # Main table
+    def create_table_conf(self):
+        grid = Gtk.Table()
+        #grid.set_column_homogeneous(False)
+        #grid.set_row_homogeneous(False)
+        grid.set_col_spacings(0)
+        grid.set_row_spacings(0)
+        return grid
 
     def build_pref_view(self):
         #TODO
@@ -168,6 +185,7 @@ class Gtk2App(UI):
 
         self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, "Configuration", "modules_support", 0)
         self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, "Configuration", "applications_support", 1)
+        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 2)
 
     def build_edit_view(self):
         self.clean_main_view()
@@ -175,6 +193,8 @@ class Gtk2App(UI):
 
     def build_icon_view(self):
         self.clean_main_view()
+        # Generate the view again, to take the modifications of edit_view
+        self.generate_view()
         self.build_generic_icon_view("visible")
 
     def build_generic_icon_view(self, type_view):

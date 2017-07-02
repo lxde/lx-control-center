@@ -561,7 +561,9 @@ class Main(Utils):
             if (key == "modules_support"):
                 self.modules_support = variable
             elif (key == "applications_support"):
-                self.applications_support = variable                
+                self.applications_support = variable
+            elif (key == "icon_view_icons_size"):
+                self.icon_view_icons_size = variable
             else:
                 logging.debug("set_setting: %s - %s not implemented" % (group, key))
         else:

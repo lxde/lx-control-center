@@ -57,6 +57,7 @@ class UI(Main):
         self.pref_category_configuration_label = _("Configuration")
         self.pref_modules_support_label = _("Activate module support")
         self.pref_applications_support_label = _("Activate applications support")
+        self.pref_icon_view_icons_size = _("Icon size for the view")
 
     def generate_view(self):
         self.triage_items()
