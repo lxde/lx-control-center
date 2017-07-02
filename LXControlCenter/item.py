@@ -112,8 +112,8 @@ class Item(Utils):
         self.check_module()
 
     def define_category_from_list(self):
-        logging.debug("define_category_from_list: enter function with categories_list = %s" % self.categories_list)
-        logging.debug("define_category_from_list: enter function with categories_array = %s" % self.categories_array)
+        logging.debug("define_category_from_list: enter function with categories_list for %s = %s" % (self.path, self.categories_list))
+        logging.debug("define_category_from_list: enter function with categories_array for %s = %s" % (self.path, self.categories_array))
         tmp_dict = {}
         keys = self.categories_array.keys()
         for item in self.categories_list:
@@ -126,7 +126,7 @@ class Item(Utils):
             self.category = _("Other")
         else:
             max_category = max(tmp_dict.keys(), key=(lambda k: tmp_dict[k]))
-            self.category = max_category
+            self.category = self.categories_array[max_category]
 
     def define_icon_type(self):
         if (len(self.icon) > 0):
