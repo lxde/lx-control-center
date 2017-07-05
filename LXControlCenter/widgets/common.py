@@ -60,7 +60,8 @@ class UI(Main):
         self.pref_icon_view_icons_size = _("Icon size for the view")
 
     def generate_view(self):
-        self.triage_items()
+        # Necessary ?
+        #self.triage_items()
         self.items_visible_generate()
         self.items_visible_by_categories_generate()
         self.items_by_categories_generate()
