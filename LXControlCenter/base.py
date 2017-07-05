@@ -111,7 +111,7 @@ class Main(Utils):
         self.icon_view_columns_default = 5
         self.icon_view_columns = self.icon_view_columns_default
 
-        self.icon_view_icons_size_default = 32
+        self.icon_view_icons_size_default = 48
         self.icon_view_icons_size = self.icon_view_icons_size_default
 
         self.icon_not_theme_allow_default = False
@@ -348,6 +348,11 @@ class Main(Utils):
                         self.items[i].activate = False
                         self.items[i].activate_original = False
                         self.items[i].add_deactivate_reason(_("Replaced by an active module"))
+
+    # TODO Store list of running applications, to filter desktop application
+    # procs = psutil.process_iter()
+    # for proc in procs:
+    #   print(proc.name())
 
     def apply_desktop_env_sort(self, i):
         if (len(self.items[i].not_show_in) != 0):
