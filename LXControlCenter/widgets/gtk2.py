@@ -363,13 +363,12 @@ class Gtk2App(UI):
         box_buttons.add(cancel_button)
         self.content_ui_vbox.pack_start(box_buttons, False, True, 0)
 
-        # TODO grey label
         # TODO Display other information about the desktop file
         box_location = Gtk.HBox()
         label_location = Gtk.Label()
         label_location.set_text(_("Location"))
         box_location.pack_start(label_location, False, True, 3)
-        self.entry_location = Gtk.Entry()
+        self.entry_location = Gtk.Label()
         self.entry_location.set_text(self.item_to_save.path)
         box_location.pack_start(self.entry_location, True, True, 3)
         self.content_ui_vbox.pack_start(box_location, False, True, 3)
