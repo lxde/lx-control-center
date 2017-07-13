@@ -72,6 +72,12 @@ class Main(Utils):
         self.applications_support_default = True
         self.applications_support = self.applications_support_default
 
+        self.blacklist_default = ["debian-xterm.desktop","debian-uxterm.desktop"]
+        self.blacklist =  self.blacklist_default
+
+        self.whitelist_default = []
+        self.whitelist =  self.whitelist_default
+
         # Order by importance (first read take advantage)
         self.applications_path_default = ["/usr/share/applications", ";"]
         self.applications_path = self.applications_path_default
@@ -162,6 +168,8 @@ class Main(Utils):
             self.apply_desktop_env_sort(i)
             self.apply_try_exec_test(i)
             self.apply_no_exec_applications(i)
+            self.apply_blacklist(i)
+            self.apply_whitelist(i)
             self.apply_module_toolkit(i)
             self.apply_items_categories(i)
 
@@ -218,6 +226,8 @@ class Main(Utils):
             self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
             self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
             self.categories_fixed = self.load_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
+            self.blacklist = self.load_setting(keyfile, "Configuration","blacklist", self.blacklist_default, "list")
+            self.whitelist = self.load_setting(keyfile, "Configuration","whitelist", self.whitelist_default, "list")
 
             # Categories
             if (self.categories_fixed == False):
@@ -384,6 +394,30 @@ class Main(Utils):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
                     self.items[i].add_deactivate_reason(_("Excecutable path doesn't exist"))
+
+    def apply_blacklist (self, i):
+        # Test abslotute path
+        if (self.items[i].path in self.blacklist):
+            self.items[i].activate = False
+            self.items[i].activate_original = False
+            self.items[i].add_deactivate_reason(_("Blacklisted (absolute path)"))
+        # Test desktop file name
+        if (os.path.basename(self.items[i].path) in self.blacklist):
+            self.items[i].activate = False
+            self.items[i].activate_original = False
+            self.items[i].add_deactivate_reason(_("Blacklisted (desktop file name)"))
+
+    def apply_whitelist (self, i):
+        # Test abslotute path
+        if (self.items[i].path in self.whitelist):
+            self.items[i].activate = True
+            self.items[i].activate_original = True
+            self.items[i].add_deactivate_reason(_("Whitelisted (absolute path)"))
+        # Test desktop file name
+        if (os.path.basename(self.items[i].path) in self.whitelist):
+            self.items[i].activate = True
+            self.items[i].activate_original = True
+            self.items[i].add_deactivate_reason(_("Whitelisted (desktop file name)"))
 
     def apply_applications_modules_suport(self, i):
         if (self.items[i].type == "module"):
