@@ -1,5 +1,5 @@
 * Complete preferences UI for configure lxcc
-* Option to Hide "Other" Category
 * Module : Check dependancy
 * Monitor file and directory changes
 * Load application for menu-cache (alternative to desktop files)
+* Search capability (in normal and edit view)

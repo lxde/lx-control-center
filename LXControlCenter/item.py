@@ -42,6 +42,7 @@ class Item(Utils):
         self.category = ""
         self.categories_list = []
         self.categories_array = categories_array
+        self.category_other = False
         self.icon = ""
         # Icon type : themed, fix or fallback
         self.icon_type = ""
@@ -124,6 +125,7 @@ class Item(Utils):
                     tmp_dict[item] = 1
         if (len(tmp_dict) == 0):
             self.category = _("Other")
+            self.category_other = True
         else:
             max_category = max(tmp_dict.keys(), key=(lambda k: tmp_dict[k]))
             self.category = self.categories_array[max_category]
