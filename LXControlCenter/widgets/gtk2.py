@@ -178,7 +178,7 @@ class Gtk2App(UI):
         return grid
 
     def build_pref_view(self):
-        #TODO
+        #TODO Complete options
         self.clean_main_view()
         # Configuration
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
@@ -308,7 +308,6 @@ class Gtk2App(UI):
 
     def build_edit_item_view(self, path):
         # TODO Icon image for icon
-        # TODO reason for activate state
         self.clean_main_view()
         self.mode = "edit-item-UI"
         self.item_to_save = self.items[path]
