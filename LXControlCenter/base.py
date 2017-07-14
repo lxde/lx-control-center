@@ -653,6 +653,7 @@ class Main(Utils):
             logging.debug("Item activate : %s" % self.items[i].activate)
             logging.debug("Item changed : %s" % self.items[i].changed)
             logging.debug("Item check : %s" % self.items[i].check)
+            logging.debug("Item deactivation reasons : %s" % self.items[i].deactivate_reasons)
             logging.debug("Item module_replace_application : %s" % self.items[i].module_replace_application)
             logging.debug("Item module_toolkit : %s" % self.items[i].module_toolkit)
             logging.debug("=================")
