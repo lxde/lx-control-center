@@ -481,6 +481,8 @@ class Main(Utils):
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean")
+        self.save_setting(keyfile, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list")
+        self.save_setting(keyfile, "Configuration", "whitelist", self.whitelist, self.whitelist_default, "list")
         self.save_setting(keyfile, "Configuration", "show_category_other", self.show_category_other, self.show_category_other_default, "boolean")
 
         # Categories
