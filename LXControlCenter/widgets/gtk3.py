@@ -135,6 +135,9 @@ class Gtk3App(UI):
     def on_switch_click(self, switch, gparam, group, key):
         logging.debug("on_switch_click: Setting %s - %s to %s" % (group, key, switch.get_active()))
         self.set_setting(group, key, switch.get_active())
+
+        # Need to re-triage the item, because we changed the filters
+        self.triage_items()
         self.generate_view()
 
     def clean_main_view(self):
