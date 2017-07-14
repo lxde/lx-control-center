@@ -151,6 +151,7 @@ class UI(Main):
         if (self.items[path].type == "module"):
             self.mode = "module-UI"
             self.module_active(self.items[path])
+            self.items[path].launch()
             self.draw_ui()
         else:
             self.items[path].launch()
