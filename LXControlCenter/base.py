@@ -481,6 +481,7 @@ class Main(Utils):
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean")
+        self.save_setting(keyfile, "Configuration", "show_category_other", self.show_category_other, self.show_category_other_default, "boolean")
 
         # Categories
         if (self.categories_fixed == False):
@@ -615,10 +616,12 @@ class Main(Utils):
                 self.applications_support = variable
             elif (key == "icon_view_icons_size"):
                 self.icon_view_icons_size = variable
+            elif (key == "show_category_other"):
+                self.show_category_other = variable
             else:
-                logging.debug("set_setting: %s - %s not implemented" % (group, key))
+                logging.warning("set_setting: %s - %s not implemented" % (group, key))
         else:
-            logging.debug("set_setting: %s - %s not implemented" % (group, key))
+            logging.warning("set_setting: %s - %s not implemented" % (group, key))
             
     def module_active(self,item):
         self.module_activated = item

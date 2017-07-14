@@ -57,11 +57,10 @@ class UI(Main):
         self.pref_category_configuration_label = _("Configuration")
         self.pref_modules_support_label = _("Activate module support")
         self.pref_applications_support_label = _("Activate applications support")
+        self.pref_show_category_other_label = _("Show category Other")
         self.pref_icon_view_icons_size = _("Icon size for the view")
 
     def generate_view(self):
-        # Necessary ?
-        #self.triage_items()
         self.items_visible_generate()
         self.items_visible_by_categories_generate()
         self.items_by_categories_generate()

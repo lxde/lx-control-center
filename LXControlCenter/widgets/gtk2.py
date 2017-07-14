@@ -149,6 +149,9 @@ class Gtk2App(UI):
             switch.set_label("ON")
         else:
             switch.set_label("OFF")
+
+        # Need to re-triage the item, because we changed the filters
+        self.triage_items()
         self.generate_view()
 
     # SpinButton
@@ -185,7 +188,8 @@ class Gtk2App(UI):
 
         self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, "Configuration", "modules_support", 0)
         self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, "Configuration", "applications_support", 1)
-        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 2)
+        self.create_switch_conf(configuration_grid, self.pref_show_category_other_label, self.show_category_other, "Configuration", "show_category_other", 2)
+        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 3)
 
     def build_edit_view(self):
         self.clean_main_view()
