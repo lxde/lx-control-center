@@ -63,6 +63,9 @@ class Main(Utils):
         self.desktop_environments_setting_default = ["Auto"]
         self.desktop_environments_setting = self.desktop_environments_setting_default
 
+        self.frontend_default = "GTK3"
+        self.frontend = self.frontend_default
+
         self.version_config_default = 0.1
         self.version_config = self.version_config_default
 
@@ -226,6 +229,7 @@ class Main(Utils):
             # Configuration
             self.keyword_categories_settings_list = self.load_setting(keyfile, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
             self.desktop_environments_setting = self.load_setting(keyfile, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
+            self.frontend = self.load_setting(keyfile, "Configuration", "frontend", self.frontend_default, "string")
             self.version_config = self.load_setting(keyfile, "Configuration", "version_config", self.version_config_default, "float")
             self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
             self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
@@ -476,7 +480,8 @@ class Main(Utils):
 
         # Configuration
         self.save_setting(keyfile, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list")
-        self.save_setting(keyfile, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting, "list")
+        self.save_setting(keyfile, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list")
+        self.save_setting(keyfile, "Configuration","frontend", self.frontend, self.frontend_default, "string")
         self.save_setting(keyfile, "Configuration", "version_config", self.version_config, self.version_config_default, "float")
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")

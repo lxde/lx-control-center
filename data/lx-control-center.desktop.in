@@ -1,8 +1,8 @@
 [Desktop Entry]
 _Name=LX Control Center
 _GenericName=LX Control Center
-_Comment=Manage your settings in one place - GTK3 version
-Exec=lx-control-center-gtk3
+_Comment=Manage your settings in one place
+Exec=lx-control-center
 Icon=preferences-system
 Terminal=false
 Type=Application

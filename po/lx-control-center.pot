@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-28 11:24+0100\n"
+"POT-Creation-Date: 2017-07-15 10:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,92 +17,136 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/lx-control-center-gtk3.desktop.in.h:1
-#: ../data/lx-control-center-gtk2.desktop.in.h:1
+#: ../data/lx-control-center.desktop.in.h:1
 msgid "LX Control Center"
 msgstr ""
 
-#: ../data/lx-control-center-gtk3.desktop.in.h:2
-msgid "Manage your settings in one place - GTK3 version"
+#: ../data/lx-control-center.desktop.in.h:2
+msgid "Manage your settings in one place"
 msgstr ""
 
-#: ../data/lx-control-center-gtk3.desktop.in.h:3
-#: ../data/lx-control-center-gtk2.desktop.in.h:3
+#: ../data/lx-control-center.desktop.in.h:3
 msgid "System;Settings;"
 msgstr ""
 
-#: ../data/lx-control-center-gtk2.desktop.in.h:2
-msgid "Manage your settings in one place - GTK2 version"
-msgstr ""
-
-#: ../LXControlCenter/base.py:81 ../LXControlCenter/base.py:94
+#: ../LXControlCenter/base.py:99
 msgid "DesktopSettings"
 msgstr ""
 
-#: ../LXControlCenter/base.py:82 ../LXControlCenter/base.py:95
+#: ../LXControlCenter/base.py:100
 msgid "HardwareSettings"
 msgstr ""
 
-#: ../LXControlCenter/base.py:83 ../LXControlCenter/base.py:96
+#: ../LXControlCenter/base.py:101
 msgid "Printing"
 msgstr ""
 
-#: ../LXControlCenter/base.py:84 ../LXControlCenter/base.py:97
-#: ../LXControlCenter/base.py:98
+#: ../LXControlCenter/base.py:102
 msgid "System"
 msgstr ""
 
-#: ../LXControlCenter/base.py:85 ../LXControlCenter/base.py:99
-#: ../LXControlCenter/base.py:100 ../LXControlCenter/base.py:101
+#: ../LXControlCenter/base.py:103
 msgid "FileManager"
 msgstr ""
 
-#: ../LXControlCenter/base.py:86 ../LXControlCenter/base.py:102
+#: ../LXControlCenter/base.py:104
 msgid "Monitor"
 msgstr ""
 
-#: ../LXControlCenter/base.py:87 ../LXControlCenter/base.py:103
+#: ../LXControlCenter/base.py:105
 msgid "Security"
 msgstr ""
 
-#: ../LXControlCenter/base.py:88 ../LXControlCenter/base.py:104
+#: ../LXControlCenter/base.py:106
 msgid "Accessibility"
 msgstr ""
 
-#: ../LXControlCenter/base.py:118
+#: ../LXControlCenter/base.py:120
 msgid "LX-Control-Center"
 msgstr ""
 
-#: ../LXControlCenter/item.py:117
+#: ../LXControlCenter/base.py:369
+msgid "Replaced by an active module"
+msgstr ""
+
+#: ../LXControlCenter/base.py:382
+msgid "Current environment in NotShow field"
+msgstr ""
+
+#: ../LXControlCenter/base.py:390
+msgid "Current environment not in OnlyShow field"
+msgstr ""
+
+#: ../LXControlCenter/base.py:398
+msgid "Excecutable in TryExec doesn't exist"
+msgstr ""
+
+#: ../LXControlCenter/base.py:405
+msgid "Excecutable path doesn't exist"
+msgstr ""
+
+#: ../LXControlCenter/base.py:412
+msgid "Blacklisted (absolute path)"
+msgstr ""
+
+#: ../LXControlCenter/base.py:417
+msgid "Blacklisted (desktop file name)"
+msgstr ""
+
+#: ../LXControlCenter/base.py:424
+msgid "Whitelisted (absolute path)"
+msgstr ""
+
+#: ../LXControlCenter/base.py:429
+msgid "Whitelisted (desktop file name)"
+msgstr ""
+
+#: ../LXControlCenter/base.py:436
+msgid "Category Other deactivated"
+msgstr ""
+
+#: ../LXControlCenter/base.py:452
+msgid "Module is not compatible with current toolkit"
+msgstr ""
+
+#: ../LXControlCenter/item.py:127
 msgid "Other"
 msgstr ""
 
 #. Menu items labels & tooltips
 #. TODO Find something useful to display
-#: ../LXControlCenter/widgets/common.py:40
-#: ../LXControlCenter/widgets/common.py:44
+#: ../LXControlCenter/widgets/common.py:48
+#: ../LXControlCenter/widgets/common.py:52
 msgid "Icons"
 msgstr ""
 
-#: ../LXControlCenter/widgets/common.py:41
-#: ../LXControlCenter/widgets/common.py:45
+#: ../LXControlCenter/widgets/common.py:49
+#: ../LXControlCenter/widgets/common.py:53
 msgid "Preferences"
 msgstr ""
 
-#: ../LXControlCenter/widgets/common.py:42
-#: ../LXControlCenter/widgets/common.py:46
+#: ../LXControlCenter/widgets/common.py:50
+#: ../LXControlCenter/widgets/common.py:54
 msgid "Edit"
 msgstr ""
 
 #. Pref Mode labels
-#: ../LXControlCenter/widgets/common.py:49
+#: ../LXControlCenter/widgets/common.py:57
 msgid "Configuration"
 msgstr ""
 
-#: ../LXControlCenter/widgets/common.py:50
+#: ../LXControlCenter/widgets/common.py:58
 msgid "Activate module support"
 msgstr ""
 
-#: ../LXControlCenter/widgets/common.py:51
+#: ../LXControlCenter/widgets/common.py:59
 msgid "Activate applications support"
+msgstr ""
+
+#: ../LXControlCenter/widgets/common.py:60
+msgid "Show category Other"
+msgstr ""
+
+#: ../LXControlCenter/widgets/common.py:61
+msgid "Icon size for the view"
 msgstr ""

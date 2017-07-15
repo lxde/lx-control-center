@@ -173,3 +173,27 @@ class UI(Main):
         self.icon_view_columns_generate()
         if (self.icon_view_columns != tmp_icons_col):
             self.draw_ui()
+
+    def run (self):
+        frontend = self.frontend
+        if (frontend == "GTK2"):
+            from LXControlCenter.widgets.gtk2 import Gtk2App
+            app = Gtk2App()
+            app.main()
+        elif (frontend == "GTK3"):
+            from LXControlCenter.widgets.gtk3 import Gtk3App
+            app = Gtk3App()
+            app.main()
+        elif (frontend == "Qt5"):
+            from LXControlCenter.widgets.qt5 import Qt5App
+            app = Qt5App()
+            app.main()
+        elif (frontend == "webkitgtk2"):
+            from LXControlCenter.widgets.webkitgtk2 import WebkitApp
+            app = WebkitApp()
+            app.main()
+        else:
+            # Defautl to GTK3
+            from LXControlCenter.widgets.gtk3 import Gtk3App
+            app = Gtk3App()
+            app.main()
