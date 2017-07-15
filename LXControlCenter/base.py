@@ -63,8 +63,9 @@ class Main(Utils):
         self.desktop_environments_setting_default = ["Auto"]
         self.desktop_environments_setting = self.desktop_environments_setting_default
 
-        self.frontend_default = "GTK3"
-        self.frontend = self.frontend_default
+        self.frontend_setting_default = "Auto"
+        self.frontend_setting = self.frontend_setting_default
+        self.frontend = "GTK3"
 
         self.version_config_default = 0.1
         self.version_config = self.version_config_default
@@ -165,6 +166,9 @@ class Main(Utils):
         # Load specific item conf
         self.load_items_conf()
 
+        # Set frontend
+        self.frontend_generate()
+
         # Debug if enable
         self.print_debug()
 
@@ -229,7 +233,7 @@ class Main(Utils):
             # Configuration
             self.keyword_categories_settings_list = self.load_setting(keyfile, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
             self.desktop_environments_setting = self.load_setting(keyfile, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
-            self.frontend = self.load_setting(keyfile, "Configuration", "frontend", self.frontend_default, "string")
+            self.frontend_setting = self.load_setting(keyfile, "Configuration", "frontend", self.frontend_setting_default, "string")
             self.version_config = self.load_setting(keyfile, "Configuration", "version_config", self.version_config_default, "float")
             self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
             self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
@@ -464,6 +468,23 @@ class Main(Utils):
         else:
             self.desktop_environments = self.desktop_environments_setting
 
+    def frontend_generate(self):
+        if (self.frontend_setting == "Auto"):
+            current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
+            gtk2_list = ['LXDE']
+            gtk3_list = ['GNOME']
+            qt5_list = ['KDE', 'LXQt']
+            if (current_desktop in gtk2_list):
+                self.frontend = 'GTK2'
+            elif (current_desktop in gtk3_list):
+                self.frontend = 'GTK3'
+            elif (current_desktop in qt5_list):
+                self.frontend = 'Qt5'
+            else:
+                self.frontend = 'GTK3'
+        else:
+            self.frontend = self.frontend_setting
+
     def categories_triaged_generate(self):
         for key in self.categories_keys.keys():
             for item in self.categories_keys[key]:
@@ -481,7 +502,7 @@ class Main(Utils):
         # Configuration
         self.save_setting(keyfile, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list")
         self.save_setting(keyfile, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list")
-        self.save_setting(keyfile, "Configuration","frontend", self.frontend, self.frontend_default, "string")
+        self.save_setting(keyfile, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string")
         self.save_setting(keyfile, "Configuration", "version_config", self.version_config, self.version_config_default, "float")
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
