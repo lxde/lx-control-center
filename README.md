@@ -14,12 +14,13 @@
 
 ## Run
 
- * You can run locally by doing "python lx-control-center-gtk2" or "python lx-control-center-gtk3"
- * There are currently 4 versions / frontend:
-  - GTK3 version (lx-control-center-gtk3) : the most complete frontend
-  - GTK2 version (lx-control-center-gtk2) : close to the GTK3 version
-  - Qt5 version (lx-control-center-qt5) : experimental
-  - Webkit - GTK2 version (lx-control-center-webkitgtk2) : port of the lxde-ctrl-center - tuquito-control-center
+ * You can run locally by doing "python lx-control-center", it will detect the better frontend available for your environment.
+ * You can specify the frontend by parsing --ui the_name_of_the_frontend (see below)
+ * There are currently 4 frontends:
+  - GTK3 version (--ui GTK3) : the most complete frontend (also the default).
+  - GTK2 version (--ui GTK2) : close to the GTK3 version
+  - Qt5 version (--ui Qt5) : experimental
+  - Webkit - GTK2 version (--ui webkitgtk2) : port of the lxde-ctrl-center - tuquito-control-center
  * You can also build debian packages by running "dpkg-buildpackage -tc" 
  * To enable debug, pass --log=INFO or --log=DEBUG
  * To save the output to a file, pass -logfile=the_log_file
@@ -35,21 +36,21 @@
  * For all versions :
   - python DistUtils and DistUtilsExtra
 
- * GTK2 version (lx-control-center-gtk2)
+ * GTK2 frontend
   - python2
   - pygtk
 
- * GTK3 version (lx-control-center-gtk3)
+ * GTK3 frontend
   - python3
   - pygi
   - GLib GIR
   - GTK3 GIR
 
- * Qt5 version (lx-control-center-qt5)
+ * Qt5 frontend
   - python3
   - pyqt5
 
- * Webkit (lx-control-center-webkitgtk2)
+ * Webkit frontend
   - python2
   - pygtk
   - python-webkit
