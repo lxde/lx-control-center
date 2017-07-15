@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-15 10:18+0200\n"
+"POT-Creation-Date: 2017-07-15 16:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,84 +29,96 @@ msgstr ""
 msgid "System;Settings;"
 msgstr ""
 
-#: ../LXControlCenter/base.py:99
+#: ../LXControlCenter/base.py:100
 msgid "DesktopSettings"
 msgstr ""
 
-#: ../LXControlCenter/base.py:100
+#: ../LXControlCenter/base.py:101
 msgid "HardwareSettings"
 msgstr ""
 
-#: ../LXControlCenter/base.py:101
+#: ../LXControlCenter/base.py:102
 msgid "Printing"
 msgstr ""
 
-#: ../LXControlCenter/base.py:102
+#: ../LXControlCenter/base.py:103
 msgid "System"
 msgstr ""
 
-#: ../LXControlCenter/base.py:103
+#: ../LXControlCenter/base.py:104
 msgid "FileManager"
 msgstr ""
 
-#: ../LXControlCenter/base.py:104
+#: ../LXControlCenter/base.py:105
 msgid "Monitor"
 msgstr ""
 
-#: ../LXControlCenter/base.py:105
+#: ../LXControlCenter/base.py:106
 msgid "Security"
 msgstr ""
 
-#: ../LXControlCenter/base.py:106
+#: ../LXControlCenter/base.py:107
 msgid "Accessibility"
 msgstr ""
 
-#: ../LXControlCenter/base.py:120
+#: ../LXControlCenter/base.py:121
 msgid "LX-Control-Center"
 msgstr ""
 
-#: ../LXControlCenter/base.py:369
+#: ../LXControlCenter/base.py:375
 msgid "Replaced by an active module"
 msgstr ""
 
-#: ../LXControlCenter/base.py:382
+#: ../LXControlCenter/base.py:388
 msgid "Current environment in NotShow field"
 msgstr ""
 
-#: ../LXControlCenter/base.py:390
+#: ../LXControlCenter/base.py:396
 msgid "Current environment not in OnlyShow field"
 msgstr ""
 
-#: ../LXControlCenter/base.py:398
+#: ../LXControlCenter/base.py:404
 msgid "Excecutable in TryExec doesn't exist"
 msgstr ""
 
-#: ../LXControlCenter/base.py:405
+#: ../LXControlCenter/base.py:411
 msgid "Excecutable path doesn't exist"
 msgstr ""
 
-#: ../LXControlCenter/base.py:412
+#: ../LXControlCenter/base.py:418
 msgid "Blacklisted (absolute path)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:417
+#: ../LXControlCenter/base.py:423
 msgid "Blacklisted (desktop file name)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:424
+#: ../LXControlCenter/base.py:430
 msgid "Whitelisted (absolute path)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:429
+#: ../LXControlCenter/base.py:435
 msgid "Whitelisted (desktop file name)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:436
+#: ../LXControlCenter/base.py:442
 msgid "Category Other deactivated"
 msgstr ""
 
-#: ../LXControlCenter/base.py:452
+#: ../LXControlCenter/base.py:458
 msgid "Module is not compatible with current toolkit"
+msgstr ""
+
+#: ../LXControlCenter/base.py:488
+#, python-format
+msgid ""
+"%s desktop environment not supported, please report it as a bug. Default to "
+"GTK3"
+msgstr ""
+
+#: ../LXControlCenter/base.py:495
+#, python-format
+msgid "%s desktop environment unknown or not supported. Default to GTK3"
 msgstr ""
 
 #: ../LXControlCenter/item.py:127
