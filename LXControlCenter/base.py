@@ -190,9 +190,11 @@ class Main(Utils):
         parser = argparse.ArgumentParser(description='Launch LX Control Center')
         parser.add_argument('-l', '--log', help='Set log level (values available : WARNING, INFO or DEBUG)')
         parser.add_argument('-f', '--logfile', help='Set log file to write logs')
+        parser.add_argument('-u', '--ui', help='Set Frontend - UI (values available: GTK2, GTK3, Qt5, Auto ...')
         args = parser.parse_args()
         self.loglevel_args =  args.log
         self.logfile_args =  args.logfile
+        self.frontend_args =  args.ui
 
     def set_log(self):
         """ Set log level by parsing"""
@@ -469,21 +471,29 @@ class Main(Utils):
             self.desktop_environments = self.desktop_environments_setting
 
     def frontend_generate(self):
-        if (self.frontend_setting == "Auto"):
-            current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
-            gtk2_list = ['LXDE']
-            gtk3_list = ['GNOME']
-            qt5_list = ['KDE', 'LXQt']
-            if (current_desktop in gtk2_list):
-                self.frontend = 'GTK2'
-            elif (current_desktop in gtk3_list):
-                self.frontend = 'GTK3'
-            elif (current_desktop in qt5_list):
-                self.frontend = 'Qt5'
+        supported_frontend = ["GTK3", "GTK2", "Qt5", "webkitgtk2"]
+        if (self.frontend_args == None):
+            if (self.frontend_setting == "Auto"):
+                current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
+                gtk2_list = ['LXDE']
+                gtk3_list = ['GNOME']
+                qt5_list = ['KDE', 'LXQt']
+                if (current_desktop in gtk2_list):
+                    self.frontend = 'GTK2'
+                elif (current_desktop in gtk3_list):
+                    self.frontend = 'GTK3'
+                elif (current_desktop in qt5_list):
+                    self.frontend = 'Qt5'
+                else:
+                    logging.warning(_("%s desktop environment not supported, please report it as a bug. Default to GTK3" % current_desktop))
+                    self.frontend = 'GTK3'
             else:
-                self.frontend = 'GTK3'
+                self.frontend = self.frontend_setting
+        elif (self.frontend_args in supported_frontend):
+            self.frontend = self.frontend_args
         else:
-            self.frontend = self.frontend_setting
+            logging.warning(_("%s desktop environment unknown or not supported. Default to GTK3" % self.frontend_args))
+            self.frontend = 'GTK3'
 
     def categories_triaged_generate(self):
         for key in self.categories_keys.keys():
