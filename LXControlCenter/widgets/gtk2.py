@@ -138,6 +138,7 @@ class Gtk2App(UI):
             switch_widget.set_label("OFF")
 
         switch_widget.connect("toggled", self.on_switch_click, group, key)
+        # GTK2 specific
         grid.attach(label_widget, 0, 1, position, position + 1)
         grid.attach(switch_widget, 1, 2, position, position + 1)
 
@@ -160,6 +161,7 @@ class Gtk2App(UI):
         adjustment = Gtk.Adjustment(value=default, lower=8, upper=128, step_incr=1, page_incr=1, page_size=0)
         spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
         spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key)
+        # GTK2 specific
         grid.attach(label_widget, 0, 1, position, position + 1)
         grid.attach(spin_button_widget, 1, 2, position, position + 1)
 
@@ -171,17 +173,20 @@ class Gtk2App(UI):
     # Main table
     def create_table_conf(self):
         grid = Gtk.Table()
+        # GTK2 Specific
         #grid.set_column_homogeneous(False)
         #grid.set_row_homogeneous(False)
-        grid.set_col_spacings(0)
-        grid.set_row_spacings(0)
+        grid.set_col_spacings(20)
+        grid.set_row_spacings(20)
         return grid
 
     def build_pref_view(self):
         #TODO Complete options
         self.clean_main_view()
+
         # Configuration
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
+        # GTK2 Specific
         self.content_ui_vbox.pack_start(configuration_frame, False, False)
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
