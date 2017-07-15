@@ -175,6 +175,7 @@ class Main(Utils):
     def triage_items(self):
         for i in self.items:
             self.apply_applications_modules_suport(i)
+            self.apply_triage_module(i)
             self.apply_desktop_env_sort(i)
             self.apply_try_exec_test(i)
             self.apply_no_exec_applications(i)
@@ -366,14 +367,6 @@ class Main(Utils):
             if (item.check == True):
                 self.items[item.path] = item
 
-            to_replace = item.module_replace_application
-            for i in self.items:
-                for r in to_replace:
-                    if (self.items[i].filename == r):
-                        self.items[i].activate = False
-                        self.items[i].activate_original = False
-                        self.items[i].add_deactivate_reason(_("Replaced by an active module"))
-
     # TODO Store list of running applications, to filter desktop application
     # procs = psutil.process_iter()
     # for proc in procs:
@@ -448,6 +441,20 @@ class Main(Utils):
         elif (self.items[i].type == "application"):
             self.items[i].activate = self.applications_support
             self.items[i].activate_original = self.modules_support
+
+    def apply_triage_module(self, i):
+        if (self.items[i].type == "module"):
+            if (self.modules_support == True):
+                to_replace = item.module_replace_application
+                for r in to_replace:
+                    if (self.items[i].filename == r):
+                        self.items[i].activate = False
+                        self.items[i].activate_original = False
+                        self.items[i].add_deactivate_reason(_("Replaced by an active module"))
+            else:
+                self.items[i].activate = False
+                self.items[i].activate_original = False
+                self.items[i].add_deactivate_reason(_("Module support deactivated"))
 
     def apply_module_toolkit(self, i):
         if (self.items[i].type == "module"):
