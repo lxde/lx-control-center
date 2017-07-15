@@ -115,8 +115,8 @@ class Gtk3App(UI):
         popup = uimanager.get_widget("/PopupMenu")
         self.menu_button.set_popup(popup)
 
-        pixbuf = self.theme.get_default().load_icon("open-menu-symbolic", 16, Gtk.IconLookupFlags.FORCE_SIZE)
-        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        menu_pixbuf = self.theme.get_default().load_icon("open-menu-symbolic", 16, Gtk.IconLookupFlags.FORCE_SIZE)
+        image = Gtk.Image.new_from_pixbuf(menu_pixbuf)
         self.menu_button.add(image)
         self.header_bar.pack_start(self.menu_button)
 
@@ -250,21 +250,23 @@ class Gtk3App(UI):
 
                 if (i.activate == False):
                     logging.debug("build_generic_icon_view - Grey inactive icons: %s - %s" % (i.name, i.path))
-                    pixbuf.saturate_and_pixelate(pixbuf,0.1, True)
+                    desaturated = pixbuf.copy()
+                    pixbuf.saturate_and_pixelate(desaturated, 0.1, True)
                     display_name = _("(Inactive) - ") + i.name
-
-                liststore.append([pixbuf, display_name, i.path])
+                    liststore.append([desaturated, display_name, i.path])
+                else:
+                    liststore.append([pixbuf, display_name, i.path])
 
             hbox.add(iconview)
 
     def define_icon_type_with_gtk_theme(self):
-        for i in self.items_visible:
-            if (i.icon_type == "fix"):
+        for i in self.items:
+            if (self.items[i].icon_type == "fix"):
                 if (self.icon_not_theme_allow == False):
-                    i.icon_type = "fallback"
-            elif (i.icon_type == "themed"):
-                if (self.theme.has_icon(i.icon) == False):
-                    i.icon_type = "fallback"
+                    self.items[i].icon_type = "fallback"
+            elif (self.items[i].icon_type == "themed"):
+                if (self.theme.has_icon(self.items[i].icon) == False):
+                    self.items[i].icon_type = "fallback"
 
 
     def on_item_activated(self, icon_view, tree_path):
