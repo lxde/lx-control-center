@@ -107,6 +107,8 @@ class Main(Utils):
                                             _("Accessibility"):("Accessibility",)
                                         }
         self.categories_keys = self.categories_keys_default
+
+        self.categories_triaged = {}
         
         # UI - View
         self.window_size_w_default = 800
@@ -147,9 +149,6 @@ class Main(Utils):
 
         # Enable log
         self.set_log()
-
-        self.categories_triaged = {}
-        self.categories_triaged_generate()
 
         # Function to launch at startup
         self.load_configuration_file()
