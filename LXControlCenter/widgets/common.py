@@ -174,20 +174,34 @@ class UI(Main):
         if (self.icon_view_columns != tmp_icons_col):
             self.draw_ui()
 
+    def set_standalone(self):
+        logging.debug("set_standalone: enter function")
+        logging.debug("set_standalone: value of standalone_module: %s" % self.standalone_module)
+        if (self.standalone_module != None):
+            self.mode = "module-UI"
+            for i in self.items:
+                if (self.items[i].filename == self.standalone_module + '.desktop'):
+                    if (self.toolkit == self.items[i].module_toolkit):
+                        self.on_item_activated_common(i)
+                        return True
+                    else:
+                        logging.error("Module %s is not compatible with current toolkit %s." % (self.standalone_module, self.toolkit))
+                        return False
+        else:
+            return True
+
     def run (self):
         frontend = self.frontend
+        app = None
         if (frontend == "GTK2"):
             from LXControlCenter.widgets.gtk2 import Gtk2App
             app = Gtk2App()
-            app.main()
         elif (frontend == "GTK3"):
             from LXControlCenter.widgets.gtk3 import Gtk3App
             app = Gtk3App()
-            app.main()
         elif (frontend == "Qt5"):
             from LXControlCenter.widgets.qt5 import Qt5App
             app = Qt5App()
-            app.main()
         elif (frontend == "webkitgtk2"):
             from LXControlCenter.widgets.webkitgtk2 import WebkitApp
             app = WebkitApp()
@@ -196,4 +210,6 @@ class UI(Main):
             # Defautl to GTK3
             from LXControlCenter.widgets.gtk3 import Gtk3App
             app = Gtk3App()
+
+        if (app.set_standalone() == True):
             app.main()

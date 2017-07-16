@@ -23,7 +23,8 @@
   - Webkit - GTK2 version (--ui webkitgtk2) : port of the lxde-ctrl-center - tuquito-control-center
  * You can also build debian packages by running "dpkg-buildpackage -tc" 
  * To enable debug, pass --log=INFO or --log=DEBUG
- * To save the output to a file, pass -logfile=the_log_file
+ * To save the output to a file, pass --logfile=the_log_file
+ * To run only 1 module in a standalone mode, pass -m or --module with the filename of the desktop file of the module (without the .desktop), like -m lxcc-module-test.
 
 ## Build / Install
 

@@ -49,6 +49,7 @@ class Main(Utils):
         self.trigger_save_settings_file = False
         self.module_activated = None
         self.toolkit = None
+        self.standalone_module = None
 
         self.keyword_categories_settings_list_default = [   "Settings",
 													        "System",
@@ -150,20 +151,23 @@ class Main(Utils):
         # Enable log
         self.set_log()
 
-        # Function to launch at startup
+        # Load configuration file, and the settings in it
         self.load_configuration_file()
         self.load_settings()
 
-        self.load_all_applications()
-        self.load_all_modules()
+        # Normal startup, if no module arg set
+        if (self.standalone_module == None):
+            self.load_all_applications()
+            self.load_all_modules()
+            self.desktop_environments_generate()
 
-        self.desktop_environments_generate()
+            # Desactivate items
+            self.triage_items()
 
-        # Desactivate items
-        self.triage_items()
-
-        # Load specific item conf
-        self.load_items_conf()
+            # Load specific item conf
+            self.load_items_conf()
+        else:
+            self.load_all_modules()
 
         # Set frontend
         self.frontend_generate()
@@ -191,10 +195,12 @@ class Main(Utils):
         parser.add_argument('-l', '--log', help='Set log level (values available : WARNING, INFO or DEBUG)')
         parser.add_argument('-f', '--logfile', help='Set log file to write logs')
         parser.add_argument('-u', '--ui', help='Set Frontend - UI (values available: GTK2, GTK3, Qt5, Auto ...')
+        parser.add_argument('-m', '--module', help='Launch only the specific module. Must be the desktop filename, without .desktop')
         args = parser.parse_args()
         self.loglevel_args =  args.log
         self.logfile_args =  args.logfile
         self.frontend_args =  args.ui
+        self.standalone_module =  args.module
 
     def set_log(self):
         """ Set log level by parsing"""
@@ -444,7 +450,7 @@ class Main(Utils):
     def apply_triage_module(self, i):
         if (self.items[i].type == "module"):
             if (self.modules_support == True):
-                to_replace = item.module_replace_application
+                to_replace = self.items[i].module_replace_application
                 for r in to_replace:
                     if (self.items[i].filename == r):
                         self.items[i].activate = False

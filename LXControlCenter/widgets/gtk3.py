@@ -60,34 +60,40 @@ class Gtk3App(UI):
 
         # Function to launch at startup
         self.generate_view()
-        self.build_toolbar()
+        if (self.standalone_module == None):
+            self.build_toolbar()
         self.draw_ui()
 
     def draw_ui(self):
         if (self.mode == "main-UI"):
-            self.action_group.get_action("IconsMode").set_visible(False)
-            self.action_group.get_action("PrefMode").set_visible(True)
-            self.action_group.get_action("EditMode").set_visible(True)
+            if (self.standalone_module == None):
+                self.action_group.get_action("IconsMode").set_visible(False)
+                self.action_group.get_action("PrefMode").set_visible(True)
+                self.action_group.get_action("EditMode").set_visible(True)
             self.build_icon_view()
         elif (self.mode == "edit-UI"):
-            self.action_group.get_action("IconsMode").set_visible(True)
-            self.action_group.get_action("PrefMode").set_visible(True)
-            self.action_group.get_action("EditMode").set_visible(False)
+            if (self.standalone_module == None):
+                self.action_group.get_action("IconsMode").set_visible(True)
+                self.action_group.get_action("PrefMode").set_visible(True)
+                self.action_group.get_action("EditMode").set_visible(False)
             self.build_edit_view()
         elif (self.mode == "pref-UI"):
-            self.action_group.get_action("IconsMode").set_visible(True)
-            self.action_group.get_action("PrefMode").set_visible(False)
-            self.action_group.get_action("EditMode").set_visible(True)
+            if (self.standalone_module == None):
+                self.action_group.get_action("IconsMode").set_visible(True)
+                self.action_group.get_action("PrefMode").set_visible(False)
+                self.action_group.get_action("EditMode").set_visible(True)
             self.build_pref_view()
         elif (self.mode == "module-UI"):
-            self.action_group.get_action("IconsMode").set_visible(True)
-            self.action_group.get_action("PrefMode").set_visible(True)
-            self.action_group.get_action("EditMode").set_visible(True)
+            if (self.standalone_module == None):
+                self.action_group.get_action("IconsMode").set_visible(True)
+                self.action_group.get_action("PrefMode").set_visible(True)
+                self.action_group.get_action("EditMode").set_visible(True)
             self.build_module_view()
         elif (self.mode == "edit-item-UI"):
-            self.action_group.get_action("IconsMode").set_visible(True)
-            self.action_group.get_action("PrefMode").set_visible(True)
-            self.action_group.get_action("EditMode").set_visible(True)
+            if (self.standalone_module == None):
+                self.action_group.get_action("IconsMode").set_visible(True)
+                self.action_group.get_action("PrefMode").set_visible(True)
+                self.action_group.get_action("EditMode").set_visible(True)
         self.window.show_all()
 
     def build_toolbar(self):

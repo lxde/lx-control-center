@@ -72,7 +72,8 @@ class Gtk2App(UI):
 
         # Function to launch at startup
         self.generate_view()
-        self.build_toolbar()
+        if (self.standalone_module == None):
+            self.build_toolbar()
         self.draw_ui()
 
     def draw_ui(self):
@@ -270,10 +271,12 @@ class Gtk2App(UI):
 
                 if (i.activate == False):
                     logging.debug("build_generic_icon_view - Grey inactive icons: %s - %s" % (i.name, i.path))
-                    pixbuf.saturate_and_pixelate(pixbuf,0.1, True)
+                    desaturated = pixbuf.copy()
+                    pixbuf.saturate_and_pixelate(desaturated, 0.1, True)
                     display_name = _("(Inactive) - ") + i.name
-
-                liststore.append([pixbuf, display_name, i.path])
+                    liststore.append([desaturated, display_name, i.path])
+                else:
+                    liststore.append([pixbuf, display_name, i.path])
 
             hbox.add(iconview)
 
