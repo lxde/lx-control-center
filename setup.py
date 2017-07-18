@@ -5,8 +5,15 @@ import glob
 import os
 from DistUtilsExtra.command import *
 
-setup(name='lx-control-center',
+setup(
+      name='lx-control-center',
       version='0.1',
+      author ='Julien Lavergne',
+      author_email='gilir@ubuntu.com',
+      description = ('A too to centralise all settings for an LXDE environment.'),
+      licence = 'GPL2',
+      keywords = 'LXDE control-center settings',
+      url = 'https://github.com/lxde/lx-control-center',
       packages=[
                 'LXControlCenter',
                 'LXControlCenter.widgets',
