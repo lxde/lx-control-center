@@ -18,7 +18,6 @@
 #       MA 02110-1301, USA.
 
 import os.path
-from xdg import BaseDirectory
 import gettext
 
 import logging
@@ -152,7 +151,7 @@ class Main(Utils):
         self.set_log()
 
         # Load configuration file, and the settings in it
-        self.load_configuration_file()
+        self.settings_path = self.load_configuration_file ("lx-control-center","settings.conf",True)
         self.load_settings()
 
         # Normal startup, if no module arg set
@@ -213,27 +212,11 @@ class Main(Utils):
             else:
                 logging.basicConfig(filename=self.logfile_args, level=numeric_level)
        
-
-    def load_configuration_file (self):
-        """ Set configuration path to self.settings_path"""
-
-        config_dirs = BaseDirectory.xdg_config_dirs
-
-        for path in config_dirs:
-            test_path = os.path.join(path,"lx-control-center","settings.conf")
-            if(os.path.exists(test_path)):
-                self.settings_path = test_path
-                break
-        if (self.settings_path == None):
-            self.settings_path = os.path.join(os.getcwd(), "data","settings.conf")
-
-        logging.debug("load_configuration_file : self.settings_path = %s" % self.settings_path)
-
     def load_settings (self):
         """ Load settings from self.settings_path"""
 
         if (self.settings_path is None):
-            self.load_configuration_file ()
+            self.settings_path = self.load_configuration_file ("lx-control-center","settings.conf",True)
 
         keyfile = self.load_inifile(self.settings_path)
 
@@ -280,13 +263,7 @@ class Main(Utils):
             self.view_visual_effects = self.load_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
 
     def load_items_conf(self):
-        config_dirs = BaseDirectory.xdg_config_dirs
-
-        for path in config_dirs:
-            test_path = os.path.join(path,"lx-control-center","items.conf")
-            if(os.path.exists(test_path)):
-                self.items_conf_path = test_path
-                break
+        self.items_conf_path = self.load_configuration_file ("lx-control-center","items.conf",True)
 
         keyfile = self.load_inifile(self.items_conf_path)
 

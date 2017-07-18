@@ -18,8 +18,10 @@
 #       MA 02110-1301, USA.
 
 import logging
+import xdg.BaseDirectory
 import xdg.DesktopEntry
 import xdg.IniFile
+import xdg.Locale
 import os.path
 try:
     import configparser as configparser
@@ -65,8 +67,35 @@ class Utils(object):
                 elif (type_to_get == "boolean"):
                     return_value = keyfile.getboolean(group,key)
 
+                elif (type_to_get == "string"):
+                    new_key = key
+                    for lang in xdg.Locale.langs:
+                        langkey = "%s[%s]" % (key, lang)
+                        if (keyfile.has_option(group, langkey)):
+                           new_key =  langkey
+                    return_value = keyfile.get(group, new_key)
                 else:
                     return_value = keyfile.get(group,key)
 
         return return_value
 
+    def load_configuration_file (self, directory, name, local = False):
+        """ Set configuration path to self.settings_path"""
+
+        config_dirs = xdg.BaseDirectory.xdg_config_dirs
+
+        return_path = None
+
+        for path in config_dirs:
+            test_path = os.path.join(path, directory, name)
+            if(os.path.exists(test_path)):
+                return_path = test_path
+                break
+
+        if (local == True):
+            if (return_path == None):
+                return_path = os.path.join(os.getcwd(), "data",name)
+
+        logging.debug("load_configuration_file : return_path = %s" % return_path)
+
+        return return_path
