@@ -350,9 +350,7 @@ class Main(Utils):
                 self.items[item.path] = item
 
     # TODO Store list of running applications, to filter desktop application
-    # procs = psutil.process_iter()
-    # for proc in procs:
-    #   print(proc.name())
+    # Use self.generate_running_applications
 
     def apply_desktop_env_sort(self, i):
         if (len(self.items[i].not_show_in) != 0):
@@ -552,103 +550,6 @@ class Main(Utils):
         if (self.trigger_save_settings_file == True):
             self.save_file(keyfile_items, "items")
             self.trigger_save_settings_file = False
-
-    def save_setting(self, keyfile, group, key, variable, default, type_to_set):
-        logging.debug("save_setting: group, key and variable => %s, %s, %s" %(group, key, variable))
-        if (variable == default):
-            logging.debug("save_setting: variable == default, checking for existing key")
-            if(keyfile.has_option(group, key)):
-                logging.debug("save_setting: variable == default, existing key, removing")
-                keyfile.remove_option(group, key)
-                self.trigger_save_settings_file = True
-            # TODO Remove section if it's empty
-        else:
-            if (keyfile.has_section(group) == False):
-                keyfile.add_section(group)
-                self.trigger_save_settings_file = True
-
-            if (type_to_set == "float"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True 
-  
-                elif (keyfile.getfloat(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "int"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-                
-                elif (keyfile.getint(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "boolean"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.getboolean(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "list"):
-                if (keyfile.has_option(group, key) == False):
-                    list_to_save = ';'.join(variable) + ";"
-                    keyfile.set(group, key, list_to_save)
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.get(group, key) != variable):
-                    list_to_save = ';'.join(variable) + ";"
-                    keyfile.set(group, key, list_to_save)
-                    self.trigger_save_settings_file = True
-            else:
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.get(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-    def save_file(self, keyfile, settings_type):
-        dir_path = os.path.join(os.path.expanduser('~'), ".config","lx-control-center")
-        file_path = settings_type + ".conf"
-        home_path = os.path.join(dir_path, file_path)
-
-        if (self.settings_path != home_path):
-            self.settings_path = home_path
-
-        if (os.path.exists(dir_path) == False):
-            logging.debug("save_file: Directory doesn't exist => create it")
-            os.makedirs(dir_path)
-
-        if (os.path.exists(home_path) == False):
-            logging.debug("save_file: File doesn't exist => create it")
-            file_to_create = open(home_path,'a')
-            file_to_create.close()
-
-        logging.debug("save_file: Save file on %s" % home_path)
-        file_to_save = open(home_path,'w')
-        keyfile.write(file_to_save)
-        file_to_save.close()
-
-    def set_setting(self, group, key, variable):
-        if (group == "Configuration"):
-            if (key == "modules_support"):
-                self.modules_support = variable
-            elif (key == "applications_support"):
-                self.applications_support = variable
-            elif (key == "icon_view_icons_size"):
-                self.icon_view_icons_size = variable
-            elif (key == "show_category_other"):
-                self.show_category_other = variable
-            else:
-                logging.warning("set_setting: %s - %s not implemented" % (group, key))
-        else:
-            logging.warning("set_setting: %s - %s not implemented" % (group, key))
             
     def module_active(self,item):
         self.module_activated = item
