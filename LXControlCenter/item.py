@@ -69,6 +69,7 @@ class Item(Utils):
         self.module_api_version = 0.0
         self.module_spec = None
         self.module_toolkit = None
+        self.module_experimental = False
 
     def load_common_app_module_from_path(self,path,keyfile):
         self.path = path
@@ -110,6 +111,7 @@ class Item(Utils):
         self.module_version = keyfile.get("X-LX-Control-Center-Version", group="Desktop Entry", type="numeric")
         self.module_api_version = keyfile.get("X-LX-Control-Center-API-Version", group="Desktop Entry", type="numeric")
         self.module_toolkit = keyfile.get("X-LX-Control-Center-Toolkit", group="Desktop Entry", type="string")
+        self.module_experimental = keyfile.get("X-LX-Control-Center-Experimental", group="Desktop Entry", type="string")
         self.check_module()
 
     def define_category_from_list(self):

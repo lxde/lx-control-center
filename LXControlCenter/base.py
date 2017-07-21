@@ -73,6 +73,9 @@ class Main(Utils):
         self.modules_support_default = True
         self.modules_support = self.modules_support_default
 
+        self.modules_experimental_support_default = False
+        self.modules_experimental_support = self.modules_experimental_support_default
+
         self.applications_support_default = True
         self.applications_support = self.applications_support_default
 
@@ -227,6 +230,7 @@ class Main(Utils):
             self.frontend_setting = self.load_setting(keyfile, "Configuration", "frontend", self.frontend_setting_default, "string")
             self.version_config = self.load_setting(keyfile, "Configuration", "version_config", self.version_config_default, "float")
             self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
+            self.modules_experimental_support = self.load_setting(keyfile, "Configuration", "modules_experimental_support", self.modules_experimental_support_default, "boolean")
             self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
             self.categories_fixed = self.load_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
             self.show_category_other = self.load_setting(keyfile, "Configuration", "show_category_other", self.show_category_other_default, "boolean")
@@ -444,6 +448,18 @@ class Main(Utils):
                     self.items[i].activate_original = False
                     self.items[i].add_deactivate_reason(_("Module is not compatible with current toolkit"))
 
+    def apply_module_experimental_support(self, i):
+        if (self.items[i].type == "module"):
+            if (self.items[i].module_experimental == True):
+                if (self.module_experimental_support == True):
+                    self.items[i].activate = True
+                    self.items[i].activate_original = True
+                    self.items[i].add_deactivate_reason(_("Experimental module, with support enabled"))
+                else:
+                    self.items[i].activate = False
+                    self.items[i].activate_original = False
+                    self.items[i].add_deactivate_reason(_("Experimental module, but the support is not enabled"))
+
     def apply_items_categories(self, i):
         logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
         self.items[i].category_array = self.categories_triaged
@@ -502,6 +518,7 @@ class Main(Utils):
         self.save_setting(keyfile, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string")
         self.save_setting(keyfile, "Configuration", "version_config", self.version_config, self.version_config_default, "float")
         self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
+        self.save_setting(keyfile, "Configuration", "modules_experimental_support", self.modules_experimental_support, self.modules_experimental_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
         self.save_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean")
         self.save_setting(keyfile, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list")
@@ -563,6 +580,7 @@ class Main(Utils):
         logging.debug("self.modules_path : %s" % self.modules_path)
         logging.debug("self.applications_support: %s" % self.applications_support)
         logging.debug("self.modules_support: %s" % self.modules_support)
+        logging.debug("self.modules_experimental_support: %s" % self.modules_experimental_support)
         logging.debug("self.categories_triaged: %s" % self.categories_triaged)
         logging.debug("self.categories_keys : %s" % self.categories_keys)
         logging.debug("self.desktop_environments : %s" % self.desktop_environments)
@@ -582,5 +600,6 @@ class Main(Utils):
             logging.debug("Item deactivation reasons : %s" % self.items[i].deactivate_reasons)
             logging.debug("Item module_replace_application : %s" % self.items[i].module_replace_application)
             logging.debug("Item module_toolkit : %s" % self.items[i].module_toolkit)
+            logging.debug("Item module_experimental : %s" % self.items[i].module_experimental)
             logging.debug("=================")
 

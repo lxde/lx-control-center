@@ -200,6 +200,8 @@ class Utils(object):
                 self.applications_support = variable
             elif (key == "icon_view_icons_size"):
                 self.icon_view_icons_size = variable
+            elif (key == "modules_experimental_support"):
+                self.modules_experimental_support = variable
             elif (key == "show_category_other"):
                 self.show_category_other = variable
             else:
