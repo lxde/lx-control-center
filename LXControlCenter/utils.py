@@ -23,6 +23,7 @@ import xdg.DesktopEntry
 import xdg.IniFile
 import xdg.Locale
 import os.path
+import psutil
 try:
     import configparser as configparser
 except:
@@ -101,10 +102,10 @@ class Utils(object):
         return return_path
 
     def generate_running_applications(self):
-        return_lis = []
+        return_list = []
         procs = psutil.process_iter()
         for proc in procs:
-            return_lis.append(proc.name())
+            return_list.append(proc.name())
         return return_list
 
     def save_setting(self, keyfile, group, key, variable, default, type_to_set):
