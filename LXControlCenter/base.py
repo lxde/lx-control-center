@@ -21,7 +21,7 @@ import os.path
 import gettext
 
 import logging
-import argparse
+import collections
 
 from .utils import Utils
 from .item import Item
@@ -32,14 +32,14 @@ gettext.install("lx-control-center", "/usr/share/locale")
 gettext.bindtextdomain("lx-control-center", "/usr/share/locale")
 gettext.textdomain("lx-control-center")
 
-class Main(Utils):
+class Base(Utils):
     def __init__(self):
+        logging.info("Base__init__: enter function")
         Utils.__init__(self)
 
+        # Base
         self.version_config = 0.1
         self.settings_path = None
-        self.loglevel_args = None
-        self.logfile_args = None
 
         self.items = {}
         self.items_conf_path = None
@@ -89,7 +89,7 @@ class Main(Utils):
         self.whitelist =  self.whitelist_default
 
         # Order by importance (first read take advantage)
-        self.applications_path_default = ["/usr/share/applications", ";"]
+        self.applications_path_default = ["/usr/share/applications"]
         self.applications_path = self.applications_path_default
 
         self.modules_path_default = [   "/usr/lib/lx-control-center",
@@ -126,7 +126,7 @@ class Main(Utils):
         self.window_title_default = _("LX-Control-Center")
         self.window_title = self.window_title_default
 
-        self.icon_view_columns_default = 5
+        self.icon_view_columns_default = 3
         self.icon_view_columns = self.icon_view_columns_default
 
         self.icon_view_icons_size_default = 48
@@ -147,16 +147,51 @@ class Main(Utils):
         self.view_visual_effects_default = False
         self.view_visual_effects = self.view_visual_effects_default
 
-        # Parse command line arguments
-        self.get_args_parameters()
+        # UI
 
-        # Enable log
-        self.set_log()
+        # Items visible in the view, to be display
+        self.items_visible = []
 
+        # Items visible, triage by categories
+        self.items_visible_by_categories = {}
+
+        # Items, triage by categories
+        self.items_by_categories = {}
+
+        # Different mode of display the UI :
+        #  - main-UI => Icons view
+        #  - pref-UI => Preferences view
+        #  - edit-UI => Edit mode of the icons view
+        #  - edit-item-UI => Edit an item, after clicking on a icon of edit mode
+        #  - category-UI => View of only 1 category
+        #  - module-UI ==> Display the current module loaded
+        self.mode = "main-UI"
+
+        # Menu items labels & tooltips
+        self.icons_menu_item = _("Icons")
+        self.preferences_menu_item = _("Preferences")
+        self.edit_menu_item = _("Edit")
+        # TODO Find something useful to display
+        self.icons_menu_item_tooltip = _("Icons")
+        self.preferences_menu_item_tooltip = _("Preferences")
+        self.edit_menu_item_tooltip = _("Edit")
+
+        # Pref Mode labels
+        self.pref_category_configuration_label = _("Configuration")
+        self.pref_modules_support_label = _("Activate module support")
+        self.pref_applications_support_label = _("Activate applications support")
+        self.pref_show_category_other_label = _("Show category Other")
+        self.pref_enable_experimental_module_label = _("Enable experimental modules")
+        self.pref_icon_view_icons_size = _("Icon size for the view")
+
+        # UI Items
+        self.content_ui_vbox = None
+
+    def init(self):
+        logging.info("Base.init: enter function")
         # Load configuration file, and the settings in it
         self.settings_path = self.load_configuration_file ("lx-control-center","settings.conf",True)
         self.load_settings()
-
         # Normal startup, if no module arg set
         if (self.standalone_module == None):
             self.load_all_applications()
@@ -170,17 +205,18 @@ class Main(Utils):
             self.load_items_conf()
         else:
             self.load_all_modules()
-
-        # Set frontend
-        self.frontend_generate()
+            for i in self.items:
+                self.triage_modules(i)
 
         # Debug if enable
         self.print_debug()
 
+    # Base functions
     def triage_items(self):
+        logging.info("Base.triage_items: enter function")
         for i in self.items:
             self.apply_applications_modules_suport(i)
-            self.apply_triage_module(i)
+            self.triage_modules(i)
             self.apply_desktop_env_sort(i)
             self.apply_try_exec_test(i)
             self.apply_no_exec_applications(i)
@@ -192,36 +228,15 @@ class Main(Utils):
 
         self.load_items_conf()
 
-    def get_args_parameters(self):
-        parser = argparse.ArgumentParser(description='Launch LX Control Center')
-        parser.add_argument('-l', '--log', help='Set log level (values available : WARNING, INFO or DEBUG)')
-        parser.add_argument('-f', '--logfile', help='Set log file to write logs')
-        parser.add_argument('-u', '--ui', help='Set Frontend - UI (values available: GTK2, GTK3, Qt5, Auto ...')
-        parser.add_argument('-m', '--module', help='Launch only the specific module. Must be the desktop filename, without .desktop')
-        args = parser.parse_args()
-        self.loglevel_args =  args.log
-        self.logfile_args =  args.logfile
-        self.frontend_args =  args.ui
-        self.standalone_module =  args.module
-
-    def set_log(self):
-        """ Set log level by parsing"""
-        if (self.loglevel_args != None):
-            numeric_level = getattr(logging, self.loglevel_args.upper(), None)
-            if not isinstance(numeric_level, int):
-                raise ValueError('Invalid log level: %s' % self.loglevel_args)
-            if (self.logfile_args == None):
-                logging.basicConfig(level=numeric_level)
-            else:
-                logging.basicConfig(filename=self.logfile_args, level=numeric_level)
+    def triage_modules(self, item):
+        logging.info("Base.triage_modules: enter function")
+        self.apply_module_experimental_support(item)
+        self.apply_module_toolkit(item)
        
     def load_settings (self):
+        logging.info("Base.load_settings: enter function")
         """ Load settings from self.settings_path"""
-
-        if (self.settings_path is None):
-            self.settings_path = self.load_configuration_file ("lx-control-center","settings.conf",True)
-
-        keyfile = self.load_inifile(self.settings_path)
+        keyfile = self.load_keyfile_from_conf("lx-control-center")
 
         if(os.path.exists(self.settings_path)):
             # Configuration
@@ -247,13 +262,14 @@ class Main(Utils):
                         logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
                         self.categories_keys[key] = self.load_setting(keyfile, "Categories", key, self.categories_keys_default, "list")
                         logging.debug("load_settings: self.categories_keys = %s" % self.categories_keys)
-                    self.categories_triaged_generate()
+                self.categories_triaged_generate()
 
             # Path
             self.applications_path = self.load_setting(keyfile, "Path","applications_path", self.applications_path_default, "list")
             self.modules_path = self.load_setting(keyfile, "Path","modules_path", self.modules_path_default, "list")
 
             # UI
+
             self.window_size_w = self.load_setting(keyfile, "UI", "window_size_w", self.window_size_w_default, "int")
             self.window_size_h = self.load_setting(keyfile, "UI", "window_size_h", self.window_size_h_default, "int")
             self.window_icon = self.load_setting(keyfile, "UI", "window_icon", self.window_icon_default, "string")
@@ -267,6 +283,7 @@ class Main(Utils):
             self.view_visual_effects = self.load_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
 
     def load_items_conf(self):
+        logging.info("Base.load_items_conf: enter function")
         self.items_conf_path = self.load_configuration_file ("lx-control-center","items.conf",True)
 
         keyfile = self.load_inifile(self.items_conf_path)
@@ -290,7 +307,7 @@ class Main(Utils):
 
     def list_all_applications_from_dirs(self):
         """ List all applications from applications directories"""
-        logging.debug("list_all_applications_from_dirs: enter function")
+        logging.info("list_all_applications_from_dirs: enter function")
         return_list = []
         for path in self.applications_path:
             try:
@@ -316,6 +333,7 @@ class Main(Utils):
         return return_list
 
     def load_all_applications (self):
+        logging.info("Base.load_all_applications: enter function")
         list_app = self.list_all_applications_from_dirs()
         logging.debug("load_all_applications: %s" % list_app)
         for i in list_app:
@@ -325,6 +343,7 @@ class Main(Utils):
                 self.items[item.path] = item
 
     def list_all_modules_from_dirs(self):
+        logging.info("Base.list_all_modules_from_dirs: enter function")
         return_list = []
         for path in self.modules_path:
             if(os.path.exists(path)):
@@ -345,6 +364,7 @@ class Main(Utils):
         return return_list
 
     def load_all_modules (self):
+        logging.info("Base.load_all_modules: enter function")
         list_modules = self.list_all_modules_from_dirs()
         logging.debug("load_all_modules: %s :" % list_modules)
         for m in list_modules:
@@ -357,6 +377,7 @@ class Main(Utils):
     # Use self.generate_running_applications
 
     def apply_desktop_env_sort(self, i):
+        logging.info("Base.apply_desktop_env_sort: enter function")
         if (len(self.items[i].not_show_in) != 0):
             for desktop in self.desktop_environments:
                 if (desktop in self.items[i].not_show_in):
@@ -373,6 +394,7 @@ class Main(Utils):
                         self.items[i].add_deactivate_reason(_("Current environment not in OnlyShow field"))
 
     def apply_try_exec_test(self, i):
+        logging.info("Base.apply_try_exec_test: enter function")
         if (self.items[i].type == "application"):
             if (self.items[i].try_exec != ""):
                 if (os.path.exists(self.items[i].try_exec) == False):
@@ -381,6 +403,7 @@ class Main(Utils):
                     self.items[i].add_deactivate_reason(_("Excecutable in TryExec doesn't exist"))
 
     def apply_no_exec_applications(self, i):
+        logging.info("Base.apply_no_exec_applications: enter function")
         if (self.items[i].type == "application"):
             if (self.items[i].execute_command is None):
                     self.items[i].activate = False
@@ -388,6 +411,7 @@ class Main(Utils):
                     self.items[i].add_deactivate_reason(_("Excecutable path doesn't exist"))
 
     def apply_blacklist (self, i):
+        logging.info("Base.apply_blacklist: enter function")
         # Test abslotute path
         if (self.items[i].path in self.blacklist):
             self.items[i].activate = False
@@ -400,6 +424,7 @@ class Main(Utils):
             self.items[i].add_deactivate_reason(_("Blacklisted (desktop file name)"))
 
     def apply_whitelist (self, i):
+        logging.info("Base.apply_whitelist: enter function")
         # Test abslotute path
         if (self.items[i].path in self.whitelist):
             self.items[i].activate = True
@@ -412,6 +437,7 @@ class Main(Utils):
             self.items[i].add_deactivate_reason(_("Whitelisted (desktop file name)"))
 
     def apply_category_other (self, i):
+        logging.info("Base.apply_category_other: enter function")
         if (self.show_category_other == False):
             if (self.items[i].category_other == True):
                 self.items[i].activate = False
@@ -419,6 +445,7 @@ class Main(Utils):
                 self.items[i].add_deactivate_reason(_("Category Other deactivated"))
 
     def apply_applications_modules_suport(self, i):
+        logging.info("Base.apply_applications_modules_suport: enter function")
         if (self.items[i].type == "module"):
             self.items[i].activate = self.modules_support
             self.items[i].activate_original = self.modules_support
@@ -427,6 +454,7 @@ class Main(Utils):
             self.items[i].activate_original = self.modules_support
 
     def apply_triage_module(self, i):
+        logging.info("Base.apply_triage_module: enter function")
         if (self.items[i].type == "module"):
             if (self.modules_support == True):
                 to_replace = self.items[i].module_replace_application
@@ -441,6 +469,7 @@ class Main(Utils):
                 self.items[i].add_deactivate_reason(_("Module support deactivated"))
 
     def apply_module_toolkit(self, i):
+        logging.info("Base.apply_module_toolkit: enter function")
         if (self.items[i].type == "module"):
             if (self.items[i].module_toolkit != None):
                 if (self.items[i].module_toolkit != self.toolkit):
@@ -449,11 +478,10 @@ class Main(Utils):
                     self.items[i].add_deactivate_reason(_("Module is not compatible with current toolkit"))
 
     def apply_module_experimental_support(self, i):
+        logging.info("Base.apply_module_experimental_support: enter function")
         if (self.items[i].type == "module"):
             if (self.items[i].module_experimental == True):
-                if (self.module_experimental_support == True):
-                    self.items[i].activate = True
-                    self.items[i].activate_original = True
+                if (self.modules_experimental_support == True):
                     self.items[i].add_deactivate_reason(_("Experimental module, with support enabled"))
                 else:
                     self.items[i].activate = False
@@ -461,11 +489,12 @@ class Main(Utils):
                     self.items[i].add_deactivate_reason(_("Experimental module, but the support is not enabled"))
 
     def apply_items_categories(self, i):
-        logging.debug("apply_items_categories: enter fonction with self.categories_triaged = %s" % self.categories_triaged)
+        logging.info("Base.apply_items_categories: enter fonction")
         self.items[i].category_array = self.categories_triaged
         self.items[i].define_category_from_list()
 
     def desktop_environments_generate(self):
+        logging.info("Base.desktop_environments_generate: enter function")
         if self.desktop_environments_setting == ["Auto"]:
             new_list = []
             new_list.append(os.getenv("XDG_CURRENT_DESKTOP"))
@@ -473,32 +502,8 @@ class Main(Utils):
         else:
             self.desktop_environments = self.desktop_environments_setting
 
-    def frontend_generate(self):
-        supported_frontend = ["GTK3", "GTK2", "Qt5", "webkitgtk2"]
-        if (self.frontend_args == None):
-            if (self.frontend_setting == "Auto"):
-                current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
-                gtk2_list = ['LXDE']
-                gtk3_list = ['GNOME']
-                qt5_list = ['KDE', 'LXQt']
-                if (current_desktop in gtk2_list):
-                    self.frontend = 'GTK2'
-                elif (current_desktop in gtk3_list):
-                    self.frontend = 'GTK3'
-                elif (current_desktop in qt5_list):
-                    self.frontend = 'Qt5'
-                else:
-                    logging.warning(_("%s desktop environment not supported, please report it as a bug. Default to GTK3" % current_desktop))
-                    self.frontend = 'GTK3'
-            else:
-                self.frontend = self.frontend_setting
-        elif (self.frontend_args in supported_frontend):
-            self.frontend = self.frontend_args
-        else:
-            logging.warning(_("%s desktop environment unknown or not supported. Default to GTK3" % self.frontend_args))
-            self.frontend = 'GTK3'
-
     def categories_triaged_generate(self):
+        logging.info("Base.categories_triaged_generate: enter function")
         for key in self.categories_keys.keys():
             for item in self.categories_keys[key]:
                 if (len(item) > 1):
@@ -509,7 +514,8 @@ class Main(Utils):
                     break
 
     def save_settings(self):
-        keyfile = self.load_inifile(self.settings_path)
+        logging.info("Base.save_settings: enter function")
+        keyfile = self.load_keyfile_from_conf("lx-control-center")
         logging.debug("save_settings: loading %s as a keyfile" % self.settings_path)
 
         # Configuration
@@ -569,7 +575,145 @@ class Main(Utils):
             self.trigger_save_settings_file = False
             
     def module_active(self,item):
+        logging.info("Base.module_active: enter function")
         self.module_activated = item
+
+    # UI functions
+    def generate_view(self):
+        logging.info("Base.generate_view: enter function")
+        self.items_visible_generate()
+        self.items_visible_by_categories_generate()
+        self.items_by_categories_generate()
+        self.icon_view_columns_generate()
+
+    def items_visible_generate(self):
+        logging.info("Base.items_visible_generate: enter function")
+        self.items_visible = []
+        for i in self.items:
+            if (self.items[i].activate == True):
+                logging.debug("items_visible_generate: append %s in items_visible_generate" % self.items[i].path)
+                self.items_visible.append(self.items[i])
+
+    def items_visible_by_categories_generate(self):
+        logging.info("Base.items_visible_by_categories_generate: enter function")
+        self.items_visible_by_categories = {}
+        non_order_dict = {}
+        for i in self.items_visible:
+            if (i.category not in non_order_dict):
+                empty_list = []
+                non_order_dict[i.category] = empty_list
+
+            non_order_dict[i.category].append(i)
+
+        self.items_visible_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
+
+    def items_by_categories_generate(self):
+        # TODO Factorise with items_visble_by_categories_generate
+        logging.info("Base.items_by_categories_generate: enter function")
+        self.items_by_categories = {}
+        non_order_dict = {}
+        for i in self.items:
+            if (self.items[i].category not in non_order_dict):
+                empty_list = []
+                non_order_dict[self.items[i].category] = empty_list
+
+            non_order_dict[self.items[i].category].append(self.items[i])
+
+        self.items_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
+
+    #TODO Sorting items inside categories
+
+    def icon_view_columns_generate(self):
+        logging.info("Base.icon_view_columns_generate: enter function")
+        # TODO use iconview item size (or any way to have the size of the item instead of the size of the icon)
+        logging.debug("icon_view_columns_generate: self.window_size_w : %s" % self.window_size_w)
+        logging.debug("icon_view_columns_generate: self.icon_view_icons_size : %s" % self.icon_view_icons_size)
+        blank_pixels = 10
+        max_nbr_col_win = 0
+        max_nbr_col_categories = 0
+        max_nbr_col_win = self.window_size_w // ((4 * self.icon_view_icons_size) + (2 * blank_pixels))
+        logging.debug("icon_view_columns_generate: max_nbr_col_win : %s" % max_nbr_col_win)
+        if (self.items_visible == []):
+            max_nbr_col_categories = 0
+            max_categories = 0
+            logging.warning("icon_view_columns_generate: no icons visible")
+        else:
+            max_categories = max(self.items_visible_by_categories.keys(), key=(lambda k: len(self.items_visible_by_categories[k])))
+            max_nbr_col_categories = len(self.items_visible_by_categories[max_categories])
+        logging.debug("icon_view_columns_generate: max_nbr_col_categories : %s" % max_nbr_col_categories)
+
+        if (max_nbr_col_categories >= max_nbr_col_win):
+            self.icon_view_columns = max_nbr_col_win
+        else:
+            self.icon_view_columns = max_nbr_col_categories
+
+    def on_icons_mode_menu_click(self, widget, data=None):
+        logging.info("Base.on_icons_mode_menu_click: Clicked")
+        self.mode = "main-UI"
+        self.draw_ui()
+
+    def on_edit_mode_menu_click(self, widget, data=None):
+        logging.info("Base.on_edit_mode_menu_click: Clicked")
+        self.mode = "edit-UI"
+        self.draw_ui()
+
+    def on_pref_mode_menu_click(self, widget, data=None):
+        logging.info("Base.on_pref_mode_menu_click: Clicked")
+        self.mode = "pref-UI"
+        self.draw_ui()
+
+    def build_module_view(self):
+        logging.info("Base.build_module_view: enter function")
+        self.clean_main_view()
+        module_class = self.module_activated.module_spec.LXCC_Module()
+        self.content_ui_vbox.add(module_class.main_box)
+
+    def on_item_activated_common(self, path):
+        logging.info("Base.on_item_activated_common: enter function")
+        item_to_launch = self.items[path]
+        if (self.items[path].type == "module"):
+            self.mode = "module-UI"
+            self.module_active(self.items[path])
+            self.items[path].launch()
+            self.draw_ui()
+        else:
+            self.items[path].launch()
+
+    def draw_ui(self):
+        logging.info("Base.draw_ui: enter function")
+        pass
+
+    def on_resize_common(self, w, h):
+        logging.info("Base.on_resize_common: enter function")
+        if (self.mode == "main-UI"):
+            self.on_resize_function(w, h)
+        elif (self.mode == "edit-UI"):
+            self.on_resize_function(w, h)
+
+    def on_resize_function(self, w, h):
+        logging.info("on_resize: resize activated")
+        self.window_size_w = w
+        self.window_size_h = h
+        tmp_icons_col = self.icon_view_columns
+        self.icon_view_columns_generate()
+        if (self.icon_view_columns != tmp_icons_col):
+            self.draw_ui()
+
+    def set_standalone(self):
+        logging.info("Base.set_standalone: enter function")
+        logging.debug("set_standalone: value of standalone_module: %s" % self.standalone_module)
+        if (self.standalone_module != None):
+            self.mode = "module-UI"
+            for i in self.items:
+                if (self.items[i].filename == self.standalone_module + '.desktop'):
+                    if (self.toolkit == self.items[i].module_toolkit):
+                        self.on_item_activated_common(i)
+                        return True
+                    else:
+                        logging.error("Module %s is not compatible with current toolkit %s." % (self.standalone_module, self.toolkit))
+                        return False
+        else:
+            return True
 
     def print_debug(self):
         """ Prints variables and other useful items for debug purpose"""

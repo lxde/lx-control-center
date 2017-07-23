@@ -24,6 +24,7 @@ import xdg.IniFile
 import xdg.Locale
 import os.path
 import psutil
+import argparse
 try:
     import configparser as configparser
 except:
@@ -100,6 +101,11 @@ class Utils(object):
         logging.debug("load_configuration_file : return_path = %s" % return_path)
 
         return return_path
+
+    def load_keyfile_from_conf(self, setting):
+        settings_path = self.load_configuration_file (setting,"settings.conf",True)
+        keyfile = self.load_inifile(settings_path)
+        return keyfile
 
     def generate_running_applications(self):
         return_list = []
@@ -209,3 +215,98 @@ class Utils(object):
                 logging.warning("set_setting: %s - %s not implemented" % (group, key))
         else:
             logging.warning("set_setting: %s - %s not implemented" % (group, key))
+
+class Runner(Utils):
+    def __init__(self):
+        Utils.__init__(self)
+        self.loglevel_args = None
+        self.logfile_args = None
+        self.standalone_module = False
+
+    def get_args_parameters(self):
+        parser = argparse.ArgumentParser(description='Launch LX Control Center')
+        parser.add_argument('-l', '--log', help='Set log level (values available : WARNING, INFO or DEBUG)')
+        parser.add_argument('-f', '--logfile', help='Set log file to write logs')
+        parser.add_argument('-u', '--ui', help='Set Frontend - UI (values available: GTK2, GTK3, Qt5, Auto ...')
+        parser.add_argument('-m', '--module', help='Launch only the specific module. Must be the desktop filename, without .desktop')
+        args = parser.parse_args()
+        self.loglevel_args =  args.log
+        self.logfile_args =  args.logfile
+        self.frontend_args =  args.ui
+        self.standalone_module =  args.module
+
+    def set_log(self):
+        """ Set log level by parsing"""
+        if (self.loglevel_args != None):
+            numeric_level = getattr(logging, self.loglevel_args.upper(), None)
+            if not isinstance(numeric_level, int):
+                raise ValueError('Invalid log level: %s' % self.loglevel_args)
+            if (self.logfile_args == None):
+                logging.basicConfig(level=numeric_level)
+            else:
+                logging.basicConfig(filename=self.logfile_args, level=numeric_level)
+
+    def frontend_generate(self, keyfile):
+        supported_frontend = ["GTK3", "GTK2", "Qt5", "webkitgtk2"]
+        frontend_setting = self.load_setting(keyfile, "Configuration","frontend", None, "string")
+        frontend = None
+        if (self.frontend_args != None):
+            if (self.frontend_args in supported_frontend):
+                frontend = self.frontend_args
+            else:
+                logging.warning(_("%s desktop environment unknown or not supported. Default to GTK3" % self.frontend_args))
+                frontend = 'GTK3'
+        elif (frontend_setting == "Auto" or frontend_setting == None):
+            current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
+            gtk2_list = ['LXDE']
+            gtk3_list = ['GNOME']
+            qt5_list = ['KDE', 'LXQt']
+            if (current_desktop in gtk2_list):
+                frontend = 'GTK2'
+            elif (current_desktop in gtk3_list):
+                frontend = 'GTK3'
+            elif (current_desktop in qt5_list):
+                frontend = 'Qt5'
+            else:
+                logging.warning(_("%s desktop environment not supported, please report it as a bug. Default to GTK3" % current_desktop))
+                frontend = 'GTK3'
+        else:
+            frontend = self.frontend_setting
+
+        return frontend
+
+    def run (self):
+        # Parse command line arguments
+        self.get_args_parameters()
+
+        # Enable log
+        self.set_log()
+
+        keyfile = self.load_keyfile_from_conf("lx-control-center")
+        frontend = self.frontend_generate(keyfile)
+        app = None
+        if (frontend == "GTK2"):
+            from LXControlCenter.widgets.gtk2 import Gtk2App
+            app = Gtk2App()
+            app.toolkit = "GTK2"
+        elif (frontend == "GTK3"):
+            from LXControlCenter.widgets.gtk3 import Gtk3App
+            app = Gtk3App()
+            app.toolkit = "GTK3"
+        elif (frontend == "Qt5"):
+            from LXControlCenter.widgets.qt5 import Qt5App
+            app = Qt5App()
+            app.toolkit = "Qt5"
+        elif (frontend == "webkitgtk2"):
+            from LXControlCenter.widgets.webkitgtk2 import WebkitApp
+            app = WebkitApp()
+            app.toolkit = None
+        else:
+            # Default to GTK3
+            from LXControlCenter.widgets.gtk3 import Gtk3App
+            app = Gtk3App()
+            app.toolkit = "GTK3"
+
+        app.frontend = frontend
+        app.standalone_module = self.standalone_module
+        app.main()

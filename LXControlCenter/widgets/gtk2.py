@@ -23,58 +23,11 @@ import gtk as Gtk
 
 import logging
 
-from .common import UI
+from ..base import Base
 
-class Gtk2App(UI):
+class Gtk2App(Base):
     def __init__(self):
-        UI.__init__(self)
-
-        self.toolkit = "GTK2"
-
-        window = Gtk.Window()
-        self.window=window
-        self.window.set_title(self.window_title)
-        self.window.set_icon_name(self.window_icon)
-        self.window.set_default_size(self.window_size_w,self.window_size_h)
-
-        self.window.connect("destroy", self.destroy)
-        self.window.connect("check-resize", self.on_resize)
-
-        window_scrolled = Gtk.ScrolledWindow()
-        # GTK2 specific
-        #window_scrolled.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
-        self.window.add(window_scrolled)
-
-        self.window_box = Gtk.VBox()
-        # GTK2 Specific: add_with_viewport
-        window_scrolled.add_with_viewport(self.window_box)
-
-        self.main_ui_vbox = Gtk.VBox()
-        self.window_box.add(self.main_ui_vbox)
-
-        # GTK2 Specific
-        self.menu_bar = Gtk.MenuBar()
-        self.main_ui_vbox.pack_start(self.menu_bar, False, True, 0)
-
-        self.content_ui_vbox = Gtk.VBox()
-        self.main_ui_vbox.pack_start(self.content_ui_vbox, False, True, 0)
-
-        # GTK2 Specific
-        self.filem_icons = Gtk.MenuItem(self.icons_menu_item)
-        self.filem_pref = Gtk.MenuItem(self.preferences_menu_item)
-        self.filem_edit = Gtk.MenuItem(self.edit_menu_item)
-        #self.menu_button = Gtk.ToolButton()
-
-        self.action_group = Gtk.ActionGroup("actions")
-
-        #GTK2 specific
-        self.theme = Gtk.icon_theme_get_default()
-
-        # Function to launch at startup
-        self.generate_view()
-        if (self.standalone_module == None):
-            self.build_toolbar()
-        self.draw_ui()
+        Base.__init__(self)
 
     def draw_ui(self):
         if (self.mode == "main-UI"):
@@ -423,4 +376,52 @@ class Gtk2App(UI):
         Gtk.main_quit()
 
     def main(self):
+        # Function to launch at startup
+        self.init()
+        logging.info("GTK2.main: finish init()")
+
+        window = Gtk.Window()
+        self.window=window
+        self.window.set_title(self.window_title)
+        self.window.set_icon_name(self.window_icon)
+        self.window.set_default_size(self.window_size_w,self.window_size_h)
+
+        self.window.connect("destroy", self.destroy)
+        self.window.connect("check-resize", self.on_resize)
+
+        window_scrolled = Gtk.ScrolledWindow()
+        # GTK2 specific
+        #window_scrolled.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
+        self.window.add(window_scrolled)
+
+        self.window_box = Gtk.VBox()
+        # GTK2 Specific: add_with_viewport
+        window_scrolled.add_with_viewport(self.window_box)
+
+        self.main_ui_vbox = Gtk.VBox()
+        self.window_box.add(self.main_ui_vbox)
+
+        # GTK2 Specific
+        self.menu_bar = Gtk.MenuBar()
+        self.main_ui_vbox.pack_start(self.menu_bar, False, True, 0)
+
+        self.content_ui_vbox = Gtk.VBox()
+        self.main_ui_vbox.pack_start(self.content_ui_vbox, False, True, 0)
+
+        # GTK2 Specific
+        self.filem_icons = Gtk.MenuItem(self.icons_menu_item)
+        self.filem_pref = Gtk.MenuItem(self.preferences_menu_item)
+        self.filem_edit = Gtk.MenuItem(self.edit_menu_item)
+        #self.menu_button = Gtk.ToolButton()
+
+        self.action_group = Gtk.ActionGroup("actions")
+
+        #GTK2 specific
+        self.theme = Gtk.icon_theme_get_default()
+
+        # Function to launch at startup
+        self.generate_view()
+        if (self.standalone_module == None):
+            self.build_toolbar()
+        self.draw_ui()
         Gtk.main()

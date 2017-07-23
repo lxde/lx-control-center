@@ -24,45 +24,11 @@ from gi.repository.GdkPixbuf import Pixbuf
 
 import logging
 
-from .common import UI
+from ..base import Base
 
-class Gtk3App(UI):
+class Gtk3App(Base):
     def __init__(self):
-        UI.__init__(self)
-
-        self.toolkit = "GTK3"
-
-        window = Gtk.Window()
-        self.window=window
-        self.window.set_title(self.window_title)
-        self.window.set_icon_name(self.window_icon)
-        self.window.set_default_size(self.window_size_w,self.window_size_h)
-
-        self.window.connect("destroy", self.destroy)
-        self.window.connect("check-resize", self.on_resize)
-
-        window_scrolled = Gtk.ScrolledWindow()
-        self.window.add(window_scrolled)
-
-        self.window_box = Gtk.VBox()
-        window_scrolled.add(self.window_box)
-
-        self.header_bar = Gtk.HeaderBar()
-
-        self.content_ui_vbox = Gtk.VBox()
-        self.window_box.pack_start(self.content_ui_vbox, True, True, 0)
-
-        self.menu_button = Gtk.MenuButton()
-
-        self.action_group = Gtk.ActionGroup("actions")
-
-        self.theme = Gtk.IconTheme.get_default()
-
-        # Function to launch at startup
-        self.generate_view()
-        if (self.standalone_module == None):
-            self.build_toolbar()
-        self.draw_ui()
+        Base.__init__(self)
 
     def draw_ui(self):
         if (self.mode == "main-UI"):
@@ -181,7 +147,8 @@ class Gtk3App(UI):
         self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, "Configuration", "modules_support", 0)
         self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, "Configuration", "applications_support", 1)
         self.create_switch_conf(configuration_grid, self.pref_show_category_other_label, self.show_category_other, "Configuration", "show_category_other", 2)
-        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 3)
+        self.create_switch_conf(configuration_grid, self.pref_enable_experimental_module_label, self.modules_experimental_support, "Configuration", "modules_experimental_support", 3)
+        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 4)
 
     def build_edit_view(self):
         self.clean_main_view()
@@ -400,4 +367,38 @@ class Gtk3App(UI):
         Gtk.main_quit()
 
     def main(self):
+        # Function to launch at startup
+        self.init()
+        logging.info("GTK3.main: finish init()")
+
+        window = Gtk.Window()
+        self.window=window
+        self.window.set_title(self.window_title)
+        self.window.set_icon_name(self.window_icon)
+        self.window.set_default_size(self.window_size_w,self.window_size_h)
+
+        self.window.connect("destroy", self.destroy)
+        self.window.connect("check-resize", self.on_resize)
+
+        window_scrolled = Gtk.ScrolledWindow()
+        self.window.add(window_scrolled)
+
+        self.window_box = Gtk.VBox()
+        window_scrolled.add(self.window_box)
+
+        self.header_bar = Gtk.HeaderBar()
+
+        self.content_ui_vbox = Gtk.VBox()
+        self.window_box.pack_start(self.content_ui_vbox, True, True, 0)
+
+        self.menu_button = Gtk.MenuButton()
+
+        self.action_group = Gtk.ActionGroup("actions")
+
+        self.theme = Gtk.IconTheme.get_default()
+        self.generate_view()
+        if (self.standalone_module == None):
+            self.build_toolbar()
+        self.draw_ui()
+        self.set_standalone()
         Gtk.main()

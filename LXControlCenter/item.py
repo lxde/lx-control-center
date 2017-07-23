@@ -111,7 +111,7 @@ class Item(Utils):
         self.module_version = keyfile.get("X-LX-Control-Center-Version", group="Desktop Entry", type="numeric")
         self.module_api_version = keyfile.get("X-LX-Control-Center-API-Version", group="Desktop Entry", type="numeric")
         self.module_toolkit = keyfile.get("X-LX-Control-Center-Toolkit", group="Desktop Entry", type="string")
-        self.module_experimental = keyfile.get("X-LX-Control-Center-Experimental", group="Desktop Entry", type="string")
+        self.module_experimental = keyfile.get("X-LX-Control-Center-Experimental", group="Desktop Entry", type="boolean")
         self.check_module()
 
     def define_category_from_list(self):
@@ -188,7 +188,3 @@ class Item(Utils):
                     spec = importlib.util.spec_from_file_location("module.name", module_path)
                     self.module_spec = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(self.module_spec)
-
-
-
-

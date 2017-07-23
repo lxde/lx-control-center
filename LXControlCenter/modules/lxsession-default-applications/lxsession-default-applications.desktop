@@ -10,4 +10,5 @@ X-LX-Control-Center-Depends=lxsession;
 X-LX-Control-Center-Version=0.1
 X-LX-Control-Center-API-Version=0.1
 X-LX-Control-Center-Application-Replaces=lxsession-default-apps.desktop;
-X-LX-Control-Center-Toolkit=GTK3
+X-LX-Control-Center-Toolkit=GTK2
+X-LX-Control-Center-Experimental=true
