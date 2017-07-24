@@ -31,6 +31,7 @@ class Gtk3App(Base):
         Base.__init__(self)
 
     def draw_ui(self):
+        logging.info("GTK3.draw_ui: enter function")
         if (self.mode == "main-UI"):
             if (self.standalone_module == None):
                 self.action_group.get_action("IconsMode").set_visible(False)
@@ -151,7 +152,10 @@ class Gtk3App(Base):
         self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 4)
 
     def build_edit_view(self):
+        logging.info("GTK3.build_edit_view: enter function")
         self.clean_main_view()
+        # Update items for search filter
+        self.items_by_categories_generate()
         self.build_generic_icon_view("all")
 
     def build_icon_view(self):
@@ -362,6 +366,11 @@ class Gtk3App(Base):
     def on_resize(self, widget, data=None):
         self.on_resize_common(self.window.get_size()[0], self.window.get_size()[1])
 
+    def on_search(self, widget, data=None):
+        logging.info("GTK3.on_search: enter function")
+        self.search_string = self.search_box.get_text()
+        self.draw_ui()
+
     def destroy(self, widget, data=None):
         self.save_settings()
         Gtk.main_quit()
@@ -387,6 +396,10 @@ class Gtk3App(Base):
         window_scrolled.add(self.window_box)
 
         self.header_bar = Gtk.HeaderBar()
+
+        self.search_box = Gtk.Entry()
+        self.search_box.connect("changed", self.on_search)
+        self.window_box.pack_start(self.search_box, False, False, 0)
 
         self.content_ui_vbox = Gtk.VBox()
         self.window_box.pack_start(self.content_ui_vbox, True, True, 0)
