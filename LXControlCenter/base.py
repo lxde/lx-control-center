@@ -186,6 +186,7 @@ class Base(Utils):
 
         # UI Items
         self.content_ui_vbox = None
+        self.search_string = None
 
     def init(self):
         logging.info("Base.init: enter function")
@@ -586,13 +587,30 @@ class Base(Utils):
         self.items_by_categories_generate()
         self.icon_view_columns_generate()
 
+    def filter_item_by_search(self, item):
+        logging.info("Base.filter_item_by_search: enter function")
+        match = False
+        if (self.search_string == None):
+            logging.debug("Base.filter_item_by_search, no search")
+            match = True
+        elif (self.search_string in item.name.lower()):
+            logging.debug("Base.filter_item_by_search, search %s in name: match for %s with %s" % (self.search_string, item.path, item.name))
+            match = True
+        elif (self.search_string in item.comment.lower()):
+            logging.debug("Base.filter_item_by_search, search %s in comment: match for %s with %s" % (self.search_string, item.path, item.comment))
+            match = True
+        else:
+            math = False
+        return match
+
     def items_visible_generate(self):
         logging.info("Base.items_visible_generate: enter function")
         self.items_visible = []
         for i in self.items:
             if (self.items[i].activate == True):
-                logging.debug("items_visible_generate: append %s in items_visible_generate" % self.items[i].path)
-                self.items_visible.append(self.items[i])
+                if (self.filter_item_by_search(self.items[i]) == True):
+                    logging.debug("items_visible_generate, append %s in items_visible_generate" % self.items[i].path)
+                    self.items_visible.append(self.items[i])
 
     def items_visible_by_categories_generate(self):
         logging.info("Base.items_visible_by_categories_generate: enter function")
@@ -613,13 +631,12 @@ class Base(Utils):
         self.items_by_categories = {}
         non_order_dict = {}
         for i in self.items:
-            if (self.items[i].category not in non_order_dict):
-                empty_list = []
-                non_order_dict[self.items[i].category] = empty_list
-
-            non_order_dict[self.items[i].category].append(self.items[i])
-
-        self.items_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
+            if (self.filter_item_by_search(self.items[i]) == True):
+                if (self.items[i].category not in non_order_dict):
+                    empty_list = []
+                    non_order_dict[self.items[i].category] = empty_list
+                non_order_dict[self.items[i].category].append(self.items[i])
+                self.items_by_categories = collections.OrderedDict(sorted(non_order_dict.items()))
 
     #TODO Sorting items inside categories
 
@@ -691,7 +708,7 @@ class Base(Utils):
             self.on_resize_function(w, h)
 
     def on_resize_function(self, w, h):
-        logging.info("on_resize: resize activated")
+        logging.info("Base.on_resize: resize activated")
         self.window_size_w = w
         self.window_size_h = h
         tmp_icons_col = self.icon_view_columns

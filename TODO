@@ -2,4 +2,3 @@
 * Module : Check dependency
 * Monitor file and directory changes (to not load all files at each startup)
 * Load application for menu-cache (alternative to desktop files)
-* Search capability (in normal and edit view)
