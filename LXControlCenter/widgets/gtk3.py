@@ -445,7 +445,7 @@ class Gtk3App(Base):
         self.header_box.pack_start(self.pref_view_button, False, False, 0)
 
         self.search_box = Gtk.Entry()
-        self.search_box.set_placeholder_text(_("Search")
+        self.search_box.set_placeholder_text(_("Search"))
         self.search_box.connect("changed", self.on_search)
         self.header_box.pack_end(self.search_box, True, True, 0)
 
