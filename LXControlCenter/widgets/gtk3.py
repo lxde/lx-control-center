@@ -37,30 +37,45 @@ class Gtk3App(Base):
                 self.action_group.get_action("IconsMode").set_visible(False)
                 self.action_group.get_action("PrefMode").set_visible(True)
                 self.action_group.get_action("EditMode").set_visible(True)
+                self.icon_view_button.set_sensitive(False)
+                self.edit_view_button.set_sensitive(True)
+                self.pref_view_button.set_sensitive(True)
             self.build_icon_view()
         elif (self.mode == "edit-UI"):
             if (self.standalone_module == None):
                 self.action_group.get_action("IconsMode").set_visible(True)
                 self.action_group.get_action("PrefMode").set_visible(True)
                 self.action_group.get_action("EditMode").set_visible(False)
+                self.icon_view_button.set_sensitive(True)
+                self.edit_view_button.set_sensitive(False)
+                self.pref_view_button.set_sensitive(True)
             self.build_edit_view()
         elif (self.mode == "pref-UI"):
             if (self.standalone_module == None):
                 self.action_group.get_action("IconsMode").set_visible(True)
                 self.action_group.get_action("PrefMode").set_visible(False)
                 self.action_group.get_action("EditMode").set_visible(True)
+                self.icon_view_button.set_sensitive(True)
+                self.edit_view_button.set_sensitive(True)
+                self.pref_view_button.set_sensitive(False)
             self.build_pref_view()
         elif (self.mode == "module-UI"):
             if (self.standalone_module == None):
                 self.action_group.get_action("IconsMode").set_visible(True)
                 self.action_group.get_action("PrefMode").set_visible(True)
                 self.action_group.get_action("EditMode").set_visible(True)
+                self.icon_view_button.set_sensitive(True)
+                self.edit_view_button.set_sensitive(True)
+                self.pref_view_button.set_sensitive(True)
             self.build_module_view()
         elif (self.mode == "edit-item-UI"):
             if (self.standalone_module == None):
                 self.action_group.get_action("IconsMode").set_visible(True)
                 self.action_group.get_action("PrefMode").set_visible(True)
                 self.action_group.get_action("EditMode").set_visible(True)
+                self.icon_view_button.set_sensitive(True)
+                self.edit_view_button.set_sensitive(True)
+                self.pref_view_button.set_sensitive(True)
         self.window.show_all()
 
     def build_toolbar(self):
@@ -98,7 +113,7 @@ class Gtk3App(Base):
             self.content_ui_vbox.remove(children)
 
     def create_switch_conf(self, grid, label, default, group, key, position):
-        label_widget = Gtk.Label(label)
+        label_widget = Gtk.Label(label, xalign=0)
         switch_widget = Gtk.Switch()
         switch_widget.set_active(default)
         switch_widget.connect("notify::active", self.on_switch_click, group, key)
@@ -115,7 +130,7 @@ class Gtk3App(Base):
 
     # SpinButton
     def create_spinbutton_conf(self, grid, label, default, group, key, position):
-        label_widget = Gtk.Label(label)
+        label_widget = Gtk.Label(label, xalign=0)
         adjustment = Gtk.Adjustment(value=default, lower=8, upper=128, step_incr=1, page_incr=1, page_size=0)
         spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
         spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key)
@@ -133,6 +148,10 @@ class Gtk3App(Base):
         grid.set_row_homogeneous(False)
         grid.set_column_spacing(20)
         grid.set_row_spacing(20)
+        grid.set_margin_left(30)
+        grid.set_margin_right(30)
+        grid.set_margin_top(10)
+        grid.set_margin_bottom(10)
         return grid
 
     def build_pref_view(self):
@@ -271,27 +290,27 @@ class Gtk3App(Base):
         box_name = Gtk.HBox()
         label_name = Gtk.Label()
         label_name.set_text(_("Name"))
-        box_name.pack_start(label_name, False, True, 3)
+        box_name.pack_start(label_name, False, False, 3)
         self.entry_name = Gtk.Entry()
         self.entry_name.set_text(self.item_to_save.name)
-        box_name.pack_start(self.entry_name, True, True, 3)
-        self.content_ui_vbox.pack_start(box_name, False, True, 3)
+        box_name.pack_start(self.entry_name, False, False, 3)
+        self.content_ui_vbox.pack_start(box_name, False, False, 3)
 
         box_comment = Gtk.HBox()
         label_comment = Gtk.Label()
         label_comment.set_text(_("Comment"))
-        box_comment.pack_start(label_comment, False, True, 3)
+        box_comment.pack_start(label_comment, False, False, 3)
         self.entry_comment = Gtk.Entry()
         self.entry_comment.set_text(self.item_to_save.comment)
-        box_comment.pack_start(self.entry_comment, True, True, 3)
-        self.content_ui_vbox.pack_start(box_comment, False, True, 3)
+        box_comment.pack_start(self.entry_comment, False, False, 3)
+        self.content_ui_vbox.pack_start(box_comment, False, False, 3)
 
         box_activate = Gtk.HBox()
         self.check_activate = Gtk.CheckButton()
         self.check_activate.set_label(_("Activate ?"))
         self.check_activate.set_active(self.item_to_save.activate)
         box_activate.add(self.check_activate)
-        self.content_ui_vbox.pack_start(box_activate, False, True, 0)
+        self.content_ui_vbox.pack_start(box_activate, False, False, 0)
 
         if (self.item_to_save.deactivate_reasons != []):
             box_deactivate_reasons = Gtk.HBox()
@@ -305,7 +324,7 @@ class Gtk3App(Base):
                 label_to_display = label_to_display + label + "\n"
             deactivate_reasons_label.set_text(label_to_display)
             box_deactivate_reasons.add(deactivate_reasons_label)
-            self.content_ui_vbox.pack_start(box_deactivate_reasons, False, True, 3)
+            self.content_ui_vbox.pack_start(box_deactivate_reasons, False, False, 3)
 
         box_buttons = Gtk.HBox()
         save_button = Gtk.Button()
@@ -320,17 +339,17 @@ class Gtk3App(Base):
         cancel_button.set_label(_("Cancel"))
         cancel_button.connect("clicked", self.on_edit_item_cancel)
         box_buttons.add(cancel_button)
-        self.content_ui_vbox.pack_start(box_buttons, False, True, 0)
+        self.content_ui_vbox.pack_start(box_buttons, False, False, 0)
 
         # TODO Display other information about the desktop file
         box_location = Gtk.HBox()
         label_location = Gtk.Label()
         label_location.set_text(_("Location"))
-        box_location.pack_start(label_location, False, True, 3)
+        box_location.pack_start(label_location, False, False, 3)
         self.entry_location = Gtk.Label()
         self.entry_location.set_text(self.item_to_save.path)
-        box_location.pack_start(self.entry_location, True, True, 3)
-        self.content_ui_vbox.pack_start(box_location, False, True, 3)
+        box_location.pack_start(self.entry_location, False, False, 3)
+        self.content_ui_vbox.pack_start(box_location, False, False, 3)
 
         self.draw_ui()
 
@@ -371,6 +390,15 @@ class Gtk3App(Base):
         self.search_string = self.search_box.get_text()
         self.draw_ui()
 
+    def create_togglebutton(self, label, icon):
+        button = Gtk.Button(label = label)
+        button.set_size_request(200, -1)
+        icon_pixbuf = self.theme.get_default().load_icon(icon, 24, Gtk.IconLookupFlags.FORCE_SIZE)
+        icon_image = Gtk.Image.new_from_pixbuf(icon_pixbuf)
+        button.set_image(icon_image)
+        button.set_sensitive(False)
+        return button
+
     def destroy(self, widget, data=None):
         self.save_settings()
         Gtk.main_quit()
@@ -397,18 +425,37 @@ class Gtk3App(Base):
 
         self.header_bar = Gtk.HeaderBar()
 
+        # Header
+        # Icon view - Edit View - Preferences - Search
+        self.header_box = Gtk.HBox()
+        self.window_box.pack_start(self.header_box, False, False, 0)
+
+        self.theme = Gtk.IconTheme.get_default()
+
+        self.icon_view_button = self.create_togglebutton(self.icons_menu_item, Gtk.STOCK_APPLY)
+        self.icon_view_button.connect("clicked", self.on_icons_mode_menu_click)
+        self.header_box.pack_start(self.icon_view_button, False, False, 0)
+
+        self.edit_view_button = self.create_togglebutton(self.edit_menu_item, Gtk.STOCK_EDIT)
+        self.edit_view_button.connect("clicked", self.on_edit_mode_menu_click)
+        self.header_box.pack_start(self.edit_view_button, False, False, 0)
+
+        self.pref_view_button = self.create_togglebutton(self.preferences_menu_item, Gtk.STOCK_PREFERENCES)
+        self.pref_view_button.connect("clicked", self.on_pref_mode_menu_click)
+        self.header_box.pack_start(self.pref_view_button, False, False, 0)
+
         self.search_box = Gtk.Entry()
+        self.search_box.set_placeholder_text(_("Search")
         self.search_box.connect("changed", self.on_search)
-        self.window_box.pack_start(self.search_box, False, False, 0)
+        self.header_box.pack_end(self.search_box, True, True, 0)
 
         self.content_ui_vbox = Gtk.VBox()
-        self.window_box.pack_start(self.content_ui_vbox, True, True, 0)
+        self.window_box.pack_start(self.content_ui_vbox, False, False, 0)
 
         self.menu_button = Gtk.MenuButton()
 
         self.action_group = Gtk.ActionGroup("actions")
 
-        self.theme = Gtk.IconTheme.get_default()
         self.generate_view()
         if (self.standalone_module == None):
             self.build_toolbar()
