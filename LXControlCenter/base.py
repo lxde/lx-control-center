@@ -23,8 +23,8 @@ import gettext
 import logging
 import collections
 
-from .utils import Utils
-from .item import Item
+from LXControlCenter.utils import Utils
+from LXControlCenter.item import Item
 
 _ = gettext.gettext
 
@@ -35,11 +35,12 @@ gettext.textdomain("lx-control-center")
 class Base(Utils):
     def __init__(self):
         logging.info("Base__init__: enter function")
-        Utils.__init__(self)
 
+        self.util = Utils()
         # Base
         self.version_config = 0.1
-        self.settings_path = None
+        self.keyfile_settings = None
+        self.keyfile_items = None
 
         self.items = {}
         self.items_conf_path = None
@@ -191,7 +192,6 @@ class Base(Utils):
     def init(self):
         logging.info("Base.init: enter function")
         # Load configuration file, and the settings in it
-        self.settings_path = self.load_configuration_file ("lx-control-center","settings.conf",True)
         self.load_settings()
         # Normal startup, if no module arg set
         if (self.standalone_module == None):
@@ -236,74 +236,73 @@ class Base(Utils):
        
     def load_settings (self):
         logging.info("Base.load_settings: enter function")
-        """ Load settings from self.settings_path"""
-        keyfile = self.load_keyfile_from_conf("lx-control-center")
+        """ Load settings from lx-control-center/settings.conf"""
+        if (self.keyfile_settings == None):
+            self.keyfile_settings = self.util.load_object("keyfile", os.path.join("lx-control-center", "settings.conf"))
 
-        if(os.path.exists(self.settings_path)):
+        if(self.keyfile_settings != None):
             # Configuration
-            self.keyword_categories_settings_list = self.load_setting(keyfile, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
-            self.desktop_environments_setting = self.load_setting(keyfile, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
-            self.frontend_setting = self.load_setting(keyfile, "Configuration", "frontend", self.frontend_setting_default, "string")
-            self.version_config = self.load_setting(keyfile, "Configuration", "version_config", self.version_config_default, "float")
-            self.modules_support = self.load_setting(keyfile, "Configuration", "modules_support", self.modules_support_default, "boolean")
-            self.modules_experimental_support = self.load_setting(keyfile, "Configuration", "modules_experimental_support", self.modules_experimental_support_default, "boolean")
-            self.applications_support = self.load_setting(keyfile, "Configuration", "applications_support", self.applications_support_default, "boolean")
-            self.categories_fixed = self.load_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
-            self.show_category_other = self.load_setting(keyfile, "Configuration", "show_category_other", self.show_category_other_default, "boolean")
-            self.blacklist = self.load_setting(keyfile, "Configuration","blacklist", self.blacklist_default, "list")
-            self.whitelist = self.load_setting(keyfile, "Configuration","whitelist", self.whitelist_default, "list")
+            self.keyword_categories_settings_list = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
+            self.desktop_environments_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
+            self.frontend_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "frontend", self.frontend_setting_default, "string")
+            self.version_config = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config_default, "float")
+            self.modules_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "modules_support", self.modules_support_default, "boolean")
+            self.modules_experimental_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "modules_experimental_support", self.modules_experimental_support_default, "boolean")
+            self.applications_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "applications_support", self.applications_support_default, "boolean")
+            self.categories_fixed = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
+            self.show_category_other = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "show_category_other", self.show_category_other_default, "boolean")
+            self.blacklist = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration","blacklist", self.blacklist_default, "list")
+            self.whitelist = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration","whitelist", self.whitelist_default, "list")
 
             # Categories
             if (self.categories_fixed == False):
-                if (keyfile.has_section("Categories")):
+                if (self.keyfile_settings.has_section("Categories")):
                     self.categories_keys.clear()
                     self.categories_triaged.clear()
-                    tmp_categories_keys = keyfile.options("Categories")
+                    tmp_categories_keys = self.keyfile_settings.options("Categories")
                     for key in tmp_categories_keys:
                         logging.debug("load_settings: key in tmp_categories_keys = %s" % key)
-                        self.categories_keys[key] = self.load_setting(keyfile, "Categories", key, self.categories_keys_default, "list")
+                        self.categories_keys[key] = self.util.get_setting("keyfile", self.keyfile_settings, "Categories", key, self.categories_keys_default, "list")
                         logging.debug("load_settings: self.categories_keys = %s" % self.categories_keys)
                 self.categories_triaged_generate()
 
             # Path
-            self.applications_path = self.load_setting(keyfile, "Path","applications_path", self.applications_path_default, "list")
-            self.modules_path = self.load_setting(keyfile, "Path","modules_path", self.modules_path_default, "list")
+            self.applications_path = self.util.get_setting("keyfile", self.keyfile_settings, "Path","applications_path", self.applications_path_default, "list")
+            self.modules_path = self.util.get_setting("keyfile", self.keyfile_settings, "Path","modules_path", self.modules_path_default, "list")
 
             # UI
-
-            self.window_size_w = self.load_setting(keyfile, "UI", "window_size_w", self.window_size_w_default, "int")
-            self.window_size_h = self.load_setting(keyfile, "UI", "window_size_h", self.window_size_h_default, "int")
-            self.window_icon = self.load_setting(keyfile, "UI", "window_icon", self.window_icon_default, "string")
-            self.window_title = self.load_setting(keyfile, "UI", "window_title", self.window_title_default, "string")
-            self.icon_view_columns = self.load_setting(keyfile, "UI", "icon_view_columns", self.icon_view_columns_default, "int")
-            self.icon_view_icons_size = self.load_setting(keyfile, "UI", "icon_view_icons_size", self.icon_view_icons_size_default, "int")
-            self.icon_not_theme_allow = self.load_setting(keyfile, "UI", "icon_not_theme_allow", self.icon_not_theme_allow_default, "boolean")
-            self.icon_force_size = self.load_setting(keyfile, "UI", "icon_force_size", self.icon_force_size_default, "boolean")
-            self.icon_fallback = self.load_setting(keyfile, "UI", "icon_fallback", self.icon_fallback_default, "string")
-            self.view_mode = self.load_setting(keyfile, "UI", "view_mode", self.view_mode_default, "string")
-            self.view_visual_effects = self.load_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
+            self.window_size_w = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_size_w", self.window_size_w_default, "int")
+            self.window_size_h = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_size_h", self.window_size_h_default, "int")
+            self.window_icon = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_icon", self.window_icon_default, "string")
+            self.window_title = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_title", self.window_title_default, "string")
+            self.icon_view_columns = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_view_columns", self.icon_view_columns_default, "int")
+            self.icon_view_icons_size = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_view_icons_size", self.icon_view_icons_size_default, "int")
+            self.icon_not_theme_allow = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_not_theme_allow", self.icon_not_theme_allow_default, "boolean")
+            self.icon_force_size = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_force_size", self.icon_force_size_default, "boolean")
+            self.icon_fallback = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_fallback", self.icon_fallback_default, "string")
+            self.view_mode = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "view_mode", self.view_mode_default, "string")
+            self.view_visual_effects = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "view_visual_effects", self.view_visual_effects_default, "boolean")
 
     def load_items_conf(self):
         logging.info("Base.load_items_conf: enter function")
-        self.items_conf_path = self.load_configuration_file ("lx-control-center","items.conf",True)
+        if (self.keyfile_items == None):
+            self.keyfile_items = self.util.load_object("ini", os.path.join("lx-control-center","items.conf"))
 
-        keyfile = self.load_inifile(self.items_conf_path)
-
-        for keyfile_item in keyfile.sections():
+        for keyfile_item in self.keyfile_items.sections():
             logging.debug("load_items_conf: keyfile_item =%s" % keyfile_item)
-            for setting in keyfile.options(keyfile_item):
+            for setting in self.keyfile_items.options(keyfile_item):
                 logging.debug("load_items_conf: setting =%s" % setting)
                 if (setting == "name"):
-                    self.items[keyfile_item].name = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].name = self.keyfile_items.get(keyfile_item, setting)
                     self.items[keyfile_item].changed = True
                 elif (setting == "comment"):
-                    self.items[keyfile_item].comment = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].comment = self.keyfile_items.get(keyfile_item, setting)
                     self.items[keyfile_item].changed = True
                 elif (setting == "icon"):
-                    self.items[keyfile_item].icon = keyfile.get(keyfile_item, setting)
+                    self.items[keyfile_item].icon = self.keyfile_items.get(keyfile_item, setting)
                     self.items[keyfile_item].changed = True
                 elif (setting == "activate"):
-                    self.items[keyfile_item].activate = keyfile.getboolean(keyfile_item, setting)
+                    self.items[keyfile_item].activate = self.keyfile_items.getboolean(keyfile_item, setting)
                     self.items[keyfile_item].changed = True
 
     def list_all_applications_from_dirs(self):
@@ -317,7 +316,7 @@ class Base(Utils):
                     app_path = os.path.join(path,application_file)
                     keyfile = None
                     if (os.path.splitext(app_path)[1] == ".desktop"):
-                        keyfile = self.load_xdgfile(app_path)
+                        keyfile = self.util.load_object("xdg",app_path)
                         categories = []
                         categories = keyfile.getCategories()
                         if (categories != []):
@@ -358,7 +357,7 @@ class Base(Utils):
                         logging.debug("list_all_modules_from_dirs: list_files = %s " % module_file)
                         if (os.path.splitext(file_path)[1] == ".desktop"):
                             keyfile = None
-                            keyfile = self.load_xdgfile(file_path)
+                            keyfile = self.util.load_object("xdg",file_path)
                             return_list.append(file_path)
             else:
                 logging.info("list_all_modules_from_dirs: %s doesn't exist in path" % path)
@@ -516,63 +515,65 @@ class Base(Utils):
 
     def save_settings(self):
         logging.info("Base.save_settings: enter function")
-        keyfile = self.load_keyfile_from_conf("lx-control-center")
-        logging.debug("save_settings: loading %s as a keyfile" % self.settings_path)
+        if (self.keyfile_settings == None):
+            self.keyfile_settings = self.util.load_object("ini", os.path.join("lx-control-center", "settings.conf"))
+        logging.debug("save_settings: loading %s as a keyfile" % os.path.join("settings.conf","lx-control-center"))
 
         # Configuration
-        self.save_setting(keyfile, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list")
-        self.save_setting(keyfile, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list")
-        self.save_setting(keyfile, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string")
-        self.save_setting(keyfile, "Configuration", "version_config", self.version_config, self.version_config_default, "float")
-        self.save_setting(keyfile, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean")
-        self.save_setting(keyfile, "Configuration", "modules_experimental_support", self.modules_experimental_support, self.modules_experimental_support_default, "boolean")
-        self.save_setting(keyfile, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean")
-        self.save_setting(keyfile, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean")
-        self.save_setting(keyfile, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list")
-        self.save_setting(keyfile, "Configuration", "whitelist", self.whitelist, self.whitelist_default, "list")
-        self.save_setting(keyfile, "Configuration", "show_category_other", self.show_category_other, self.show_category_other_default, "boolean")
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config, self.version_config_default, "float", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "modules_experimental_support", self.modules_experimental_support, self.modules_experimental_support_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "whitelist", self.whitelist, self.whitelist_default, "list", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "show_category_other", self.show_category_other, self.show_category_other_default, "boolean")
 
         # Categories
         if (self.categories_fixed == False):
             if (self.categories_keys != self.categories_keys_default):
                 for category in self.categories_keys:
-                    self.save_setting(keyfile, "Categories",category, self.categories_keys[category], None, "list")
+                    self.util.set_setting("keyfile", self.keyfile_settings, "Categories",category, self.categories_keys[category], None, "list", self.trigger_save_settings_file)
 
         # Path
-        self.save_setting(keyfile, "Path","applications_path", self.applications_path, self.applications_path_default, "list")
-        self.save_setting(keyfile, "Path","modules_path", self.modules_path, self.modules_path_default, "list")
+        self.util.set_setting("keyfile", self.keyfile_settings, "Path","applications_path", self.applications_path, self.applications_path_default, "list", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "Path","modules_path", self.modules_path, self.modules_path_default, "list", self.trigger_save_settings_file)
 
 
         # UI
-        self.save_setting(keyfile, "UI", "window_size_w", self.window_size_w, self.window_size_w_default, "int")
-        self.save_setting(keyfile, "UI", "window_size_h", self.window_size_h, self.window_size_h_default, "int")
-        self.save_setting(keyfile, "UI", "window_icon", self.window_icon, self.window_icon_default, "generic")
-        self.save_setting(keyfile, "UI", "window_title", self.window_title, self.window_title_default, "generic")
-        self.save_setting(keyfile, "UI", "icon_view_columns", self.icon_view_columns, self.icon_view_columns_default, "int")
-        self.save_setting(keyfile, "UI", "icon_view_icons_size", self.icon_view_icons_size, self.icon_view_icons_size_default, "int")
-        self.save_setting(keyfile, "UI", "icon_not_theme_allow", self.icon_not_theme_allow, self.icon_not_theme_allow_default, "boolean")
-        self.save_setting(keyfile, "UI", "icon_force_size", self.icon_force_size, self.icon_force_size_default, "boolean")
-        self.save_setting(keyfile, "UI", "icon_fallback", self.icon_fallback, self.icon_fallback_default, "generic")
-        self.save_setting(keyfile, "UI", "view_mode", self.view_mode, self.view_mode_default, "generic")
-        self.save_setting(keyfile, "UI", "view_visual_effects", self.view_visual_effects, self.view_visual_effects_default, "boolean")
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_size_w", self.window_size_w, self.window_size_w_default, "int", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_size_h", self.window_size_h, self.window_size_h_default, "int", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_icon", self.window_icon, self.window_icon_default, "generic", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_title", self.window_title, self.window_title_default, "generic", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_view_columns", self.icon_view_columns, self.icon_view_columns_default, "int", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_view_icons_size", self.icon_view_icons_size, self.icon_view_icons_size_default, "int", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_not_theme_allow", self.icon_not_theme_allow, self.icon_not_theme_allow_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_force_size", self.icon_force_size, self.icon_force_size_default, "boolean", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_fallback", self.icon_fallback, self.icon_fallback_default, "generic", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "view_mode", self.view_mode, self.view_mode_default, "generic", self.trigger_save_settings_file)
+        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "view_visual_effects", self.view_visual_effects, self.view_visual_effects_default, "boolean", self.trigger_save_settings_file)
 
         if (self.trigger_save_settings_file == True):
-            self.save_file(keyfile, "settings")
+            self.util.save_object(self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
             self.trigger_save_settings_file = False
 
         # items.conf
-        keyfile_items = self.load_inifile(self.items_conf_path)
-        logging.debug("save_settings: loading %s as a keyfile_items" % self.items_conf_path)
+        if (self.keyfile_items == None):
+            self.keyfile_items = self.util.load_object("ini", os.path.join("lx-control-center","items.conf"))
+        logging.debug("save_settings: loading %s as a keyfile_items" % os.path.join("lx-control-center","items.conf"))
 
         for i in self.items:
             if (self.items[i].changed == True):
-                self.save_setting(keyfile_items, self.items[i].path, "name", self.items[i].name, self.items[i].name_original, "generic")
-                self.save_setting(keyfile_items, self.items[i].path, "icon", self.items[i].icon, self.items[i].icon_original, "generic")
-                self.save_setting(keyfile_items, self.items[i].path, "comment", self.items[i].comment, self.items[i].comment_original, "generic")
-                self.save_setting(keyfile_items, self.items[i].path, "activate", self.items[i].activate, self.items[i].activate_original, "boolean")
+                self.util.set_setting("keyfile", self.keyfile_items, self.items[i].path, "name", self.items[i].name, self.items[i].name_original, "generic", self.trigger_save_settings_file)
+                self.util.set_setting("keyfile", self.keyfile_items, self.items[i].path, "icon", self.items[i].icon, self.items[i].icon_original, "generic", self.trigger_save_settings_file)
+                self.util.set_setting("keyfile", self.keyfile_items, self.items[i].path, "comment", self.items[i].comment, self.items[i].comment_original, "generic", self.trigger_save_settings_file)
+                self.util.set_setting("keyfile", self.keyfile_items, self.items[i].path, "activate", self.items[i].activate, self.items[i].activate_original, "boolean", self.trigger_save_settings_file)
 
         if (self.trigger_save_settings_file == True):
-            self.save_file(keyfile_items, "items")
+            self.util.save_object(self.keyfile_settings, os.path.join("lx-control-center", "items.conf"))
             self.trigger_save_settings_file = False
             
     def module_active(self,item):
@@ -735,7 +736,6 @@ class Base(Utils):
     def print_debug(self):
         """ Prints variables and other useful items for debug purpose"""
         logging.debug("Printing variables")
-        logging.debug("self.settings_path : %s" % self.settings_path)
         logging.debug("self.keyword_categories_settings_list : %s" % self.keyword_categories_settings_list)
         logging.debug("self.applications_path : %s" % self.applications_path)
         logging.debug("self.modules_path : %s" % self.modules_path)

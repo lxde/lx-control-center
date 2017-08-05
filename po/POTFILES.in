@@ -4,3 +4,4 @@ data/lx-control-center.desktop.in
 # files
 LXControlCenter/base.py
 LXControlCenter/item.py
+LXControlCenter/runner.py

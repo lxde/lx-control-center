@@ -24,289 +24,272 @@ import xdg.IniFile
 import xdg.Locale
 import os.path
 import psutil
-import argparse
+
 try:
     import configparser as configparser
 except:
     import ConfigParser as configparser
 
 class Utils(object):
-    def load_xdgfile(self,path):
-        xdgfile = None
-        try:
-            xdgfile = xdg.DesktopEntry.DesktopEntry(path)
-        except:
-            logging.error("load_xdgfile: error, %s is not a desktop file" % path)
-        return xdgfile
-
-    def load_inifile(self,path):
-        inifile = None
-        inifile = configparser.ConfigParser()
-        inifile.optionxform = str
-        try:
-            inifile.read_file(open(path))
-        except:
-            try:
-                inifile.readfp(open(path))
-            except:
-                logging.error("load_inifile: error, when loading %s as a ini file" % path)
-        return inifile
-
-    def load_setting(self, keyfile, group, key, default_value, type_to_get):
-        return_value = default_value
-        if (keyfile.has_section(group)):
-            if (keyfile.has_option(group, key)):
-                if(type_to_get == "list"):
-                    return_value = keyfile.get(group,key).split(";")
-                    return_value.pop()
-
-                elif (type_to_get == "float"):
-                    return_value = keyfile.getfloat(group,key)
-
-                elif (type_to_get == "int"):
-                    return_value = keyfile.getint(group,key)
-
-                elif (type_to_get == "boolean"):
-                    return_value = keyfile.getboolean(group,key)
-
-                elif (type_to_get == "string"):
-                    new_key = key
-                    for lang in xdg.Locale.langs:
-                        langkey = "%s[%s]" % (key, lang)
-                        if (keyfile.has_option(group, langkey)):
-                           new_key =  langkey
-                    return_value = keyfile.get(group, new_key)
-                else:
-                    return_value = keyfile.get(group,key)
-
-        return return_value
-
-    def load_configuration_file (self, directory, name, local = False):
-        """ Set configuration path to self.settings_path"""
-
-        config_dirs = xdg.BaseDirectory.xdg_config_dirs
-
-        return_path = None
-
-        for path in config_dirs:
-            test_path = os.path.join(path, directory, name)
-            if(os.path.exists(test_path)):
-                return_path = test_path
-                break
-
-        if (local == True):
-            if (return_path == None):
-                return_path = os.path.join(os.getcwd(), "data",name)
-
-        logging.debug("load_configuration_file : return_path = %s" % return_path)
-
-        return return_path
-
-    def load_keyfile_from_conf(self, setting):
-        settings_path = self.load_configuration_file (setting,"settings.conf",True)
-        keyfile = self.load_inifile(settings_path)
-        return keyfile
+    # Public API
+    #
+    # Utilities
+    # generate_running_applications = generate a list of running applications
+    #
+    # Settings access
+    # load_object = load setting object (file, or gsetting, or dbus ...)
+    # save_object = save setting object (file, or gsetting, or dbus ...)
+    # get_setting = get setting from object
+    # set_setting = set setting from object
 
     def generate_running_applications(self):
+        """
+            return: A list of running applications
+        """
+        logging.info("Utils.generate_running_applications: enter function")
         return_list = []
         procs = psutil.process_iter()
         for proc in procs:
             return_list.append(proc.name())
         return return_list
 
-    def save_setting(self, keyfile, group, key, variable, default, type_to_set):
-        logging.debug("save_setting: group, key and variable => %s, %s, %s" %(group, key, variable))
-        if (variable == default):
-            logging.debug("save_setting: variable == default, checking for existing key")
-            if(keyfile.has_option(group, key)):
-                logging.debug("save_setting: variable == default, existing key, removing")
-                keyfile.remove_option(group, key)
-                self.trigger_save_settings_file = True
-            # TODO Remove section if it's empty
+    def load_object (self, object_type, relative_path):
+        """ Load object with setting.
+            object_type: ini (inifile), xdg (xdg ini file)
+            relative_path: relative path to the object (exemple = os.path.join("lx-control-center","settings.conf")
+
+            return: Return the object (keyfile)
+        """
+        logging.info("Utils.load_object: enter function")
+        return_value = None
+        if (relative_path[0] == "/"):
+            path = relative_path
         else:
-            if (keyfile.has_section(group) == False):
-                keyfile.add_section(group)
-                self.trigger_save_settings_file = True
-
-            if (type_to_set == "float"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-  
-                elif (keyfile.getfloat(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "int"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.getint(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "boolean"):
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.getboolean(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-            elif(type_to_set == "list"):
-                if (keyfile.has_option(group, key) == False):
-                    list_to_save = ';'.join(variable) + ";"
-                    keyfile.set(group, key, list_to_save)
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.get(group, key) != variable):
-                    list_to_save = ';'.join(variable) + ";"
-                    keyfile.set(group, key, list_to_save)
-                    self.trigger_save_settings_file = True
-            else:
-                if (keyfile.has_option(group, key) == False):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-                elif (keyfile.get(group, key) != variable):
-                    keyfile.set(group, key, str(variable))
-                    self.trigger_save_settings_file = True
-
-    def save_file(self, keyfile, settings_type, module = None):
-        if (module == None):
-            dir_path = os.path.join(os.path.expanduser('~'), ".config","lx-control-center")
+            path = self.__get_path(relative_path)
+        if (object_type == "ini" or object_type == "keyfile"):
+            return_value = configparser.ConfigParser()
+            return_value.optionxform = str
+            try:
+                return_value.read_file(open(path))
+            except:
+                try:
+                    return_value.readfp(open(path))
+                except:
+                    logging.error("Utils.load_object(ini): error, when loading %s as a ini file" % path)
+        elif (object_type == "xdg"):
+            try:
+                return_value = xdg.DesktopEntry.DesktopEntry(path)
+            except:
+                logging.error("load_xdgfile: error, %s is not a desktop file" % path)
         else:
-            dir_path = os.path.join(os.path.expanduser('~'), ".config","lx-control-center", "modules", module)
-        file_path = settings_type + ".conf"
-        home_path = os.path.join(dir_path, file_path)
+            logging.error("Utils.load_object: object type %s not supported" % object_type)
 
-        if (self.settings_path != home_path):
-            self.settings_path = home_path
+        return return_value
 
-        if (os.path.exists(dir_path) == False):
-            logging.debug("save_file: Directory doesn't exist => create it")
-            os.makedirs(dir_path)
+    def save_object(self, object_type, object_to_save, relative_path = None):
+        """ Save object with setting.
+            object_type: file (ini or xdg)
+            relative_path: relative path to the object (exemple = os.path.join("lx-control-center","settings.conf")
+        """
+        logging.info("Utils.save_object: enter function")
+        if (object_type == "file" or object_type == "keyfile"):
+            path = self.__get_path(relative_path)
+            dir_path = os.path.dirname(path)
+            if (os.path.exists(dir_path) == False):
+                logging.debug("save_file: Directory doesn't exist => create it")
+                os.makedirs(dir_path)
 
-        if (os.path.exists(home_path) == False):
-            logging.debug("save_file: File doesn't exist => create it")
-            file_to_create = open(home_path,'a')
-            file_to_create.close()
+            if (os.path.exists(path) == False):
+                logging.debug("save_file: File doesn't exist => create it")
+                file_to_create = open(path,'a')
+                file_to_create.close()
 
-        logging.debug("save_file: Save file on %s" % home_path)
-        file_to_save = open(home_path,'w')
-        keyfile.write(file_to_save)
-        file_to_save.close()
+            logging.debug("save_file: Save file on %s" % path)
+            file_to_save = open(path,'w')
+            object_to_save.write(file_to_save)
+            file_to_save.close()
 
-    def set_setting(self, group, key, variable):
-        if (group == "Configuration"):
-            if (key == "modules_support"):
-                self.modules_support = variable
-            elif (key == "applications_support"):
-                self.applications_support = variable
-            elif (key == "icon_view_icons_size"):
-                self.icon_view_icons_size = variable
-            elif (key == "modules_experimental_support"):
-                self.modules_experimental_support = variable
-            elif (key == "show_category_other"):
-                self.show_category_other = variable
+    def get_setting(self, object_type, object_to_get, group, key, default_value, type_to_get):
+        """ Get setting from a setting object.
+            object_type: Type of setting (keyfile, gsetting)
+            object_to_get: keyfile object, or None
+            group: First setting parameter
+            key: Second setting parameter
+            default_value: Value to return if nothing is find, or None (Not apply on gsetting)
+            type_to_get: Type of the setting (string, int, list, float, boolean)
+
+            return: Return the object
+        """
+        #TODO Dbus Backend
+        #TODO XML Backend
+        #https://stackoverflow.com/questions/1629687/alter-xml-while-preserving-layout
+        logging.info("Utils.get_setting: enter function")
+        return_value = default_value
+        # Keyfile
+        if (object_type == "keyfile"):
+            keyfile = object_to_get
+            if (keyfile.has_section(group)):
+                if (keyfile.has_option(group, key)):
+                    if(type_to_get == "list"):
+                        return_value = keyfile.get(group,key).split(";")
+                        return_value.pop()
+
+                    elif (type_to_get == "float"):
+                        return_value = keyfile.getfloat(group,key)
+
+                    elif (type_to_get == "int"):
+                        return_value = keyfile.getint(group,key)
+
+                    elif (type_to_get == "boolean"):
+                        return_value = keyfile.getboolean(group,key)
+
+                    elif (type_to_get == "string"):
+                        new_key = key
+                        for lang in xdg.Locale.langs:
+                            langkey = "%s[%s]" % (key, lang)
+                            if (keyfile.has_option(group, langkey)):
+                               new_key =  langkey
+                        return_value = keyfile.get(group, new_key)
+                    else:
+                        return_value = keyfile.get(group,key)
+        elif (object_type == "gsetting"):
+            gsettings = Gio.Settings.new(group)
+            if (type_to_set == "string"):
+                return_value = gsettings.get_string(key)
             else:
-                logging.warning("set_setting: %s - %s not implemented" % (group, key))
+                logging.warning("Utils.get_setting: GSetting not supported for type %s." % type_to_set)
         else:
-            logging.warning("set_setting: %s - %s not implemented" % (group, key))
+            logging.warning("Utils.get_setting: type %s is not supported." % object_type)
 
-class Runner(Utils):
-    def __init__(self):
-        Utils.__init__(self)
-        self.loglevel_args = None
-        self.logfile_args = None
-        self.standalone_module = False
+        return return_value
 
-    def get_args_parameters(self):
-        parser = argparse.ArgumentParser(description='Launch LX Control Center')
-        parser.add_argument('-l', '--log', help='Set log level (values available : WARNING, INFO or DEBUG)')
-        parser.add_argument('-f', '--logfile', help='Set log file to write logs')
-        parser.add_argument('-u', '--ui', help='Set Frontend - UI (values available: GTK2, GTK3, Qt5, Auto ...')
-        parser.add_argument('-m', '--module', help='Launch only the specific module. Must be the desktop filename, without .desktop')
-        args = parser.parse_args()
-        self.loglevel_args =  args.log
-        self.logfile_args =  args.logfile
-        self.frontend_args =  args.ui
-        self.standalone_module =  args.module
+    def set_setting(self, object_type, object_to_get, group, key, variable, default, type_to_set, trigger = False):
+        """ Set a setting from a setting object.
+            object_type: keyfile (ini), gsetting
+            object_to_get: keyfile object, or None
+            group: First setting parameter
+            key: Second setting parameter
+            variable: Value to set
+            default_value: Value to return if nothing is find, or None
+            type_to_get: Type of the setting (string, int, list, float, boolean)
+            trigger: (Optionnal) pass a variable to trigger a file save trigger
 
-    def set_log(self):
-        """ Set log level by parsing"""
-        if (self.loglevel_args != None):
-            numeric_level = getattr(logging, self.loglevel_args.upper(), None)
-            if not isinstance(numeric_level, int):
-                raise ValueError('Invalid log level: %s' % self.loglevel_args)
-            if (self.logfile_args == None):
-                logging.basicConfig(level=numeric_level)
+            return True is the object need to be saved
+        """
+        #TODO Dbus Backend
+        #TODO XML Backend
+        #TODO binary Backend
+        logging.info("Utils.set_setting: enter function")
+        logging.debug("Utils.set_setting: group, key and variable => %s, %s, %s" %(group, key, variable))
+        trigger_save_settings_file = False
+        # Keyfile
+        if (object_type == "keyfile"):
+            keyfile = object_to_get
+            logging.debug("set_setting: variable: %s" % variable)
+            logging.debug("set_setting: default: %s" % default)
+            if (variable == default):
+                logging.debug("set_setting: variable == default, checking for existing key")
+                if(keyfile.has_option(group, key)):
+                    logging.debug("set_setting: variable == default, existing key, removing")
+                    keyfile.remove_option(group, key)
+                    trigger_save_settings_file = True
+                #TODO Remove section if it's empty
             else:
-                logging.basicConfig(filename=self.logfile_args, level=numeric_level)
+                if (keyfile.has_section(group) == False):
+                    keyfile.add_section(group)
+                    trigger_save_settings_file = True
 
-    def frontend_generate(self, keyfile):
-        supported_frontend = ["GTK3", "GTK2", "Qt5", "webkitgtk2"]
-        frontend_setting = self.load_setting(keyfile, "Configuration","frontend", None, "string")
-        frontend = None
-        if (self.frontend_args != None):
-            if (self.frontend_args in supported_frontend):
-                frontend = self.frontend_args
+                if (type_to_set == "float"):
+                    if (keyfile.has_option(group, key) == False):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                    elif (keyfile.getfloat(group, key) != variable):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                elif(type_to_set == "int" or type_to_set == "integer"):
+                    if (keyfile.has_option(group, key) == False):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                    elif (keyfile.getint(group, key) != variable):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                elif(type_to_set == "boolean" or type_to_set == "bool"):
+                    if (keyfile.has_option(group, key) == False):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                    elif (keyfile.getboolean(group, key) != variable):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                elif(type_to_set == "list"):
+                    if (keyfile.has_option(group, key) == False):
+                        list_to_save = ';'.join(variable) + ";"
+                        keyfile.set(group, key, list_to_save)
+                        trigger_save_settings_file = True
+
+                    elif (keyfile.get(group, key) != variable):
+                        list_to_save = ';'.join(variable) + ";"
+                        keyfile.set(group, key, list_to_save)
+                        trigger_save_settings_file = True
+                else:
+                    if (keyfile.has_option(group, key) == False):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+
+                    elif (keyfile.get(group, key) != variable):
+                        keyfile.set(group, key, str(variable))
+                        trigger_save_settings_file = True
+        # GSetting
+        elif (object_type == "gsetting"):
+            gsettings = Gio.Settings.new(group)
+            if (gsettings.get_default_value(key) == variable):
+                gsettings.reset(key)
+            elif (type_to_set == "string"):
+                if (gsettings.get_string(key) != variable):
+                    gsettings.set_string(key, value)
+                    gsettings.apply()
             else:
-                logging.warning(_("%s desktop environment unknown or not supported. Default to GTK3" % self.frontend_args))
-                frontend = 'GTK3'
-        elif (frontend_setting == "Auto" or frontend_setting == None):
-            current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
-            gtk2_list = ['LXDE']
-            gtk3_list = ['GNOME']
-            qt5_list = ['KDE', 'LXQt']
-            if (current_desktop in gtk2_list):
-                frontend = 'GTK2'
-            elif (current_desktop in gtk3_list):
-                frontend = 'GTK3'
-            elif (current_desktop in qt5_list):
-                frontend = 'Qt5'
-            else:
-                logging.warning(_("%s desktop environment not supported, please report it as a bug. Default to GTK3" % current_desktop))
-                frontend = 'GTK3'
+                logging.warning("Utils.set_setting: GSetting not supported for type %s." % type_to_set)
         else:
-            frontend = self.frontend_setting
+            logging.warning("Utils.set_setting: type %s is not supported." % object_type)
 
-        return frontend
+        if (trigger == False):
+            trigger = trigger_save_settings_file
+        return trigger_save_settings_file
 
-    def run (self):
-        # Parse command line arguments
-        self.get_args_parameters()
+    def __get_path (self, relative_path):
+        """ Find the current configuration file, using XDG standart
+            path: relative path to the object (exemple = os.path.join("lx-control-center","settings.conf")
 
-        # Enable log
-        self.set_log()
+            return the absolute path
+        """
+        logging.info("Utils.__get_path : enter function")
+        config_dirs = xdg.BaseDirectory.xdg_config_dirs
+        return_path = None
 
-        keyfile = self.load_keyfile_from_conf("lx-control-center")
-        frontend = self.frontend_generate(keyfile)
-        app = None
-        if (frontend == "GTK2"):
-            from LXControlCenter.widgets.gtk2 import Gtk2App
-            app = Gtk2App()
-            app.toolkit = "GTK2"
-        elif (frontend == "GTK3"):
-            from LXControlCenter.widgets.gtk3 import Gtk3App
-            app = Gtk3App()
-            app.toolkit = "GTK3"
-        elif (frontend == "Qt5"):
-            from LXControlCenter.widgets.qt5 import Qt5App
-            app = Qt5App()
-            app.toolkit = "Qt5"
-        elif (frontend == "webkitgtk2"):
-            from LXControlCenter.widgets.webkitgtk2 import WebkitApp
-            app = WebkitApp()
-            app.toolkit = None
-        else:
-            # Default to GTK3
-            from LXControlCenter.widgets.gtk3 import Gtk3App
-            app = Gtk3App()
-            app.toolkit = "GTK3"
+        for path in config_dirs:
+            test_path = os.path.join(path, relative_path)
+            if(os.path.exists(test_path)):
+                return_path = test_path
+                break
 
-        app.frontend = frontend
-        app.standalone_module = self.standalone_module
-        app.main()
+        if (return_path == None):
+            test_path = os.path.join(os.getcwd(), "data", os.path.basename(relative_path))
+            if (os.path.exists(test_path)):
+                return_path = test_path
+
+        if (return_path == None):
+            test_path = os.path.join(os.getcwd(), relative_path)
+            if (os.path.exists(test_path)):
+                return_path = test_path
+
+        if (return_path == None):
+            logging.warning("Utils.__get_path : Can't find an existing file for relative path %s" % return_path)
+
+        logging.debug("Utils.__get_path : return_path = %s" % return_path)
+        return return_path

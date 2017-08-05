@@ -22,14 +22,15 @@ import sys
 import logging
 import subprocess
 
-from .utils import Utils
+from LXControlCenter.utils import Utils
 
 import gettext
 _ = gettext.gettext
 
-class Item(Utils):
+class Item():
     def __init__(self, categories_array):
-        Utils.__init__(self)
+
+        self.util = Utils()
 
         # Item structure
         self.path = ""
@@ -97,13 +98,13 @@ class Item(Utils):
         self.define_icon_type()
 
     def load_application_from_path(self, path):
-        keyfile = self.load_xdgfile(path)
+        keyfile = self.util.load_object("xdg",path)
         self.load_common_app_module_from_path(path, keyfile)
         self.type = "application"
 
 
     def load_module_from_path(self, path):
-        keyfile = self.load_xdgfile(path)
+        keyfile = self.util.load_object("xdg",path)
         self.load_common_app_module_from_path(path, keyfile)
         self.type = "module"
         self.module_replace_application = keyfile.get("X-LX-Control-Center-Application-Replaces", group="Desktop Entry", type="string", list=True)

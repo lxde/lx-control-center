@@ -23,6 +23,8 @@ from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
 
 import logging
+import os
+import os.path
 
 from ..base import Base
 
@@ -34,112 +36,104 @@ class Gtk3App(Base):
         logging.info("GTK3.draw_ui: enter function")
         if (self.mode == "main-UI"):
             if (self.standalone_module == None):
-                self.action_group.get_action("IconsMode").set_visible(False)
-                self.action_group.get_action("PrefMode").set_visible(True)
-                self.action_group.get_action("EditMode").set_visible(True)
                 self.icon_view_button.set_sensitive(False)
                 self.edit_view_button.set_sensitive(True)
                 self.pref_view_button.set_sensitive(True)
             self.build_icon_view()
         elif (self.mode == "edit-UI"):
             if (self.standalone_module == None):
-                self.action_group.get_action("IconsMode").set_visible(True)
-                self.action_group.get_action("PrefMode").set_visible(True)
-                self.action_group.get_action("EditMode").set_visible(False)
                 self.icon_view_button.set_sensitive(True)
                 self.edit_view_button.set_sensitive(False)
                 self.pref_view_button.set_sensitive(True)
             self.build_edit_view()
         elif (self.mode == "pref-UI"):
             if (self.standalone_module == None):
-                self.action_group.get_action("IconsMode").set_visible(True)
-                self.action_group.get_action("PrefMode").set_visible(False)
-                self.action_group.get_action("EditMode").set_visible(True)
                 self.icon_view_button.set_sensitive(True)
                 self.edit_view_button.set_sensitive(True)
                 self.pref_view_button.set_sensitive(False)
             self.build_pref_view()
         elif (self.mode == "module-UI"):
             if (self.standalone_module == None):
-                self.action_group.get_action("IconsMode").set_visible(True)
-                self.action_group.get_action("PrefMode").set_visible(True)
-                self.action_group.get_action("EditMode").set_visible(True)
                 self.icon_view_button.set_sensitive(True)
                 self.edit_view_button.set_sensitive(True)
                 self.pref_view_button.set_sensitive(True)
             self.build_module_view()
         elif (self.mode == "edit-item-UI"):
             if (self.standalone_module == None):
-                self.action_group.get_action("IconsMode").set_visible(True)
-                self.action_group.get_action("PrefMode").set_visible(True)
-                self.action_group.get_action("EditMode").set_visible(True)
                 self.icon_view_button.set_sensitive(True)
                 self.edit_view_button.set_sensitive(True)
                 self.pref_view_button.set_sensitive(True)
         self.window.show_all()
 
     def build_toolbar(self):
-        self.header_bar.set_show_close_button(True)
-        self.header_bar.props.title = self.window_title
-        self.window.set_titlebar(self.header_bar)
 
-        UI_INFO =   """
-                    <ui>
-                        <popup name='PopupMenu'>
-                            <menuitem action='IconsMode' />
-                            <menuitem action='PrefMode' />
-                            <menuitem action='EditMode' />
-                        </popup>
-                    </ui>
-                    """
-        uimanager = Gtk.UIManager()
-        uimanager.add_ui_from_string(UI_INFO)
-        self.action_group.add_actions([
-            ("IconsMode", Gtk.STOCK_APPLY, self.icons_menu_item, None, self.icons_menu_item_tooltip, self.on_icons_mode_menu_click),
-            ("PrefMode", Gtk.STOCK_PREFERENCES, self.preferences_menu_item, None, self.preferences_menu_item_tooltip, self.on_pref_mode_menu_click),
-            ("EditMode", Gtk.STOCK_EDIT , self.edit_menu_item, None, self.edit_menu_item_tooltip, self.on_edit_mode_menu_click)
-                                    ])
-        uimanager.insert_action_group(self.action_group)
-        popup = uimanager.get_widget("/PopupMenu")
-        self.menu_button.set_popup(popup)
+        # Header
+        # Icon view - Edit View - Preferences - Search
+        self.header_box = Gtk.HBox()
+        self.window_box.pack_start(self.header_box, False, False, 0)
 
-        menu_pixbuf = self.theme.get_default().load_icon("open-menu-symbolic", 16, Gtk.IconLookupFlags.FORCE_SIZE)
-        image = Gtk.Image.new_from_pixbuf(menu_pixbuf)
-        self.menu_button.add(image)
-        self.header_bar.pack_start(self.menu_button)
+        self.search_box = Gtk.Entry()
+        self.search_box.set_placeholder_text(_("Search"))
+        self.search_box.connect("changed", self.on_search)
+        self.header_box.pack_end(self.search_box, True, True, 0)
+
+        self.icon_view_button = self.create_togglebutton(self.icons_menu_item, Gtk.STOCK_APPLY)
+        self.icon_view_button.connect("clicked", self.on_icons_mode_menu_click)
+        self.header_box.pack_start(self.icon_view_button, False, False, 0)
+
+        self.edit_view_button = self.create_togglebutton(self.edit_menu_item, Gtk.STOCK_EDIT)
+        self.edit_view_button.connect("clicked", self.on_edit_mode_menu_click)
+        self.header_box.pack_start(self.edit_view_button, False, False, 0)
+
+        self.pref_view_button = self.create_togglebutton(self.preferences_menu_item, Gtk.STOCK_PREFERENCES)
+        self.pref_view_button.connect("clicked", self.on_pref_mode_menu_click)
+        self.header_box.pack_start(self.pref_view_button, False, False, 0)
 
     def clean_main_view(self):
         for children in self.content_ui_vbox.get_children():
             self.content_ui_vbox.remove(children)
 
-    def create_switch_conf(self, grid, label, default, group, key, position):
+    def create_switch_conf(self, grid, label, default, default_value, group, key, position):
         label_widget = Gtk.Label(label, xalign=0)
         switch_widget = Gtk.Switch()
         switch_widget.set_active(default)
-        switch_widget.connect("notify::active", self.on_switch_click, group, key)
+        switch_widget.connect("notify::active", self.on_switch_click, group, key, default_value)
         grid.attach(label_widget, 0, position, 1, 1)
         grid.attach_next_to(switch_widget, label_widget, Gtk.PositionType.RIGHT, 1, 1)
 
-    def on_switch_click(self, switch, gparam, group, key):
+    def on_switch_click(self, switch, gparam, group, key, default):
         logging.debug("on_switch_click: Setting %s - %s to %s" % (group, key, switch.get_active()))
-        self.set_setting(group, key, switch.get_active())
+        save = self.util.set_setting("keyfile", self.keyfile_settings, group, key, switch.get_active(), default, "boolean")
+
+        # Keyfile is changed, reload settings
+        self.load_settings()
+
+        if (save == True):
+            self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
 
         # Need to re-triage the item, because we changed the filters
         self.triage_items()
         self.generate_view()
 
     # SpinButton
-    def create_spinbutton_conf(self, grid, label, default, group, key, position):
+    def create_spinbutton_conf(self, grid, label, default, default_value, group, key, position):
         label_widget = Gtk.Label(label, xalign=0)
         adjustment = Gtk.Adjustment(value=default, lower=8, upper=128, step_incr=1, page_incr=1, page_size=0)
         spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
-        spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key)
+        spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key, default_value)
         grid.attach(label_widget, 0, position, 1, 1)
         grid.attach_next_to(spin_button_widget, label_widget, Gtk.PositionType.RIGHT, 1, 1)
 
-    def on_spinbutton_change(self, spinbutton, group, key):
+    def on_spinbutton_change(self, spinbutton, group, key, default):
         logging.debug("on_spinbutton_change: Setting %s - %s to %s" % (group, key, spinbutton.get_value_as_int()))
-        self.set_setting(group, key, spinbutton.get_value_as_int())
+        save = self.util.set_setting("keyfile", self.keyfile_settings, group, key, spinbutton.get_value_as_int(), default, "int")
+
+        # Keyfile is changed, reload settings
+        self.load_settings()
+
+        if (save == True):
+            self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
+
         self.generate_view()
 
     def create_table_conf(self):
@@ -160,15 +154,15 @@ class Gtk3App(Base):
     
         # Configuration
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
-        self.content_ui_vbox.add(configuration_frame)
+        self.content_ui_vbox.pack_start(configuration_frame, False, False, 0)
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
 
-        self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, "Configuration", "modules_support", 0)
-        self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, "Configuration", "applications_support", 1)
-        self.create_switch_conf(configuration_grid, self.pref_show_category_other_label, self.show_category_other, "Configuration", "show_category_other", 2)
-        self.create_switch_conf(configuration_grid, self.pref_enable_experimental_module_label, self.modules_experimental_support, "Configuration", "modules_experimental_support", 3)
-        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, "Configuration", "icon_view_icons_size", 4)
+        self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, self.modules_support_default, "Configuration", "modules_support", 0)
+        self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, self.applications_support_default, "Configuration", "applications_support", 1)
+        self.create_switch_conf(configuration_grid, self.pref_show_category_other_label, self.show_category_other, self.show_category_other_default, "Configuration", "show_category_other", 2)
+        self.create_switch_conf(configuration_grid, self.pref_enable_experimental_module_label, self.modules_experimental_support, self.modules_experimental_support_default, "Configuration", "modules_experimental_support", 3)
+        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, self.icon_view_icons_size_default, "Configuration", "icon_view_icons_size", 4)
 
     def build_edit_view(self):
         logging.info("GTK3.build_edit_view: enter function")
@@ -184,6 +178,7 @@ class Gtk3App(Base):
         self.build_generic_icon_view("visible")       
 
     def build_generic_icon_view(self, type_view):
+        logging.info("GTK3.build_generic_icon_view: enter function")
 
         items_to_draw = self.items_visible_by_categories
 
@@ -400,7 +395,7 @@ class Gtk3App(Base):
         return button
 
     def destroy(self, widget, data=None):
-        self.save_settings()
+        self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
         Gtk.main_quit()
 
     def main(self):
@@ -423,42 +418,15 @@ class Gtk3App(Base):
         self.window_box = Gtk.VBox()
         window_scrolled.add(self.window_box)
 
-        self.header_bar = Gtk.HeaderBar()
-
-        # Header
-        # Icon view - Edit View - Preferences - Search
-        self.header_box = Gtk.HBox()
-        self.window_box.pack_start(self.header_box, False, False, 0)
-
         self.theme = Gtk.IconTheme.get_default()
 
-        self.icon_view_button = self.create_togglebutton(self.icons_menu_item, Gtk.STOCK_APPLY)
-        self.icon_view_button.connect("clicked", self.on_icons_mode_menu_click)
-        self.header_box.pack_start(self.icon_view_button, False, False, 0)
-
-        self.edit_view_button = self.create_togglebutton(self.edit_menu_item, Gtk.STOCK_EDIT)
-        self.edit_view_button.connect("clicked", self.on_edit_mode_menu_click)
-        self.header_box.pack_start(self.edit_view_button, False, False, 0)
-
-        self.pref_view_button = self.create_togglebutton(self.preferences_menu_item, Gtk.STOCK_PREFERENCES)
-        self.pref_view_button.connect("clicked", self.on_pref_mode_menu_click)
-        self.header_box.pack_start(self.pref_view_button, False, False, 0)
-
-        self.search_box = Gtk.Entry()
-        self.search_box.set_placeholder_text(_("Search"))
-        self.search_box.connect("changed", self.on_search)
-        self.header_box.pack_end(self.search_box, True, True, 0)
-
         self.content_ui_vbox = Gtk.VBox()
-        self.window_box.pack_start(self.content_ui_vbox, False, False, 0)
-
-        self.menu_button = Gtk.MenuButton()
-
-        self.action_group = Gtk.ActionGroup("actions")
-
-        self.generate_view()
         if (self.standalone_module == None):
             self.build_toolbar()
+
+        self.window_box.pack_start(self.content_ui_vbox, False, False, 0)
+
+        self.generate_view()
         self.draw_ui()
         self.set_standalone()
         Gtk.main()

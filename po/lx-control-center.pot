@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-24 21:20+0200\n"
+"POT-Creation-Date: 2017-08-05 15:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,62 +104,74 @@ msgstr ""
 msgid "Icon size for the view"
 msgstr ""
 
-#: ../LXControlCenter/base.py:388
+#: ../LXControlCenter/base.py:386
 msgid "Current environment in NotShow field"
 msgstr ""
 
-#: ../LXControlCenter/base.py:396
+#: ../LXControlCenter/base.py:394
 msgid "Current environment not in OnlyShow field"
 msgstr ""
 
-#: ../LXControlCenter/base.py:405
+#: ../LXControlCenter/base.py:403
 msgid "Excecutable in TryExec doesn't exist"
 msgstr ""
 
-#: ../LXControlCenter/base.py:413
+#: ../LXControlCenter/base.py:411
 msgid "Excecutable path doesn't exist"
 msgstr ""
 
-#: ../LXControlCenter/base.py:421
+#: ../LXControlCenter/base.py:419
 msgid "Blacklisted (absolute path)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:426
+#: ../LXControlCenter/base.py:424
 msgid "Blacklisted (desktop file name)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:434
+#: ../LXControlCenter/base.py:432
 msgid "Whitelisted (absolute path)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:439
+#: ../LXControlCenter/base.py:437
 msgid "Whitelisted (desktop file name)"
 msgstr ""
 
-#: ../LXControlCenter/base.py:447
+#: ../LXControlCenter/base.py:445
 msgid "Category Other deactivated"
 msgstr ""
 
-#: ../LXControlCenter/base.py:467
+#: ../LXControlCenter/base.py:465
 msgid "Replaced by an active module"
 msgstr ""
 
-#: ../LXControlCenter/base.py:471
+#: ../LXControlCenter/base.py:469
 msgid "Module support deactivated"
 msgstr ""
 
-#: ../LXControlCenter/base.py:480
+#: ../LXControlCenter/base.py:478
 msgid "Module is not compatible with current toolkit"
 msgstr ""
 
-#: ../LXControlCenter/base.py:487
+#: ../LXControlCenter/base.py:485
 msgid "Experimental module, with support enabled"
 msgstr ""
 
-#: ../LXControlCenter/base.py:491
+#: ../LXControlCenter/base.py:489
 msgid "Experimental module, but the support is not enabled"
 msgstr ""
 
-#: ../LXControlCenter/item.py:129
+#: ../LXControlCenter/item.py:130
 msgid "Other"
+msgstr ""
+
+#: ../LXControlCenter/runner.py:67
+#, python-format
+msgid "%s desktop environment unknown or not supported. Default to GTK3"
+msgstr ""
+
+#: ../LXControlCenter/runner.py:81
+#, python-format
+msgid ""
+"%s desktop environment not supported, please report it as a bug. Default to "
+"GTK3"
 msgstr ""
