@@ -34,13 +34,6 @@ from LXControlCenter.utils import Utils
 # Cinnamon: https://github.com/linuxmint/Cinnamon/tree/master/files/usr/share/cinnamon/cinnamon-settings/modules
 # Mate: https://github.com/mate-desktop/mate-control-center/blob/master/capplets/appearance/appearance.h
 
-
-# Theme
-# GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
-# LXSession: https://github.com/lxde/lxsession/blob/master/data/desktop.conf.example
-# LXQt: https://github.com/lxde/lxqt-session/blob/master/config/lxqt.conf
-# Mate: https://github.com/mate-desktop/mate-control-center/blob/master/capplets/appearance/appearance.h
-
 class Setting():
     def __init__(self, runtime):
         logging.info("Setting.__init__: enter function")
@@ -241,6 +234,14 @@ class Setting():
         setting[2] = arg_2
         setting[3] = arg_3
 
+# Theme
+# GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
+# LXSession: https://github.com/lxde/lxsession/blob/master/data/desktop.conf.example
+# LXQt: https://github.com/lxde/lxqt-session/blob/master/config/lxqt.conf
+# Cinnamon: https://github.com/linuxmint/Cinnamon/blob/master/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
+# Mate: https://github.com/mate-desktop/mate-control-center/blob/master/capplets/appearance/appearance.h
+# GTK3: https://developer.gnome.org/gtk3/stable/GtkSettings.html
+
 class IconThemeSetting(Setting):
     def __init__(self, support):
         Setting.__init__(self, support)
@@ -264,4 +265,26 @@ class GtkThemeSetting(Setting):
         self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "gtk-theme")
         self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "gtk-theme")
         self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-theme-name")
+        self.set_settings_support()
+
+class CursorThemeSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("CursorThemeSetting.__init__: enter function")
+        self.name = "Cursor Theme Support"
+        self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "sGtk/CursorThemeName")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.interface", "cursor-theme")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "cursor-theme")
+        self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "cursor-theme")
+        self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-cursor-theme-name")
+        self.set_settings_support()
+
+class CursorSizeSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("CursorSizeSetting.__init__: enter function")
+        self.name = "Cursor Size Support"
+        self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "iGtk/CursorThemeSize")
+        self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "cursor-size")
+        self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-cursor-theme-size")
         self.set_settings_support()
