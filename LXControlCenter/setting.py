@@ -23,7 +23,6 @@ import os.path
 
 from pydbus import SessionBus
 
-from gi.repository import Gio
 from LXControlCenter.utils import Utils
 
 # Documentation / Examples
@@ -54,15 +53,15 @@ class Setting():
         # LXSession Dbus: Format Dbus: ["lxsession", support, Method, key1, key2]
         self.lxsession_dbus_setting = ["lxsession_dbus", False, None, None, None]
         # Cinnamon Setting: Format GSettings [group, key]
-        self.cinnamon_setting = ["cinnamon", False, None, None]
+        self.cinnamon_setting = ["cinnamon_settings", False, None, None]
         # Gnome Setting: Format GSettings [group, key]
-        self.gnome_setting = ["gnome", False, None, None]
+        self.gnome_setting = ["gnome_settings", False, None, None]
         # Mate Setting: Format GSettings [group, key]
-        self.mate_setting = ["mate", False, None, None]
+        self.mate_setting = ["mate_settings", False, None, None]
         # LXQt Setting: Format GSettings [group, key]
-        self.lxqt_setting = ["lxqt", False, None, None]
+        self.lxqt_setting = ["lxqt_settings", False, None, None]
         # GTK3 Setting: Format .ini [group, key]
-        self.gtk3_setting = ["gtk3", False, None, None]
+        self.gtk3_setting = ["gtk3_settings", False, None, None]
 
         #List of settings
         self.settings_list =    [   self.lxsession_file_setting,
@@ -74,10 +73,13 @@ class Setting():
                                     self.gtk3_setting
                                 ]
 
+        self.support_list = []
+
     def get(self):
         logging.info("Setting.get: enter function")
         return_value = None
-        for setting in self.settings_list:
+        # TODO Break when we found a setting ?
+        for setting in self.support_list:
             # Check if the setting is handle
             if (setting[1] == True):
                 if (setting[0] == "lxsession_file"):
@@ -91,49 +93,49 @@ class Setting():
                     #TODO
                     #support.lxsession_dbus_runtime.SessionSet(key1,key2)
                     logging.warning("lxsession_dbus not supported")
-                elif (setting[0] == "cinnamon"):
+                elif (setting[0] == "cinnamon_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
                                                             self.cinnamon_setting[2], 
                                                             self.cinnamon_setting[3], 
-                                                            None
+                                                            None,
                                                             "string")
-                elif (setting[0] == "gnome"):
+                elif (setting[0] == "gnome_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
                                                             self.gnome_setting[2],
                                                             self.gnome_setting[3],
                                                             None,
                                                             "string")
-                elif (setting[0] == "mate"):
+                elif (setting[0] == "mate_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
                                                             self.mate_setting[2],
                                                             self.mate_setting[3],
                                                             None,
                                                             "string")
-                elif (setting[0] == "gtk3"):
+                elif (setting[0] == "gtk3_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
                                                             self.gtk3_setting[2],
                                                             self.gtk3_setting[3],
                                                             None,
                                                             "string")
-                elif (setting[0] == "lxqt"):
+                elif (setting[0] == "lxqt_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["lxqt_settings"][3],
                                                             self.lxqt_setting[2], 
                                                             self.lxqt_setting[3], 
                                                             None,
                                                             "string")
-            else:
-                logging.warning("%s not supported for %s" % (setting[0], self.name))
+                else:
+                    logging.warning("%s not supported for %s" % (setting[0], self.name))
         return return_value
 
     def set(self, value):
         logging.info("Setting.set: enter function")
         current_value = self.get()
-        for setting in self.settings_list:
+        for setting in self.support_list:
             # Check if the setting is handle
             if (setting[1] == True):
                 if (setting[0] == "lxsession_file"):
@@ -141,10 +143,10 @@ class Setting():
                                                             self.runtime.support["lxsession_file"][3],
                                                             self.lxsession_file_setting[2],
                                                             self.lxsession_file_setting[3],
-                                                            current_value,
                                                             value,
+                                                            current_value,
                                                             "string")
-                    if (trigger_save == true):
+                    if (trigger_save == True):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["lxsession_file"][3],
                                                 self.runtime.support["lxsession_file"][4])
@@ -152,78 +154,86 @@ class Setting():
                     #TODO
                     #support.lxsession_dbus_runtime.SessionSet(key1,key2)
                     logging.warning("lxsession_dbus not supported")
-                elif (setting[0] == "cinnamon"):
+                elif (setting[0] == "cinnamon_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
-                                            self.cinnamon_setting[2], 
-                                            self.cinnamon_setting[3], 
+                                            self.cinnamon_setting[2],
+                                            self.cinnamon_setting[3],
+                                            value,
                                             None,
-                                            value, 
                                             "string")
-                elif (setting[0] == "gnome"):
+                elif (setting[0] == "gnome_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
                                             self.gnome_setting[2], 
-                                            self.gnome_setting[3], 
-                                            None,
-                                            value, 
+                                            self.gnome_setting[3],
+                                            value,
+                                            None, 
                                             "string")
-                elif (setting[0] == "mate"):
+                elif (setting[0] == "mate_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
                                             self.mate_setting[2], 
                                             self.mate_setting[3], 
-                                            None,
-                                            value, 
+                                            value,
+                                            None, 
                                             "string")
-                elif (setting[0] == "gtk3"):
+                elif (setting[0] == "gtk3_settings"):
                     trigger_save = self.util.set_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
                                                             self.gtk3_setting[2],
                                                             self.gtk3_setting[3],
-                                                            current_value,
                                                             value,
+                                                            current_value,
                                                             "string")
-                    if (trigger_save == true):
+                    if (trigger_save == True):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["gtk3_settings"][3],
                                                 self.runtime.support["gtk3_settings"][4])
-                if (setting[0] == "lxqt"):
+                elif (setting[0] == "lxqt_settings"):
                     trigger_save = self.util.set_setting(   "keyfile",
                                                             self.runtime.support["lxqt_settings"][3],
                                                             self.lxqt_setting[2],
                                                             self.lxqt_setting[3],
-                                                            current_value,
                                                             value,
+                                                            current_value,
                                                             "string")
                     if (trigger_save == true):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["lxqt_settings"][3],
                                                 self.runtime.support["lxqt_settings"][4])
-            else:
-                logging.warning("%s not supported for %s" % (setting[0], self.name))
+                else:
+                    logging.warning("%s not supported for %s" % (setting[0], self.name))
 
     def set_settings_support(self):
         logging.info("Setting.set_settings_support: enter function")
         if (self.lxsession_file_setting[1] == True):
-            self.support_list.append("lxsession")
-        elif (self.lxsession_dbus_setting[1] == True):
-            self.support_list.append("lxsession")
+            if (self.runtime.support["lxsession_file"][2] == True):
+                self.support_list.append(self.lxsession_file_setting)
+
+        if (self.lxsession_dbus_setting[1] == True):
+            if (self.runtime.support["lxsession_dbus"][2] == True):
+                self.support_list.append(self.lxsession_dbus_setting)
 
         if (self.cinnamon_setting[1] == True):
-            self.support_list.append("cinnamon")
+            if (self.runtime.support["cinnamon_settings"][2] == True):
+                self.support_list.append(self.cinnamon_setting)
 
         if (self.gnome_setting[1] == True):
-            self.support_list.append("gnome")
+            if (self.runtime.support["gnome_settings"][2] == True):
+                self.support_list.append(self.gnome_setting)
 
         if (self.mate_setting[1] == True):
-            self.support_list.append("mate")
+            if (self.runtime.support["mate_settings"][2] == True):
+                self.support_list.append(self.mate_setting)
 
         if (self.gtk3_setting[1] == True):
-            self.support_list.append("gtk3")
+            if (self.runtime.support["gtk3_settings"][2] == True):
+                self.support_list.append(self.gtk3_setting)
 
         if (self.lxqt_setting[1] == True):
-            self.support_list.append("lxqt")
+            if (self.runtime.support["lxqt_settings"][2] == True):
+                self.support_list.append(self.lxqt_settings)
 
     def update_list(self, setting, arg_0, arg_1, arg_2, arg_3):
         setting[0] = arg_0
@@ -237,11 +247,11 @@ class IconThemeSetting(Setting):
         logging.info("IconThemeSetting.__init__: enter function")
         self.name = "Icon Theme Support"
         self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "sNet/IconThemeName")
-        self.update_list(self.cinnamon_setting, "cinnamon", True, "org.cinnamon.desktop.interface", "icon-theme")
-        self.update_list(self.gnome_setting, "gnome", True, "org.gnome.desktop.interface", "icon-theme")
-        self.update_list(self.mate_setting, "mate", True, "org.mate.interface", "icon-theme")
-        self.update_list(self.lxqt_setting, "lxqt", True, "General", "icon_theme")
-        self.update_list(self.gtk3_setting, "gtk3", True, "Settings", "gtk-icon-theme-name")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.interface", "icon-theme")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "icon-theme")
+        self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "icon-theme")
+        self.update_list(self.lxqt_setting, "lxqt_settings", True, "General", "icon_theme")
+        self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-icon-theme-name")
         self.set_settings_support()
 
 class GtkThemeSetting(Setting):
@@ -250,8 +260,8 @@ class GtkThemeSetting(Setting):
         logging.info("GtkThemeSetting.__init__: enter function")
         self.name = "Gtk Theme Support"
         self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "sNet/ThemeName")
-        self.update_list(self.cinnamon_setting, "cinnamon", True, "org.cinnamon.desktop.interface", "gtk-theme")
-        self.update_list(self.gnome_setting, "gnome", True, "org.gnome.desktop.interface", "gtk-theme")
-        self.update_list(self.mate_setting, "mate", True, "org.mate.interface", "gtk-theme")
-        self.update_list(self.gtk3_setting, "gtk3", True, "Settings", "gtk-theme-name")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.interface", "gtk-theme")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "gtk-theme")
+        self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "gtk-theme")
+        self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-theme-name")
         self.set_settings_support()
