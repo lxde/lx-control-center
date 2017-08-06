@@ -93,7 +93,7 @@ class Utils(object):
         """
         logging.info("Utils.save_object: enter function")
         if (object_type == "file" or object_type == "keyfile"):
-            path = self.__get_path(relative_path)
+            path = self.__get_path(relative_path, True)
             dir_path = os.path.dirname(path)
             if (os.path.exists(dir_path) == False):
                 logging.debug("save_file: Directory doesn't exist => create it")
@@ -153,8 +153,8 @@ class Utils(object):
                     else:
                         return_value = keyfile.get(group,key)
         elif (object_type == "gsetting"):
-            gsettings = Gio.Settings.new(group)
-            if (type_to_set == "string"):
+            gsettings = __new_gsetting(group)
+            if (type_to_get == "string"):
                 return_value = gsettings.get_string(key)
             else:
                 logging.warning("Utils.get_setting: GSetting not supported for type %s." % type_to_set)
@@ -246,7 +246,7 @@ class Utils(object):
                         trigger_save_settings_file = True
         # GSetting
         elif (object_type == "gsetting"):
-            gsettings = Gio.Settings.new(group)
+            gsettings = __new_gsetting(group)
             if (gsettings.get_default_value(key) == variable):
                 gsettings.reset(key)
             elif (type_to_set == "string"):
@@ -262,9 +262,10 @@ class Utils(object):
             trigger = trigger_save_settings_file
         return trigger_save_settings_file
 
-    def __get_path (self, relative_path):
+    def __get_path (self, relative_path, home = False):
         """ Find the current configuration file, using XDG standart
             path: relative path to the object (exemple = os.path.join("lx-control-center","settings.conf")
+            home: return path from home directory
 
             return the absolute path
         """
@@ -272,24 +273,38 @@ class Utils(object):
         config_dirs = xdg.BaseDirectory.xdg_config_dirs
         return_path = None
 
-        for path in config_dirs:
-            test_path = os.path.join(path, relative_path)
-            if(os.path.exists(test_path)):
-                return_path = test_path
-                break
+        if (home == True):
+            return_path = os.path.join(config_dirs[0], relative_path)
+        else:
+            for path in config_dirs:
+                test_path = os.path.join(path, relative_path)
+                if(os.path.exists(test_path)):
+                    return_path = test_path
+                    break
 
-        if (return_path == None):
-            test_path = os.path.join(os.getcwd(), "data", os.path.basename(relative_path))
-            if (os.path.exists(test_path)):
-                return_path = test_path
+            if (return_path == None):
+                test_path = os.path.join(os.getcwd(), "data", os.path.basename(relative_path))
+                if (os.path.exists(test_path)):
+                    return_path = test_path
 
-        if (return_path == None):
-            test_path = os.path.join(os.getcwd(), relative_path)
-            if (os.path.exists(test_path)):
-                return_path = test_path
+            if (return_path == None):
+                test_path = os.path.join(os.getcwd(), relative_path)
+                if (os.path.exists(test_path)):
+                    return_path = test_path
 
         if (return_path == None):
             logging.warning("Utils.__get_path : Can't find an existing file for relative path %s" % return_path)
 
         logging.debug("Utils.__get_path : return_path = %s" % return_path)
         return return_path
+
+    def __new_gsetting(self, group):
+        #FIXME 
+        try:
+            from gi.repository import Gio
+            gsettings = Gio.Settings.new(group)
+            return gsettings
+        except:
+            import gio
+            gsettings = gio.Settings.new(group)
+            return gsettings
