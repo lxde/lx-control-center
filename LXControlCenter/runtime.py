@@ -33,7 +33,7 @@ class Runtime():
         # self.support[key] = [pretty_name, binary, running ?, configuration_object, configuration_path]
         self.support = {}
         self.support["lxsession_file"] = ["LXSession (keyfile)", "lxsession", False, None, None]
-        self.support["lxsession_dbus"] = ["LXSession (dbus)", "lxsession", False, None, None
+        self.support["lxsession_dbus"] = ["LXSession (dbus)", "lxsession", False, None, None]
         self.support["cinnamon_settings"] = ["Cinnamon", "cinnamon-settings-daemon", False, None, None]
         self.support["gnome_settings"] = ["GNOME", "gnome-settings-daemon", False, None, None]
         self.support["mate_settings"] = ["MATE", "mate-settings-daemon", False, None, None]
@@ -47,8 +47,9 @@ class Runtime():
         self.running_aplications = self.util.generate_running_applications()
         self.check_running_support()
         self.check_conf_support()
-        self.generate_support_list()
 
+        # Debug
+        # self.debug()
 
     def generate_running(self):
         for support in self.support:
@@ -58,10 +59,10 @@ class Runtime():
     def check_running_support(self):
         logging.info("Runtime.check_running_support: enter function")
         for support in self.support:
-            if (support[1] == None):
-                support[2] = True
-            elif (support[1] in self.running_aplications):
-                support[2] = True
+            if (self.support[support][1] == None):
+                self.support[support][2] = True
+            elif (self.support[support][1] in self.running_aplications):
+                self.support[support][2] = True
 
     def check_conf_support(self):
         logging.info("Runtime.check_running_support: enter function")
@@ -70,29 +71,32 @@ class Runtime():
                 profile = os.environ['DESKTOP_SESSION']
                 lxsession_dir = os.path.join("lxsession", profile)
                 try:
-                    support[4] = os.path.join(lxsession_dir, "desktop.conf")
-                    if (support[4] is not None):
-                        support[3] = self.util.load_object("ini", support[4])
+                    self.support[support][4] = os.path.join(lxsession_dir, "desktop.conf")
+                    if (self.support[support][4] is not None):
+                        self.support[support][3] = self.util.load_object("ini", self.support[support][4])
                 except:
                     pass
             elif (support == "lxsession_dbus"):
                 try:
                     bus = SessionBus()
                     remote_object = bus.get("org.lxde.SessionManager", "/org/lxde/SessionManager")
-                    support[3] = remote_object
+                    self.support[support][3] = remote_object
                 except:
                     pass
             elif (support == "gtk3_settings"):
                 try:
-                    support[4] = os.path.join("gtk-3.0", "settings.ini")
-                    if (support[4] is not None):
-                        support[3] = self.util.load_object("ini", support[4])
+                    self.support[support][4] = os.path.join("gtk-3.0", "settings.ini")
+                    if (self.support[support][4] is not None):
+                        self.support[support][3] = self.util.load_object("ini", self.support[support][4])
                 except:
                     pass
             elif (support == "lxqt_settings"):
                 try:
-                    support[4] = os.path.join("lxqt", "lxqt.conf")
-                    if (support[4] is not None):
-                        support[3] = self.util.load_object("ini", support[4])
+                    self.support[support][4] = os.path.join("lxqt", "lxqt.conf")
+                    if (self.support[support][4] is not None):
+                        self.support[support][3] = self.util.load_object("ini", self.support[support][4])
                 except:
                     pass
+    def debug(self):
+        for i in self.support:
+            print("Runtime.support for %s: %s - %s - %s - %s - %s" % (i, self.support[i][0], self.support[i][1], self.support[i][2], self.support[i][3], self.support[i][4]))
