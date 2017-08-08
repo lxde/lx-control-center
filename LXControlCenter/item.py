@@ -20,7 +20,6 @@
 import os.path
 import sys
 import logging
-import subprocess
 
 from LXControlCenter.utils import Utils
 
@@ -164,15 +163,8 @@ class Item():
     def launch(self):
         logging.info("launch: trying execute : %s" % self.execute_command)
         if (self.type == "application"):
-            try:
-                command_to_excecute = self.execute_command.split(" ")
-                for i in command_to_excecute:
-                    if (i[0] == "%"):
-                        command_to_excecute.remove(i)
+            self.util.launch_command(self.execute_command)
 
-                subprocess.Popen(command_to_excecute)
-            except:
-                logging.info("launch: error launching %s" % command_to_excecute)
         elif (self.type == "module"):
             python_version = sys.version_info
             module_path = os.path.join(os.path.dirname(self.path),self.execute_command)
