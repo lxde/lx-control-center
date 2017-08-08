@@ -39,7 +39,9 @@ class Setting():
         logging.info("Setting.__init__: enter function")
         self.util =  Utils()
         self.runtime = runtime
+
         self.name = None
+        self.setting_type = "string"
 
         # LXSesion file: Format .ini file: ["lxsession", support, group, key]
         self.lxsession_file_setting = ["lxsession_file", False, None, None]
@@ -55,6 +57,8 @@ class Setting():
         self.lxqt_setting = ["lxqt_settings", False, None, None]
         # GTK3 Setting: Format .ini [group, key]
         self.gtk3_setting = ["gtk3_settings", False, None, None]
+        # Openbox Setting: Format xml [support, Tag1, Tag2]
+        self.openbox_setting = ["openbox_settings", False, None, None]
 
         #List of settings
         self.settings_list =    [   self.lxsession_file_setting,
@@ -63,7 +67,8 @@ class Setting():
                                     self.gnome_setting,
                                     self.mate_setting,
                                     self.lxqt_setting,
-                                    self.gtk3_setting
+                                    self.gtk3_setting,
+                                    self.openbox_setting
                                 ]
 
         self.support_list = []
@@ -81,7 +86,7 @@ class Setting():
                                                             self.lxsession_file_setting[2],
                                                             self.lxsession_file_setting[3],
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
                 elif (setting[0] == "lxsession_dbus"):
                     #TODO
                     #support.lxsession_dbus_runtime.SessionSet(key1,key2)
@@ -92,35 +97,42 @@ class Setting():
                                                             self.cinnamon_setting[2], 
                                                             self.cinnamon_setting[3], 
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
                 elif (setting[0] == "gnome_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
                                                             self.gnome_setting[2],
                                                             self.gnome_setting[3],
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
                 elif (setting[0] == "mate_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
                                                             self.mate_setting[2],
                                                             self.mate_setting[3],
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
                 elif (setting[0] == "gtk3_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
                                                             self.gtk3_setting[2],
                                                             self.gtk3_setting[3],
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
                 elif (setting[0] == "lxqt_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["lxqt_settings"][3],
                                                             self.lxqt_setting[2], 
                                                             self.lxqt_setting[3], 
                                                             None,
-                                                            "string")
+                                                            self.setting_type)
+                elif (setting[0] == "openbox_settings"):
+                    return_value = self.util.get_setting(   "xml",
+                                                            self.runtime.support["openbox_settings"][3],
+                                                            self.openbox_setting[2],
+                                                            self.openbox_setting[3],
+                                                            None,
+                                                            self.setting_type)
                 else:
                     logging.warning("%s not supported for %s" % (setting[0], self.name))
         return return_value
@@ -138,7 +150,7 @@ class Setting():
                                                             self.lxsession_file_setting[3],
                                                             value,
                                                             current_value,
-                                                            "string")
+                                                            self.setting_type)
                     if (trigger_save == True):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["lxsession_file"][3],
@@ -154,7 +166,7 @@ class Setting():
                                             self.cinnamon_setting[3],
                                             value,
                                             None,
-                                            "string")
+                                            self.setting_type)
                 elif (setting[0] == "gnome_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
@@ -162,7 +174,7 @@ class Setting():
                                             self.gnome_setting[3],
                                             value,
                                             None, 
-                                            "string")
+                                            self.setting_type)
                 elif (setting[0] == "mate_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
@@ -170,7 +182,7 @@ class Setting():
                                             self.mate_setting[3], 
                                             value,
                                             None, 
-                                            "string")
+                                            self.setting_type)
                 elif (setting[0] == "gtk3_settings"):
                     trigger_save = self.util.set_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
@@ -178,7 +190,7 @@ class Setting():
                                                             self.gtk3_setting[3],
                                                             value,
                                                             current_value,
-                                                            "string")
+                                                            self.setting_type)
                     if (trigger_save == True):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["gtk3_settings"][3],
@@ -190,13 +202,28 @@ class Setting():
                                                             self.lxqt_setting[3],
                                                             value,
                                                             current_value,
-                                                            "string")
-                    if (trigger_save == true):
+                                                            self.setting_type)
+                    if (trigger_save == True):
                         self.util.save_object(  "keyfile",
                                                 self.runtime.support["lxqt_settings"][3],
                                                 self.runtime.support["lxqt_settings"][4])
+                elif (setting[0] == "openbox_settings"):
+                    trigger_save = self.util.set_setting(   "xml",
+                                                            self.runtime.support["openbox_settings"][3],
+                                                            self.openbox_setting[2],
+                                                            self.openbox_setting[3],
+                                                            value,
+                                                            current_value,
+                                                            self.setting_type)
+                    if (trigger_save == True):
+                        self.util.save_object(  "xml",
+                                                self.runtime.support["openbox_settings"][3],
+                                                self.runtime.support["openbox_settings"][4])
+                        self.util.launch_command("openbox --reconfigure")
                 else:
                     logging.warning("%s not supported for %s" % (setting[0], self.name))
+
+        self.set_after_hooks()
 
     def set_settings_support(self):
         logging.info("Setting.set_settings_support: enter function")
@@ -226,13 +253,21 @@ class Setting():
 
         if (self.lxqt_setting[1] == True):
             if (self.runtime.support["lxqt_settings"][2] == True):
-                self.support_list.append(self.lxqt_settings)
+                self.support_list.append(self.lxqt_setting)
+
+        if (self.openbox_setting[1] == True):
+            if (self.runtime.support["openbox_settings"][2] == True):
+                self.support_list.append(self.openbox_setting)
 
     def update_list(self, setting, arg_0, arg_1, arg_2, arg_3):
         setting[0] = arg_0
         setting[1] = arg_1
         setting[2] = arg_2
         setting[3] = arg_3
+
+    def set_after_hooks(self):
+        """ Function to launch after set function """
+        pass
 
 # Theme
 # GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
@@ -279,12 +314,25 @@ class CursorThemeSetting(Setting):
         self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-cursor-theme-name")
         self.set_settings_support()
 
+    def set_after_hooks(self):
+        #TODO Link default icon theme to apply cursor theme
+        pass
+
 class CursorSizeSetting(Setting):
     def __init__(self, support):
         Setting.__init__(self, support)
         logging.info("CursorSizeSetting.__init__: enter function")
         self.name = "Cursor Size Support"
+        self.setting_type = "int"
         self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "iGtk/CursorThemeSize")
         self.update_list(self.mate_setting, "mate_settings", True, "org.mate.interface", "cursor-size")
         self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-cursor-theme-size")
+        self.set_settings_support()
+
+class OpenboxThemeSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("OpenboxThemeSetting.__init__: enter function")
+        self.name = "Openbox Theme Support"
+        self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "name")
         self.set_settings_support()
