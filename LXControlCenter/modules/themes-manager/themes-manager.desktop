@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Module
+Icon=preferences-desktop
+Name=Themes
+GenericName=Themes
+Comment=Change the look & feel of your desktop
+Exec=main.py
+Categories=X-LX-Control-Center-Module;Settings;DesktopSettings;
+X-LX-Control-Center-Version=0.1
+X-LX-Control-Center-API-Version=0.1
+X-LX-Control-Center-Toolkit=GTK3
+X-LX-Control-Center-Experimental=true
