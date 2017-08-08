@@ -24,6 +24,9 @@ import xdg.IniFile
 import xdg.Locale
 import os.path
 import psutil
+import subprocess
+
+from xml.dom import minidom
 
 try:
     import configparser as configparser
@@ -35,6 +38,7 @@ class Utils(object):
     #
     # Utilities
     # generate_running_applications = generate a list of running applications
+    # launch_command = launch application with command line
     #
     # Settings access
     # load_object = load setting object (file, or gsetting, or dbus ...)
@@ -52,6 +56,20 @@ class Utils(object):
         for proc in procs:
             return_list.append(proc.name())
         return return_list
+
+    def launch_command(self, path):
+        """ Launch a command
+            path: the command to launch
+        """
+        try:
+            command_to_launch = path.split(" ")
+            for i in command_to_launch:
+                if (i[0] == "%"):
+                    command_to_launch.remove(i)
+
+            subprocess.Popen(command_to_launch)
+        except:
+            logging.info("launch: error launching %s" % command_to_launch)
 
     def load_object (self, object_type, relative_path):
         """ Load object with setting.
@@ -81,6 +99,11 @@ class Utils(object):
                 return_value = xdg.DesktopEntry.DesktopEntry(path)
             except:
                 logging.error("load_xdgfile: error, %s is not a desktop file" % path)
+        elif (object_type == "xml"):
+            try:
+                return_value = minidom.parse(path)
+            except:
+                logging.error("Utils.load_object: error, when parsing %s." % path)
         else:
             logging.error("Utils.load_object: object type %s not supported" % object_type)
 
@@ -92,7 +115,7 @@ class Utils(object):
             relative_path: relative path to the object (exemple = os.path.join("lx-control-center","settings.conf")
         """
         logging.info("Utils.save_object: enter function")
-        if (object_type == "file" or object_type == "keyfile"):
+        if (object_type == "file" or object_type == "keyfile" or object_type == "xml" or object_type == "ini" or object_type == "xdg"):
             path = self.__get_path(relative_path, True)
             dir_path = os.path.dirname(path)
             if (os.path.exists(dir_path) == False):
@@ -106,13 +129,19 @@ class Utils(object):
 
             logging.debug("save_file: Save file on %s" % path)
             file_to_save = open(path,'w')
-            object_to_save.write(file_to_save)
+            if (object_type == "xml"):
+                #TODO Fix whitespace maddness
+                # https://lists.gt.net/python/python/593596
+                # http://ronrothman.com/public/leftbraned/xml-dom-minidom-toprettyxml-and-silly-whitespace/#best-solution
+                file_to_save.write(object_to_save.toprettyxml())
+            else:
+                object_to_save.write(file_to_save)
             file_to_save.close()
 
     def get_setting(self, object_type, object_to_get, group, key, default_value, type_to_get):
         """ Get setting from a setting object.
-            object_type: Type of setting (keyfile, gsetting)
-            object_to_get: keyfile object, or None
+            object_type: Type of setting (keyfile, gsetting, xml)
+            object_to_get: keyfile or xml object, or None
             group: First setting parameter
             key: Second setting parameter
             default_value: Value to return if nothing is find, or None (Not apply on gsetting)
@@ -121,8 +150,6 @@ class Utils(object):
             return: Return the object
         """
         #TODO Dbus Backend
-        #TODO XML Backend
-        #https://stackoverflow.com/questions/1629687/alter-xml-while-preserving-layout
         logging.info("Utils.get_setting: enter function")
         return_value = default_value
         # Keyfile
@@ -143,6 +170,9 @@ class Utils(object):
                     elif (type_to_get == "boolean"):
                         return_value = keyfile.getboolean(group,key)
 
+                    elif (type_to_get == "string-no-locale"):
+                        return_value = keyfile.get(group,key)
+
                     elif (type_to_get == "string"):
                         new_key = key
                         for lang in xdg.Locale.langs:
@@ -152,12 +182,19 @@ class Utils(object):
                         return_value = keyfile.get(group, new_key)
                     else:
                         return_value = keyfile.get(group,key)
+        # GSettings
         elif (object_type == "gsetting"):
             gsettings = __new_gsetting(group)
             if (type_to_get == "string"):
                 return_value = gsettings.get_string(key)
             else:
                 logging.warning("Utils.get_setting: GSetting not supported for type %s." % type_to_set)
+        # XML
+        elif (object_type == "xml"):
+            xml_file = object_to_get
+            NodeGroup = xml_file.getElementsByTagName(group)[0]
+            NodeKey = NodeGroup.getElementsByTagName(key)[0]
+            return_value = NodeKey.firstChild.nodeValue
         else:
             logging.warning("Utils.get_setting: type %s is not supported." % object_type)
 
@@ -177,7 +214,6 @@ class Utils(object):
             return True is the object need to be saved
         """
         #TODO Dbus Backend
-        #TODO XML Backend
         #TODO binary Backend
         logging.info("Utils.set_setting: enter function")
         logging.debug("Utils.set_setting: group, key and variable => %s, %s, %s" %(group, key, variable))
@@ -255,6 +291,18 @@ class Utils(object):
                     gsettings.apply()
             else:
                 logging.warning("Utils.set_setting: GSetting not supported for type %s." % type_to_set)
+        # XML
+        elif (object_type == "xml"):
+            xml_file = object_to_get
+            NodeGroup = xml_file.getElementsByTagName(group)[0]
+            NKey = NodeGroup.getElementsByTagName(key)[0]
+            NodeKey = NKey.firstChild
+            if (type_to_set == "string"):
+                if (NodeKey.nodeValue != variable):
+                    NodeKey.nodeValue = variable
+                    trigger_save_settings_file = True
+            else:
+                logging.warning("Utils.get_setting: xml doesn't support type %s." % type_to_get)
         else:
             logging.warning("Utils.set_setting: type %s is not supported." % object_type)
 
