@@ -20,6 +20,7 @@
 import logging
 import os
 import os.path
+import psutil
 
 from LXControlCenter.utils import Utils
 
@@ -39,6 +40,7 @@ class Runtime():
         self.support["mate_settings"] = ["MATE", "mate-settings-daemon", False, None, None]
         self.support["lxqt_settings"] = ["LXQt", "lxqt-session", False, None, None]
         self.support["gtk3_settings"] = ["GTK3", None, False, None, None]
+        self.support["openbox_settings"] = ["Openbox", "openbox", False, None, None]
 
         # List of support key which are actually running on the system
         self.running = []
@@ -49,7 +51,7 @@ class Runtime():
         self.check_conf_support()
 
         # Debug
-        # self.debug()
+        #self.debug()
 
     def generate_running(self):
         for support in self.support:
@@ -97,6 +99,19 @@ class Runtime():
                         self.support[support][3] = self.util.load_object("ini", self.support[support][4])
                 except:
                     pass
+            elif (support == "openbox_settings"):
+                conf_file = "rc.xml"
+                procs = psutil.process_iter()
+                for proc in procs:
+                    if (proc.name() == "openbox"):
+                        try:
+                            conf_file = proc.cmdline()[2]
+                        except:
+                            pass
+                self.support[support][4] = os.path.join("openbox", conf_file)
+                if (self.support[support][4] is not None):
+                    self.support[support][3] = self.util.load_object("xml", self.support[support][4])
+
     def debug(self):
         for i in self.support:
             print("Runtime.support for %s: %s - %s - %s - %s - %s" % (i, self.support[i][0], self.support[i][1], self.support[i][2], self.support[i][3], self.support[i][4]))
