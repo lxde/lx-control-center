@@ -130,10 +130,9 @@ class Utils(object):
             logging.debug("save_file: Save file on %s" % path)
             file_to_save = open(path,'w')
             if (object_type == "xml"):
-                #TODO Fix whitespace maddness
-                # https://lists.gt.net/python/python/593596
-                # http://ronrothman.com/public/leftbraned/xml-dom-minidom-toprettyxml-and-silly-whitespace/#best-solution
-                file_to_save.write(object_to_save.toprettyxml())
+                string_to_save = object_to_save.toprettyxml(encoding='UTF-8')
+                string_to_save = os.linesep.join([s for s in string_to_save.splitlines() if s.strip()])
+                file_to_save.write(string_to_save)
             else:
                 object_to_save.write(file_to_save)
             file_to_save.close()
