@@ -223,7 +223,7 @@ class Setting():
                 else:
                     logging.warning("%s not supported for %s" % (setting[0], self.name))
 
-        self.set_after_hooks()
+        self.set_after_hooks(value)
 
     def set_settings_support(self):
         logging.info("Setting.set_settings_support: enter function")
@@ -265,7 +265,7 @@ class Setting():
         setting[2] = arg_2
         setting[3] = arg_3
 
-    def set_after_hooks(self):
+    def set_after_hooks(self, value):
         """ Function to launch after set function """
         pass
 
@@ -314,9 +314,18 @@ class CursorThemeSetting(Setting):
         self.update_list(self.gtk3_setting, "gtk3_settings", True, "Settings", "gtk-cursor-theme-name")
         self.set_settings_support()
 
-    def set_after_hooks(self):
+    def set_after_hooks(self, value):
         #TODO Link default icon theme to apply cursor theme
-        pass
+        index_file_path = os.path.join(os.path.expanduser("~"), ".icons", "default", "index.theme")
+        #if (os.path.exist(index_file_path) == False):
+            #create the file
+        #else:
+        keyfile = self.util.load_object ("keyfile", index_file_path)
+        self.util.set_setting("keyfile", keyfile, "Icon Theme", "Name", "Default", None, "string")
+        self.util.set_setting("keyfile", keyfile, "Icon Theme", "Comment", "Default Cursor Theme", None, "string")
+        self.util.set_setting("keyfile", keyfile, "Icon Theme", "Inherits", value, None, "string")
+        self.util.save_object ("keyfile", keyfile, index_file_path)
+
 
 class CursorSizeSetting(Setting):
     def __init__(self, support):
