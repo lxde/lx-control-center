@@ -11,7 +11,7 @@ It parses directories with desktop files to populate the list of applications to
  - OnlyShowIn and NotShowIn fields.
 See data/settings.conf for all the configuration possibilities.
 
-### Module
+### Modules
 
 It also supports extensions with modules, to display directly settings inside lx-control-center window.
 
@@ -36,9 +36,13 @@ There are currently 4 frontends:
  - GTK2 version (--ui GTK2) : close to the GTK3 version
  - Qt5 version (--ui Qt5) : experimental
  - Webkit - GTK2 version (--ui webkitgtk2) : port of the lxde-ctrl-center - tuquito-control-center
-You can also build debian packages by running "dpkg-buildpackage -tc" 
+
+You can also build debian packages by running "dpkg-buildpackage -tc"
+
 To enable debug, pass --log=INFO or --log=DEBUG
+
 To save the output to a file, pass --logfile=the_log_file
+
 To run only 1 module in a standalone mode, pass -m or --module with the filename of the desktop file of the module (without the .desktop), like -m lxcc-module-test.
 
 
