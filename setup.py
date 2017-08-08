@@ -17,6 +17,7 @@ setup(
       packages=[
                 'LXControlCenter',
                 'LXControlCenter.widgets',
+                'LXControlCenter.modules.themes-manager',
                 ],
       scripts=[
                'lx-control-center',
