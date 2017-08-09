@@ -8,7 +8,9 @@ Build-Depends: debhelper (>= 9),
                intltool,
                dh-python,
                python-setuptools,
-               python3-setuptools
+               python-distutils-extra,
+               python3-setuptools,
+               python3-distutils-extra
 Standards-Version: 3.9.6
 X-Python-Version: >= 2.7
 X-Python3-Version: >= 3.2
@@ -20,7 +22,7 @@ Depends: ${misc:Depends},
          ${python2:Depends}|${python3:Depends},
          python-lx-control-center|python3-lx-control-center
 Description: Utility to apply settings on LXDE environement
- The LX-Control-Center centralise all settings for an LXDE environement.
+ The LX-Control-Center centralises all settings for an LXDE environement.
 
 Package: python-lx-control-center
 Architecture: all
