@@ -369,7 +369,7 @@ class Base(Utils):
         logging.debug("load_all_modules: %s :" % list_modules)
         for m in list_modules:
             item = Item(self.categories_triaged)
-            item.load_module_from_path(m)
+            item.load_module_from_path(m, self.toolkit)
             if (item.check == True):
                 self.items[item.path] = item
 
@@ -471,8 +471,8 @@ class Base(Utils):
     def apply_module_toolkit(self, i):
         logging.info("Base.apply_module_toolkit: enter function")
         if (self.items[i].type == "module"):
-            if (self.items[i].module_toolkit != None):
-                if (self.items[i].module_toolkit != self.toolkit):
+            if (len(self.items[i].module_toolkits) > 0):
+                if (self.toolkit not in self.items[i].module_toolkits):
                     self.items[i].activate = False
                     self.items[i].activate_original = False
                     self.items[i].add_deactivate_reason(_("Module is not compatible with current toolkit"))
@@ -683,7 +683,7 @@ class Base(Utils):
     def build_module_view(self):
         logging.info("Base.build_module_view: enter function")
         self.clean_main_view()
-        module_class = self.module_activated.module_spec.LXCC_Module()
+        module_class = self.module_activated.module_spec.LXCC_Module(self.toolkit)
         self.content_ui_vbox.add(module_class.main_box)
 
     def on_item_activated_common(self, path):
@@ -724,7 +724,7 @@ class Base(Utils):
             self.mode = "module-UI"
             for i in self.items:
                 if (self.items[i].filename == self.standalone_module + '.desktop'):
-                    if (self.toolkit == self.items[i].module_toolkit):
+                    if (self.toolkit in self.items[i].module_toolkits):
                         self.on_item_activated_common(i)
                         return True
                     else:
@@ -760,7 +760,7 @@ class Base(Utils):
             logging.debug("Item check : %s" % self.items[i].check)
             logging.debug("Item deactivation reasons : %s" % self.items[i].deactivate_reasons)
             logging.debug("Item module_replace_application : %s" % self.items[i].module_replace_application)
-            logging.debug("Item module_toolkit : %s" % self.items[i].module_toolkit)
+            logging.debug("Item module_toolkits : %s" % self.items[i].module_toolkits)
             logging.debug("Item module_experimental : %s" % self.items[i].module_experimental)
             logging.debug("=================")
 

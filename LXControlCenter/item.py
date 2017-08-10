@@ -68,7 +68,8 @@ class Item():
         self.module_version = 0.0
         self.module_api_version = 0.0
         self.module_spec = None
-        self.module_toolkit = None
+        self.module_toolkits = []
+        self.module_running_toolkit = None
         self.module_experimental = False
 
     def load_common_app_module_from_path(self,path,keyfile):
@@ -102,7 +103,7 @@ class Item():
         self.type = "application"
 
 
-    def load_module_from_path(self, path):
+    def load_module_from_path(self, path, toolkit):
         keyfile = self.util.load_object("xdg",path)
         self.load_common_app_module_from_path(path, keyfile)
         self.type = "module"
@@ -110,9 +111,10 @@ class Item():
         self.module_depends = keyfile.get("X-LX-Control-Center-Depends", group="Desktop Entry", type="string", list=True)
         self.module_version = keyfile.get("X-LX-Control-Center-Version", group="Desktop Entry", type="numeric")
         self.module_api_version = keyfile.get("X-LX-Control-Center-API-Version", group="Desktop Entry", type="numeric")
-        self.module_toolkit = keyfile.get("X-LX-Control-Center-Toolkit", group="Desktop Entry", type="string")
+        self.module_toolkits = keyfile.get("X-LX-Control-Center-Toolkits", group="Desktop Entry", type="list")
         self.module_experimental = keyfile.get("X-LX-Control-Center-Experimental", group="Desktop Entry", type="boolean")
         self.check_module()
+        self.module_running_toolkit = toolkit
 
     def define_category_from_list(self):
         logging.debug("define_category_from_list: enter function with categories_list for %s = %s" % (self.path, self.categories_list))
@@ -170,14 +172,16 @@ class Item():
             module_path = os.path.join(os.path.dirname(self.path),self.execute_command)
             if (python_version[0] == 2):
                 import imp
-                self.module_spec = imp.load_source('module.name', module_path)
+                self.module_spec = imp.load_source('lxcc_module', module_path)
             elif (python_version[0] == 3):
                 if(python_version[1] < 3.5):
                     from importlib.machinery import SourceFileLoader
-                    self.module_spec = SourceFileLoader("module.name", module_path).load_module()
+                    self.module_spec = SourceFileLoader("lxcc_module", module_path).load_module()
+                    self.module_spec.init(self.module_running_toolkit)
                 else:
                     import importlib.util
                     logging.debug("launch: trying to import : %s" % module_path)
-                    spec = importlib.util.spec_from_file_location("module.name", module_path)
+                    spec = importlib.util.spec_from_file_location("lxcc_module", module_path)
                     self.module_spec = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(self.module_spec)
+                    self.module_spec.init(self.module_running_toolkit)
