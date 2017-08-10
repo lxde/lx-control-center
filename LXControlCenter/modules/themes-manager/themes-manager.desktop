@@ -8,5 +8,5 @@ Exec=main.py
 Categories=X-LX-Control-Center-Module;Settings;DesktopSettings;
 X-LX-Control-Center-Version=0.1
 X-LX-Control-Center-API-Version=0.1
-X-LX-Control-Center-Toolkit=GTK3
+X-LX-Control-Center-Toolkits=GTK3;
 X-LX-Control-Center-Experimental=true

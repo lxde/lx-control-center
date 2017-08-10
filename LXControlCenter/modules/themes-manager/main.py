@@ -17,11 +17,6 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-# Import your current toolkit (must be specify in X-LX-Control-Toolkit of the desktop file).
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-
 from LXControlCenter.utils import Utils
 from LXControlCenter.runtime import Runtime
 from LXControlCenter.setting import *
@@ -31,12 +26,10 @@ import os.path
 import logging
 
 class LXCC_Module():
-    def __init__(self):
+    def __init__(self, toolkit):
         logging.debug("LXCC_Module.__init__: Init module %s" % os.path.abspath(__file__))
 
-        # Create all your widget in __init__
-        # LXCC will attach self.main_box to the main window
-        self.main_box = Gtk.VBox()
+        self.toolkit = toolkit
 
         self.util = Utils()
         self.runtime = Runtime()
@@ -70,12 +63,26 @@ class LXCC_Module():
         #List Cursor theme (to check support)
         self.cursors_index_files = []
         self.icons_db_names = {}
-        
-        # GTK Variable
-        self.icon_theme = Gtk.IconTheme().get_default()
-        
-        self.run()
 
+        self.init()
+
+    def init(self):
+        global Gtk
+        if (self.toolkit == "GTK3"):
+            import gi
+            gi.require_version('Gtk', '3.0')
+            from gi.repository import Gtk
+            self.icon_theme = Gtk.IconTheme().get_default()
+            self.icon_lookup = Gtk.IconLookupFlags.FORCE_SIZE
+        else:
+            import pygtk
+            pygtk.require('2.0')
+            import gtk as Gtk
+            self.icon_theme = Gtk.icon_theme_get_default()
+            self.icon_lookup = Gtk.ICON_LOOKUP_USE_BUILTIN
+        # LXCC will attach self.main_box to the main window
+        self.main_box = Gtk.VBox()
+        self.run()
         
     def run (self):
         # Load configuration settings
@@ -219,15 +226,7 @@ class LXCC_Module():
         image = self.gtk_generate_preview_image(theme)
         hbox.pack_start(image, False, False, 0)
 
-        grid = Gtk.Grid()
-        grid.set_column_homogeneous(False)
-        grid.set_row_homogeneous(False)
-        grid.set_column_spacing(5)
-        grid.set_row_spacing(5)
-        grid.set_margin_left(30)
-        grid.set_margin_right(30)
-        grid.set_margin_top(10)
-        grid.set_margin_bottom(10)
+        grid = self.gtk_generate_grid()
         hbox.pack_start(grid, False, False, 0)
 
         # Row / Col for support grid
@@ -238,15 +237,7 @@ class LXCC_Module():
         expander = Gtk.Expander()
         vbox.add(expander)
         expander.set_label(_('Details'))
-        grid_ex = Gtk.Grid()
-        grid_ex.set_column_homogeneous(False)
-        grid_ex.set_row_homogeneous(False)
-        grid_ex.set_column_spacing(5)
-        grid_ex.set_row_spacing(5)
-        grid_ex.set_margin_left(30)
-        grid_ex.set_margin_right(30)
-        grid_ex.set_margin_top(10)
-        grid_ex.set_margin_bottom(10)
+        grid_ex = self.gtk_generate_grid()
         expander.add(grid_ex)
         expander_grid = [1, 0, 0, 0]
 
@@ -272,8 +263,8 @@ class LXCC_Module():
                     label.set_size_request(230, -1)
                     label.set_justify(Gtk.Justification.LEFT)
                     if (self.icon_theme.has_icon("gtk-apply")):
-                        pixbuf = self.icon_theme.load_icon("gtk-apply", 16, Gtk.IconLookupFlags.FORCE_SIZE)
-                        image = Gtk.Image.new_from_pixbuf(pixbuf)
+                        pixbuf = self.icon_theme.load_icon("gtk-apply", 16, self.icon_lookup)
+                        image = self.gtk_generate_image(pixbuf)
                         grid.attach(image,support_grid[0],support_grid[1],1,1)
                         grid.attach_next_to(label, image, Gtk.PositionType.RIGHT, 2, 1)
                     else:
@@ -314,17 +305,44 @@ class LXCC_Module():
         icon_example = icon_theme.get_example_icon_name()
 
         try:
-            pixbuf = icon_theme.load_icon(icon_example, 128, Gtk.IconLookupFlags.FORCE_SIZE)
+            pixbuf = icon_theme.load_icon(icon_example, 128, self.icon_lookup)
         except:
             try:
-                pixbuf = icon_theme.load_icon("folder", 128, Gtk.IconLookupFlags.FORCE_SIZE)
+                pixbuf = icon_theme.load_icon("folder", 128, self.icon_lookup)
             except:
                 try:
-                    pixbuf = icon_theme.load_icon("computer", 128, Gtk.IconLookupFlags.FORCE_SIZE)
+                    pixbuf = icon_theme.load_icon("computer", 128, self.icon_lookup)
                 except:
-                    pixbuf = self.icon_theme.load_icon("gtk-stop", 128, Gtk.IconLookupFlags.FORCE_SIZE)
+                    pixbuf = self.icon_theme.load_icon("gtk-stop", 128, self.icon_lookup)
 
-        image = Gtk.Image.new_from_pixbuf(pixbuf)
+        image = self.gtk_generate_image(pixbuf)
+        return image
+
+    def gtk_generate_grid(self):
+        if (self.toolkit == "GTK3"):
+            grid = Gtk.Grid()
+            grid.set_column_homogeneous(False)
+            grid.set_row_homogeneous(False)
+            grid.set_column_spacing(5)
+            grid.set_row_spacing(5)
+            grid.set_margin_left(30)
+            grid.set_margin_right(30)
+            grid.set_margin_top(10)
+            grid.set_margin_bottom(10)
+        else:
+            grid = Gtk.Table()
+            grid.set_homogeneous(False)
+            grid.set_col_spacings(20)
+            grid.set_row_spacings(20)
+        return grid
+
+    def gtk_generate_image(self, pixbuf):
+        if (self.toolkit == "GTK3"):
+            image = Gtk.Image.new_from_pixbuf(pixbuf)
+            return image
+        else:
+            image = Gtk.Image()
+            image.set_from_pixbuf(pixbuf)
         return image
 
     def draw(self):
