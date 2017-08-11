@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding:UTF-8 -*-
 #  lx-control-center
 #
@@ -17,9 +17,10 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import pygtk
-pygtk.require('2.0')
-import gtk as Gtk
+import gi
+gi.require_version('Gtk', '2.0')
+from gi.repository import Gtk
+from gi.repository.GdkPixbuf import Pixbuf
 
 import logging
 import os
@@ -88,7 +89,6 @@ class Gtk2App(Base):
         self.pref_view_button = self.create_togglebutton(self.preferences_menu_item, Gtk.STOCK_PREFERENCES)
         self.pref_view_button.connect("clicked", self.on_pref_mode_menu_click)
         self.header_box.pack_start(self.pref_view_button, False, False, 0)
-  
 
     def clean_main_view(self):
         for children in self.content_ui_vbox.get_children():
@@ -122,7 +122,7 @@ class Gtk2App(Base):
 
         if (save == True):
             self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
-
+        
         if (switch.get_active() == True):
             switch.set_label("ON")
         else:
@@ -132,7 +132,7 @@ class Gtk2App(Base):
         self.triage_items()
         self.generate_view()
 
-    # SpinButton
+        # SpinButton
     def create_spinbutton_conf(self, grid, label, default, default_value, group, key, position):
         # GTK2 Specific
         label_widget = Gtk.Label(label)
@@ -166,10 +166,9 @@ class Gtk2App(Base):
     def build_pref_view(self):
         #TODO Complete options
         self.clean_main_view()
-
+    
         # Configuration
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
-        # GTK2 Specific
         self.content_ui_vbox.pack_start(configuration_frame, False, False, 0)
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
@@ -181,6 +180,7 @@ class Gtk2App(Base):
         self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, self.icon_view_icons_size_default, "Configuration", "icon_view_icons_size", 4)
 
     def build_edit_view(self):
+        logging.info("GTK2.build_edit_view: enter function")
         self.clean_main_view()
         # Update items for search filter
         self.items_by_categories_generate()
@@ -190,9 +190,10 @@ class Gtk2App(Base):
         self.clean_main_view()
         # Generate the view again, to take the modifications of edit_view
         self.generate_view()
-        self.build_generic_icon_view("visible")
+        self.build_generic_icon_view("visible")       
 
     def build_generic_icon_view(self, type_view):
+        logging.info("GTK2.build_generic_icon_view: enter function")
 
         items_to_draw = self.items_visible_by_categories
 
@@ -208,14 +209,15 @@ class Gtk2App(Base):
             frame.add(hbox)
 
             #Impossible to add a custom structure in liststore ...
-            liststore = Gtk.ListStore(Gtk.gdk.Pixbuf, str, str)
-            iconview = Gtk.IconView(liststore)
+            liststore = Gtk.ListStore(Pixbuf, str, str)
+            iconview = Gtk.IconView.new()
+            iconview.set_model(liststore)
             iconview.set_pixbuf_column(0)
             iconview.set_text_column(1)
-            #GTK2 Specific => Force width to avoid too much spacing
+             #GTK2 Specific => Force width to avoid too much spacing
             iconview.set_item_width(self.icon_view_icons_size * 4)
             iconview.set_columns(self.icon_view_columns)
-            iconview.set_selection_mode(Gtk.SELECTION_SINGLE)
+            iconview.set_selection_mode(Gtk.SelectionMode.SINGLE)
 
             #GTK2 spcific => enable single selection click
             if (self.mode == "main-UI"):
@@ -231,18 +233,17 @@ class Gtk2App(Base):
             logging.debug("build_UI: get_item_padding = %s" % iconview.get_item_padding())
             logging.debug("build_UI: item orientation = %s" % iconview.get_item_orientation())
 
-
             if (self.icon_force_size == True):
-                icon_lookup_flags = Gtk.ICON_LOOKUP_FORCE_SVG
+                icon_lookup_flags = Gtk.IconLookupFlags.FORCE_SIZE
             else:
-                icon_lookup_flags = Gtk.ICON_LOOKUP_USE_BUILTIN
+                icon_lookup_flags = Gtk.IconLookupFlags.GENERIC_FALLBACK
 
             self.define_icon_type_with_gtk_theme()
 
             for i in items_to_draw[category]:
                 logging.debug("build_generic_icon_view - item loop: %s" % i.path)
                 if (i.icon_type == "fix"):
-                    pixbuf = Gtk.gdk.pixbuf_new_from_file(i.icon)
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file(i.icon)
                 elif (i.icon_type == "themed"):
                     try:
                         pixbuf = self.theme.load_icon(i.icon, self.icon_view_icons_size, icon_lookup_flags)
@@ -250,6 +251,7 @@ class Gtk2App(Base):
                         pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
                 else:
                     pixbuf = self.theme.load_icon(self.icon_fallback, self.icon_view_icons_size, icon_lookup_flags)
+                logging.debug("build_generic_icon_view - item add: %s - %s" % (i.name, i.path))
 
                 display_name = i.name
 
@@ -259,10 +261,8 @@ class Gtk2App(Base):
                     pixbuf.saturate_and_pixelate(desaturated, 0.1, True)
                     display_name = _("(Inactive) - ") + i.name
                     liststore.append([desaturated, display_name, i.path])
-                    logging.debug("build_generic_icon_view (deactivated)- item append: %s - %s" % (display_name, i.path))
                 else:
                     liststore.append([pixbuf, display_name, i.path])
-                    logging.debug("build_generic_icon_view (activated)- item append: %s - %s" % (display_name, i.path))
 
             hbox.add(iconview)
 
@@ -358,17 +358,17 @@ class Gtk2App(Base):
         cancel_button.set_label(_("Cancel"))
         cancel_button.connect("clicked", self.on_edit_item_cancel)
         box_buttons.add(cancel_button)
-        self.content_ui_vbox.pack_start(box_buttons, False, True, 0)
+        self.content_ui_vbox.pack_start(box_buttons, False, False, 0)
 
         # TODO Display other information about the desktop file
         box_location = Gtk.HBox()
         label_location = Gtk.Label()
         label_location.set_text(_("Location"))
-        box_location.pack_start(label_location, False, True, 3)
+        box_location.pack_start(label_location, False, False, 3)
         self.entry_location = Gtk.Label()
         self.entry_location.set_text(self.item_to_save.path)
-        box_location.pack_start(self.entry_location, True, True, 3)
-        self.content_ui_vbox.pack_start(box_location, False, True, 3)
+        box_location.pack_start(self.entry_location, False, False, 3)
+        self.content_ui_vbox.pack_start(box_location, False, False, 3)
 
         self.draw_ui()
 
@@ -405,17 +405,15 @@ class Gtk2App(Base):
         self.on_resize_common(self.window.get_size()[0], self.window.get_size()[1])
 
     def on_search(self, widget, data=None):
-        logging.info("GTK3.on_search: enter function")
+        logging.info("GTK2.on_search: enter function")
         self.search_string = self.search_box.get_text()
         self.draw_ui()
 
     def create_togglebutton(self, label, icon):
         button = Gtk.Button(label = label)
         button.set_size_request(200, -1)
-        # GTK2 Specific
-        icon_pixbuf = self.theme.load_icon(icon, 24, Gtk.ICON_LOOKUP_USE_BUILTIN)
-        icon_image = Gtk.Image()
-        icon_image.set_from_pixbuf(icon_pixbuf)
+        icon_pixbuf = self.theme.get_default().load_icon(icon, 24, Gtk.IconLookupFlags.FORCE_SIZE)
+        icon_image = Gtk.Image.new_from_pixbuf(icon_pixbuf)
         button.set_image(icon_image)
         button.set_sensitive(False)
         return button
@@ -439,16 +437,13 @@ class Gtk2App(Base):
         self.window.connect("check-resize", self.on_resize)
 
         window_scrolled = Gtk.ScrolledWindow()
-        # GTK2 specific
-        #window_scrolled.set_policy(Gtk.POLICY_AUTOMATIC, Gtk.POLICY_AUTOMATIC)
         self.window.add(window_scrolled)
 
         self.window_box = Gtk.VBox()
         # GTK2 Specific: add_with_viewport
         window_scrolled.add_with_viewport(self.window_box)
 
-        #GTK2 specific
-        self.theme = Gtk.icon_theme_get_default()
+        self.theme = Gtk.IconTheme.get_default()
 
         self.content_ui_vbox = Gtk.VBox()
         if (self.standalone_module == None):
