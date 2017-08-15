@@ -356,6 +356,17 @@ class ModulesExperimentalControlCenterSetting(Setting):
         self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "modules_experimental_support")
         self.set_settings_support()
 
+class IconsSizeControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("IconsSizeControlCenterSetting.__init__: enter function")
+        self.name = "Icons Size for Control Center"
+        self.display_name = _("Icon size for the view")
+        self.setting_type = "int"
+        self.default_value = 48
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "UI", "icon_view_icons_size")
+        self.set_settings_support()
+
 # Theme
 # GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
 # LXSession: https://github.com/lxde/lxsession/blob/master/data/desktop.conf.example

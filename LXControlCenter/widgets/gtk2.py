@@ -96,30 +96,6 @@ class Gtk2App(Base, GtkWidgets):
         for children in self.content_ui_vbox.get_children():
             self.content_ui_vbox.remove(children)
 
-        # SpinButton
-    def create_spinbutton_conf(self, grid, label, default, default_value, group, key, position):
-        # GTK2 Specific
-        label_widget = Gtk.Label(label)
-        adjustment = Gtk.Adjustment(value=default, lower=8, upper=128, step_incr=1, page_incr=1, page_size=0)
-        spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
-        spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key, default_value)
-        # GTK2 specific
-        grid.attach(label_widget, 0, 1, position, position + 1, xpadding=30, ypadding=10)
-        grid.attach(spin_button_widget, 1, 2, position, position + 1, xpadding=30, ypadding=10)
-        label_widget.set_alignment(0,0.5)
-        spin_button_widget.set_alignment(0)
-
-    def on_spinbutton_change(self, spinbutton, group, key, default):
-        logging.debug("on_spinbutton_change: Setting %s - %s to %s" % (group, key, spinbutton.get_value_as_int()))
-        save = self.util.set_setting("keyfile", self.keyfile_settings, group, key, spinbutton.get_value_as_int(), default, "int")
-
-        # Keyfile is changed, reload settings
-        self.load_settings()
-
-        if (save == True):
-            self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
-        self.generate_view()
-
     def build_pref_view(self):
         #TODO Complete options
         self.clean_main_view()
@@ -137,7 +113,15 @@ class Gtk2App(Base, GtkWidgets):
         conf_counter = self.add_switch(self.applications_support_control_center_setting, configuration_grid, conf_counter)
         conf_counter = self.add_switch(self.category_other_control_center_setting, configuration_grid, conf_counter)
         conf_counter = self.add_switch(self.modules_experimental_control_center_setting, configuration_grid, conf_counter)
-        self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, self.icon_view_icons_size_default, "Configuration", "icon_view_icons_size", 4)
+
+        ui_box = Gtk.HBox()
+        self.content_ui_vbox.pack_start(ui_box, True, False, 0)
+        ui_frame = Gtk.Frame(label=self.pref_category_ui_label)
+        ui_box.pack_start(ui_frame, True, False, 0)
+        ui_grid = self.create_table_conf()
+        ui_frame.add(ui_grid)
+        ui_counter = 0
+        ui_counter = self.add_spin_button(self.icons_size_control_center_setting, ui_grid, ui_counter, (0, 256, 2,0))
 
     def build_edit_view(self):
         logging.info("GTK2.build_edit_view: enter function")

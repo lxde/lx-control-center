@@ -127,8 +127,7 @@ class Base(Utils):
         self.icon_view_columns_default = 3
         self.icon_view_columns = self.icon_view_columns_default
 
-        self.icon_view_icons_size_default = 48
-        self.icon_view_icons_size = self.icon_view_icons_size_default
+        self.icons_size_control_center_setting = IconsSizeControlCenterSetting(self.runtime)
 
         self.icon_not_theme_allow_default = False
         self.icon_not_theme_allow = self.icon_not_theme_allow_default
@@ -176,7 +175,7 @@ class Base(Utils):
 
         # Pref Mode labels
         self.pref_category_configuration_label = _("Configuration")
-        self.pref_icon_view_icons_size = _("Icon size for the view")
+        self.pref_category_ui_label = _("Visual")
 
         # UI Items
         self.content_ui_vbox = None
@@ -268,7 +267,7 @@ class Base(Utils):
             self.window_icon = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_icon", self.window_icon_default, "string")
             self.window_title = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "window_title", self.window_title_default, "string")
             self.icon_view_columns = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_view_columns", self.icon_view_columns_default, "int")
-            self.icon_view_icons_size = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_view_icons_size", self.icon_view_icons_size_default, "int")
+            self.icon_view_icons_size = self.icons_size_control_center_setting.get()
             self.icon_not_theme_allow = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_not_theme_allow", self.icon_not_theme_allow_default, "boolean")
             self.icon_force_size = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_force_size", self.icon_force_size_default, "boolean")
             self.icon_fallback = self.util.get_setting("keyfile", self.keyfile_settings, "UI", "icon_fallback", self.icon_fallback_default, "string")
@@ -534,7 +533,6 @@ class Base(Utils):
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_icon", self.window_icon, self.window_icon_default, "generic", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "window_title", self.window_title, self.window_title_default, "generic", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_view_columns", self.icon_view_columns, self.icon_view_columns_default, "int", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_view_icons_size", self.icon_view_icons_size, self.icon_view_icons_size_default, "int", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_not_theme_allow", self.icon_not_theme_allow, self.icon_not_theme_allow_default, "boolean", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_force_size", self.icon_force_size, self.icon_force_size_default, "boolean", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "UI", "icon_fallback", self.icon_fallback, self.icon_fallback_default, "generic", self.trigger_save_settings_file)
