@@ -21,8 +21,6 @@ import logging
 import os
 import os.path
 
-from pydbus import SessionBus
-
 from LXControlCenter.utils import Utils
 
 # Documentation / Examples
@@ -42,6 +40,8 @@ class Setting():
 
         self.name = None
         self.setting_type = "string"
+
+        self.available_values = {}
 
         # LXSesion file: Format .ini file: ["lxsession", support, group, key]
         self.lxsession_file_setting = ["lxsession_file", False, None, None]
@@ -87,6 +87,7 @@ class Setting():
                                                             self.lxsession_file_setting[3],
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "lxsession_dbus"):
                     #TODO
                     #support.lxsession_dbus_runtime.SessionSet(key1,key2)
@@ -98,6 +99,7 @@ class Setting():
                                                             self.cinnamon_setting[3], 
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "gnome_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
@@ -105,6 +107,7 @@ class Setting():
                                                             self.gnome_setting[3],
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "mate_settings"):
                     return_value = self.util.get_setting(   "gsetting",
                                                             None,
@@ -112,6 +115,7 @@ class Setting():
                                                             self.mate_setting[3],
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "gtk3_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
@@ -119,6 +123,7 @@ class Setting():
                                                             self.gtk3_setting[3],
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "lxqt_settings"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["lxqt_settings"][3],
@@ -126,6 +131,7 @@ class Setting():
                                                             self.lxqt_setting[3], 
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 elif (setting[0] == "openbox_settings"):
                     return_value = self.util.get_setting(   "xml",
                                                             self.runtime.support["openbox_settings"][3],
@@ -133,6 +139,7 @@ class Setting():
                                                             self.openbox_setting[3],
                                                             None,
                                                             self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
                 else:
                     logging.warning("%s not supported for %s" % (setting[0], self.name))
         return return_value
@@ -148,7 +155,7 @@ class Setting():
                                                             self.runtime.support["lxsession_file"][3],
                                                             self.lxsession_file_setting[2],
                                                             self.lxsession_file_setting[3],
-                                                            value,
+                                                            self.transcode_values(setting[0], value),
                                                             current_value,
                                                             self.setting_type)
                     if (trigger_save == True):
@@ -164,31 +171,31 @@ class Setting():
                                             None,
                                             self.cinnamon_setting[2],
                                             self.cinnamon_setting[3],
-                                            value,
-                                            None,
+                                            self.transcode_values(setting[0], value),
+                                            current_value,
                                             self.setting_type)
                 elif (setting[0] == "gnome_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
                                             self.gnome_setting[2], 
                                             self.gnome_setting[3],
-                                            value,
-                                            None, 
+                                            self.transcode_values(setting[0], value),
+                                            current_value, 
                                             self.setting_type)
                 elif (setting[0] == "mate_settings"):
                     self.util.set_setting(  "gsetting",
                                             None,
                                             self.mate_setting[2], 
                                             self.mate_setting[3], 
-                                            value,
-                                            None, 
+                                            self.transcode_values(setting[0], value),
+                                            current_value, 
                                             self.setting_type)
                 elif (setting[0] == "gtk3_settings"):
                     trigger_save = self.util.set_setting(   "keyfile",
                                                             self.runtime.support["gtk3_settings"][3],
                                                             self.gtk3_setting[2],
                                                             self.gtk3_setting[3],
-                                                            value,
+                                                            self.transcode_values(setting[0], value),
                                                             current_value,
                                                             self.setting_type)
                     if (trigger_save == True):
@@ -200,7 +207,7 @@ class Setting():
                                                             self.runtime.support["lxqt_settings"][3],
                                                             self.lxqt_setting[2],
                                                             self.lxqt_setting[3],
-                                                            value,
+                                                            self.transcode_values(setting[0], value),
                                                             current_value,
                                                             self.setting_type)
                     if (trigger_save == True):
@@ -212,7 +219,7 @@ class Setting():
                                                             self.runtime.support["openbox_settings"][3],
                                                             self.openbox_setting[2],
                                                             self.openbox_setting[3],
-                                                            value,
+                                                            self.transcode_values(setting[0], value),
                                                             current_value,
                                                             self.setting_type)
                     if (trigger_save == True):
@@ -268,6 +275,9 @@ class Setting():
     def set_after_hooks(self, value):
         """ Function to launch after set function """
         pass
+    
+    def transcode_values(self, setting, value):
+        return value
 
 # Theme
 # GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
@@ -345,3 +355,181 @@ class OpenboxThemeSetting(Setting):
         self.name = "Openbox Theme Support"
         self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "name")
         self.set_settings_support()
+
+class DefaultFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("DefaultFontSetting.__init__: enter function")
+        self.name = "Default Font Support"
+        self.display_name = _("Default Font")
+        self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "sGtk/FontName")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.interface", "font-name")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "font-name")
+        self.set_settings_support()
+
+class MonospaceFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("MonospaceFontSetting.__init__: enter function")
+        self.name = "Monospace Font Support"
+        self.display_name = _("Monospace font")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "monospace-font-name")
+        self.set_settings_support()
+
+class DocumentFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("DocumentFontSetting.__init__: enter function")
+        self.name = "Document Font Support"
+        self.display_name = _("Document font")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "document-font-name")
+        self.set_settings_support()
+
+class TextScalingFactorSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("TextScalingFactorSetting.__init__: enter function")
+        self.name = "Text Scaling Factor Support"
+        self.display_name = _("Text scaling factor")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.interface", "text-scaling-factor")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.interface", "text-scaling-factor")
+        self.set_settings_support()
+
+class HintingSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("HintingSetting.__init__: enter function")
+        self.name = "Hinting Support"
+        self.display_name = _("Hinting")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.settings-daemon.plugins.xsettings", "hinting")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.settings-daemon.plugins.xsettings", "hinting")
+        self.set_settings_support()
+        #values=('none', 'slight', 'medium', 'full'),
+        #texts=(_('No hinting'), _('Basic'),_('Moderate'),_('Maximum')),
+        #lxsession GTK #iXft/Hinting & #iXft/HintStyle
+
+class AntialiasingSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("AntialiasingSetting.__init__: enter function")
+        self.name = "Antialiasing Support"
+        self.display_name = _("Antialiasing")
+        self.available_values["none"] = _('No antialiasing')
+        self.available_values["grayscale"] = _('Standard grayscale antialiasing')
+        self.available_values["rgba"] = _('Subpixel antialiasing (LCD screens only)')
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.settings-daemon.plugins.xsettings", "antialiasing")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.settings-daemon.plugins.xsettings", "antialiasing")
+        self.update_list(self.lxsession_file_setting, "lxsession_file", True, "GTK", "iXft/Antialias")
+        self.set_settings_support()
+
+    def transcode_values(self, setting, value):
+        # lxsession values:
+        lxsession = {}
+        lxsession["none"] = "0"
+        lxsession["grayscale"] = "1"
+        lxsession["rgba"] = "1"
+        # Reverse
+        lxsession["1"] = "grayscale"
+        lxsession["0"] = "none"
+
+        return_value = value
+        if (setting == "lxsession_file"):
+            return_value = lxsession[value]
+        return return_value
+
+class RGBASetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("RGBASetting.__init__: enter function")
+        self.name = "RGBA Support"
+        self.display_name = _("RGBA")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.settings-daemon.plugins.xsettings", "rgba-order")
+        self.set_settings_support()
+        #"The order of subpixel elements on an LCD screen, only used when antialiasing is set to 'rgba'"
+        #rgba_options = [["rgba", _("Rgba")], ["rgb", _("Rgb")], ["bgr", _("Bgr")], ["vrgb", _("Vrgb")], ["vbgr", _("Vbgr")]]
+        #lxsession GTK #iXft/RGBA
+
+class WindowTitleBarFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("WindowTitleBarFontSetting.__init__: enter function")
+        self.name = "Window Title Bar Font Support"
+        self.display_name = _("Window Title Bar Font")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.desktop.wm.preferences", "titlebar-font")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.cinnamon.desktop.wm.preferences", "titlebar-font")
+        #TODO Gconf
+        #/apps/metacity/general/titlebar_font
+        self.set_settings_support()
+
+class ActiveWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("ActiveWindowFontSetting.__init__: enter function")
+        self.name = "Active Window Font Setting Support"
+        self.display_name = _("Active Window Font")
+        #TODO openbox theme font place="ActiveWindow" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class InactiveWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("InactiveWindowFontSetting.__init__: enter function")
+        self.name = "Inactive Window Font Setting Support"
+        self.display_name = _("Inactive Window Font")
+        #TODO openbox theme font place="InactiveWindow" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class MenuHeaderWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("MenuHeaderWindowFontSetting.__init__: enter function")
+        self.name = "Menu Header Window Font Setting Support"
+        self.display_name = _("Menu Header Window Font")
+        #TODO openbox theme font place="MenuHeader" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class MenuItemWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("MenuItemWindowFontSetting.__init__: enter function")
+        self.name = "Menu Item Window Font Setting Support"
+        self.display_name = _("Menu Item Window Font")
+        #TODO openbox theme font place="MenuItem" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class ActiveOnScreenDisplayWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("ActiveOnScreenDisplayWindowFontSetting.__init__: enter function")
+        self.name = "Active On Screen Display Window Font Setting Support"
+        self.display_name = _("Active On Screen Display Window Font")
+        #TODO openbox theme font place="ActiveOnScreenDisplay" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class InactiveOnScreenDisplayWindowFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("Inactive OnScreenDisplayWindowFontSetting.__init__: enter function")
+        self.name = "Inactive On Screen Display Window Font Setting Support"
+        self.display_name = _("Inactive On Screen Display Window Font")
+        #TODO openbox theme font place="InactiveOnScreenDisplay" name
+        #self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "font")
+        self.set_settings_support()
+
+class DesktopFontSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("DesktopFontSetting.__init__: enter function")
+        self.name = "Desktop Font Support"
+        self.display_name = _("Desktop Font Font")
+        self.update_list(self.gnome_setting, "gnome_settings", True, "org.gnome.nautilus.desktop", "font")
+        self.update_list(self.cinnamon_setting, "cinnamon_settings", True, "org.nemo.desktop", "font")
+        #TODO PCManfm
+        #pcmanfm.conf [desktop] desktop_font
+        self.set_settings_support()
+        
