@@ -101,7 +101,7 @@ class Gtk2App(Base, GtkWidgets):
         label_widget = Gtk.Label(label)
         switch_widget = Gtk.ToggleButton("?")
         logging.debug(" create_switch_conf: default = %s" % default)
-        switch_widget.set_size_request(30, 30)
+        switch_widget.set_size_request(60, 30)
         if (default == True):
             switch_widget.set_active(1)
             switch_widget.set_label("ON")
@@ -111,8 +111,9 @@ class Gtk2App(Base, GtkWidgets):
 
         switch_widget.connect("toggled", self.on_switch_click, group, key, default_value)
         # GTK2 specific
-        grid.attach(label_widget, 0, 1, position, position + 1)
-        grid.attach(switch_widget, 1, 2, position, position + 1)
+        grid.attach(label_widget, 0, 1, position, position + 1, xpadding=30, ypadding=10)
+        grid.attach(switch_widget, 1, 2, position, position + 1, xpadding=30, ypadding=10)
+        label_widget.set_alignment(0,0.5)
 
 
     def on_switch_click(self, switch, group, key, default):
@@ -142,8 +143,9 @@ class Gtk2App(Base, GtkWidgets):
         spin_button_widget = Gtk.SpinButton(adjustment=adjustment, climb_rate=0.0, digits=0)
         spin_button_widget.connect("value-changed", self.on_spinbutton_change, group, key, default_value)
         # GTK2 specific
-        grid.attach(label_widget, 0, 1, position, position + 1)
-        grid.attach(spin_button_widget, 1, 2, position, position + 1)
+        grid.attach(label_widget, 0, 1, position, position + 1, xpadding=30, ypadding=10)
+        grid.attach(spin_button_widget, 1, 2, position, position + 1, xpadding=30, ypadding=10)
+        label_widget.set_alignment(0,0.5)
 
     def on_spinbutton_change(self, spinbutton, group, key, default):
         logging.debug("on_spinbutton_change: Setting %s - %s to %s" % (group, key, spinbutton.get_value_as_int()))
@@ -161,8 +163,10 @@ class Gtk2App(Base, GtkWidgets):
         self.clean_main_view()
     
         # Configuration
+        configuration_box = Gtk.HBox()
+        self.content_ui_vbox.pack_start(configuration_box, True, False, 0)
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
-        self.content_ui_vbox.pack_start(configuration_frame, False, False, 0)
+        configuration_box.pack_start(configuration_frame, True, False, 0)
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
 
