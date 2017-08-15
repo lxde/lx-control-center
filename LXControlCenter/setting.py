@@ -20,8 +20,11 @@
 import logging
 import os
 import os.path
+import gettext
 
 from LXControlCenter.utils import Utils
+
+_ = gettext.gettext
 
 # Documentation / Examples
 # LXDE / LXSession: https://github.com/lxde/lxsession/blob/master/data/desktop.conf.example
@@ -59,6 +62,8 @@ class Setting():
         self.gtk3_setting = ["gtk3_settings", False, None, None]
         # Openbox Setting: Format xml [support, Tag1, Tag2]
         self.openbox_setting = ["openbox_settings", False, None, None]
+        # LX Control Center: Format .ini file ["lx_control_center_setting", support, group, key]
+        self.lx_control_center_setting = ["lx_control_center_setting", False, None, None]
 
         #List of settings
         self.settings_list =    [   self.lxsession_file_setting,
@@ -68,7 +73,8 @@ class Setting():
                                     self.mate_setting,
                                     self.lxqt_setting,
                                     self.gtk3_setting,
-                                    self.openbox_setting
+                                    self.openbox_setting,
+                                    self.lx_control_center_setting
                                 ]
 
         self.support_list = []
@@ -80,7 +86,15 @@ class Setting():
         for setting in self.support_list:
             # Check if the setting is handle
             if (setting[1] == True):
-                if (setting[0] == "lxsession_file"):
+                if (setting[0] == "lx_control_center_setting"):
+                    return_value = self.util.get_setting(   "keyfile",
+                                                            self.runtime.support["lx_control_center_setting"][3],
+                                                            self.lx_control_center_setting[2],
+                                                            self.lx_control_center_setting[3],
+                                                            None,
+                                                            self.setting_type)
+                    return_value = self.transcode_values(setting[0], return_value)
+                elif (setting[0] == "lxsession_file"):
                     return_value = self.util.get_setting(   "keyfile",
                                                             self.runtime.support["lxsession_file"][3],
                                                             self.lxsession_file_setting[2],
@@ -142,6 +156,8 @@ class Setting():
                     return_value = self.transcode_values(setting[0], return_value)
                 else:
                     logging.warning("%s not supported for %s" % (setting[0], self.name))
+        if (return_value is None and self.default_value is not None):
+            return_value = self.default_value
         return return_value
 
     def set(self, value):
@@ -150,7 +166,19 @@ class Setting():
         for setting in self.support_list:
             # Check if the setting is handle
             if (setting[1] == True):
-                if (setting[0] == "lxsession_file"):
+                if (setting[0] == "lx_control_center_setting"):
+                    trigger_save = self.util.set_setting(   "keyfile",
+                                                            self.runtime.support["lx_control_center_setting"][3],
+                                                            self.lx_control_center_setting[2],
+                                                            self.lx_control_center_setting[3],
+                                                            self.transcode_values(setting[0], value),
+                                                            self.default_value,
+                                                            self.setting_type)
+                    if (trigger_save == True):
+                        self.util.save_object(  "keyfile",
+                                                self.runtime.support["lx_control_center_setting"][3],
+                                                self.runtime.support["lx_control_center_setting"][4])
+                elif (setting[0] == "lxsession_file"):
                     trigger_save = self.util.set_setting(   "keyfile",
                                                             self.runtime.support["lxsession_file"][3],
                                                             self.lxsession_file_setting[2],
@@ -266,6 +294,10 @@ class Setting():
             if (self.runtime.support["openbox_settings"][2] == True):
                 self.support_list.append(self.openbox_setting)
 
+        if (self.lx_control_center_setting[1] == True):
+            if (self.runtime.support["lx_control_center_setting"][2] == True):
+                self.support_list.append(self.lx_control_center_setting)
+
     def update_list(self, setting, arg_0, arg_1, arg_2, arg_3):
         setting[0] = arg_0
         setting[1] = arg_1
@@ -278,6 +310,51 @@ class Setting():
     
     def transcode_values(self, setting, value):
         return value
+
+# Control Center
+class ModulesSupportControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("ModulesSupportControlCenterSetting.__init__: enter function")
+        self.name = "Modules Support for Control Center"
+        self.display_name = _("Activate modules support")
+        self.setting_type = "boolean"
+        self.default_value = True
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "modules_support")
+        self.set_settings_support()
+
+class ApplicationsSupportControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("ApplicationsSupportControlCenterSetting.__init__: enter function")
+        self.name = "Applications Support for Control Center"
+        self.display_name = _("Activate applications support")
+        self.setting_type = "boolean"
+        self.default_value = True
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "applications_support")
+        self.set_settings_support()
+
+class CategoryOtherControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("CategoryOtherControlCenterSetting.__init__: enter function")
+        self.name = "Show Category Other for Control Center"
+        self.display_name = _("Show category Other")
+        self.setting_type = "boolean"
+        self.default_value = True
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "show_category_other")
+        self.set_settings_support()
+
+class ModulesExperimentalControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("ModulesExperimentalControlCenterSetting.__init__: enter function")
+        self.name = "Experimental Modules for Control Center"
+        self.display_name = _("Enable experimental modules")
+        self.setting_type = "boolean"
+        self.default_value = False
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "modules_experimental_support")
+        self.set_settings_support()
 
 # Theme
 # GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
@@ -356,6 +433,7 @@ class OpenboxThemeSetting(Setting):
         self.update_list(self.openbox_setting, "openbox_settings", True, "theme", "name")
         self.set_settings_support()
 
+# Font Settings
 class DefaultFontSetting(Setting):
     def __init__(self, support):
         Setting.__init__(self, support)

@@ -41,6 +41,7 @@ class Runtime():
         self.support["lxqt_settings"] = ["LXQt", "lxqt-session", False, None, None]
         self.support["gtk3_settings"] = ["GTK3", None, False, None, None]
         self.support["openbox_settings"] = ["Openbox", "openbox", False, None, None]
+        self.support["lx_control_center_setting"] = ["LX Control Center", None, True, None, None]
 
         # List of support key which are actually running on the system
         self.running = []
@@ -95,6 +96,13 @@ class Runtime():
             elif (support == "lxqt_settings"):
                 try:
                     self.support[support][4] = os.path.join("lxqt", "lxqt.conf")
+                    if (self.support[support][4] is not None):
+                        self.support[support][3] = self.util.load_object("ini", self.support[support][4])
+                except:
+                    pass
+            elif (support == "lx_control_center_setting"):
+                try:
+                    self.support[support][4] = os.path.join("lx-control-center", "settings.conf")
                     if (self.support[support][4] is not None):
                         self.support[support][3] = self.util.load_object("ini", self.support[support][4])
                 except:
