@@ -95,28 +95,6 @@ class Gtk3App(Base, GtkWidgets):
         for children in self.content_ui_vbox.get_children():
             self.content_ui_vbox.remove(children)
 
-    def create_switch_conf(self, grid, label, default, default_value, group, key, position):
-        label_widget = Gtk.Label(label, xalign=0)
-        switch_widget = Gtk.Switch()
-        switch_widget.set_active(default)
-        switch_widget.connect("notify::active", self.on_switch_click, group, key, default_value)
-        grid.attach(label_widget, 0, position, 1, 1)
-        grid.attach_next_to(switch_widget, label_widget, Gtk.PositionType.RIGHT, 1, 1)
-
-    def on_switch_click(self, switch, gparam, group, key, default):
-        logging.debug("on_switch_click: Setting %s - %s to %s" % (group, key, switch.get_active()))
-        save = self.util.set_setting("keyfile", self.keyfile_settings, group, key, switch.get_active(), default, "boolean")
-
-        # Keyfile is changed, reload settings
-        self.load_settings()
-
-        if (save == True):
-            self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
-
-        # Need to re-triage the item, because we changed the filters
-        self.triage_items()
-        self.generate_view()
-
     # SpinButton
     def create_spinbutton_conf(self, grid, label, default, default_value, group, key, position):
         label_widget = Gtk.Label(label, xalign=0)
@@ -150,10 +128,11 @@ class Gtk3App(Base, GtkWidgets):
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
 
-        self.create_switch_conf(configuration_grid, self.pref_modules_support_label, self.modules_support, self.modules_support_default, "Configuration", "modules_support", 0)
-        self.create_switch_conf(configuration_grid, self.pref_applications_support_label, self.applications_support, self.applications_support_default, "Configuration", "applications_support", 1)
-        self.create_switch_conf(configuration_grid, self.pref_show_category_other_label, self.show_category_other, self.show_category_other_default, "Configuration", "show_category_other", 2)
-        self.create_switch_conf(configuration_grid, self.pref_enable_experimental_module_label, self.modules_experimental_support, self.modules_experimental_support_default, "Configuration", "modules_experimental_support", 3)
+        conf_counter = 0
+        conf_counter = self.add_switch(self.modules_support_control_center_setting, configuration_grid, conf_counter)
+        conf_counter = self.add_switch(self.applications_support_control_center_setting, configuration_grid, conf_counter)
+        conf_counter = self.add_switch(self.category_other_control_center_setting, configuration_grid, conf_counter)
+        conf_counter = self.add_switch(self.modules_experimental_control_center_setting, configuration_grid, conf_counter)
         self.create_spinbutton_conf(configuration_grid, self.pref_icon_view_icons_size, self.icon_view_icons_size, self.icon_view_icons_size_default, "Configuration", "icon_view_icons_size", 4)
 
     def build_edit_view(self):

@@ -130,14 +130,55 @@ class GtkWidgets(object):
         model = widget.get_model()
         setting.set(model[iter][1])
 
+    def add_switch(self, setting, grid, position):
+        logging.info("gtkcommon.add_switch: enter function")
+        if len(setting.support_list) > 0 or self.gtk_widgets_debug_mode == True:
+            default_value = setting.get()
+            switch_label = Gtk.Label(setting.display_name)
+            if self.toolkit == "GTK3":
+                switch_widget = Gtk.Switch()
+                switch_widget.set_active(default_value)
+                switch_widget.connect("notify::active", self.on_gtk3_switch_change, setting)
+                self.attach_widget(position, switch_label, switch_widget, grid)
+                position = position +1
+            else:
+                switch_widget = Gtk.ToggleButton("?")
+                logging.debug(" create_switch_conf: default = %s" % default_value)
+                switch_widget.set_size_request(30, 30)
+                if (default_value == True):
+                    switch_widget.set_active(1)
+                    switch_widget.set_label("ON")
+                else:
+                    switch_widget.set_active(0)
+                    switch_widget.set_label("OFF")
+                switch_widget.connect("toggled", self.on_gtk2_switch_change, setting)
+                self.attach_widget(position, switch_label, switch_widget, grid)
+                position = position +1
+        return position
+
+    def on_gtk3_switch_change(self, widget, gparam, setting):
+        logging.debug("Save value: %s" % widget.get_active())
+        setting.set(widget.get_active())
+    
+    def on_gtk2_switch_change(self, widget, setting):
+        if (widget.get_active() == True):
+            widget.set_label("ON")
+            setting.set(True)
+        else:
+            widget.set_label("OFF")
+            setting.set(False)
+
     def attach_widget(self,position, label, widget, grid):
         if self.toolkit == "GTK3":
             # (0, 0, 1, 1)
             # (1, 0, 1, 1)
             grid.attach(label, 0, position, 1, 1)
             grid.attach(widget, 1, position, 1, 1)
+            label.set_alignment(0,0.5)
         else:
             # (0, 1, 0, 1)
             # (1, 2, 0, 1)
-            grid.attach(label, 0, 1, position, position +1)
-            grid.attach(widget, 1, 2, position, position +1)
+            grid.attach(label, 0, 1, position, position +1, xpadding=30, ypadding=10)
+            grid.attach(widget, 1, 2, position, position +1, xpadding=30, ypadding=10)
+            label.set_alignment(0,0.5)
+            widget.set_alignment(0.5,0)

@@ -25,6 +25,8 @@ import collections
 
 from LXControlCenter.utils import Utils
 from LXControlCenter.item import Item
+from LXControlCenter.runtime import Runtime
+from LXControlCenter.setting import *
 
 _ = gettext.gettext
 
@@ -37,6 +39,8 @@ class Base(Utils):
         logging.info("Base__init__: enter function")
 
         self.util = Utils()
+        self.runtime = Runtime()
+
         # Base
         self.version_config = 0.1
         self.keyfile_settings = None
@@ -71,17 +75,10 @@ class Base(Utils):
         self.version_config_default = 0.1
         self.version_config = self.version_config_default
 
-        self.modules_support_default = True
-        self.modules_support = self.modules_support_default
-
-        self.modules_experimental_support_default = False
-        self.modules_experimental_support = self.modules_experimental_support_default
-
-        self.applications_support_default = True
-        self.applications_support = self.applications_support_default
-
-        self.show_category_other_default = True
-        self.show_category_other = self.show_category_other_default
+        self.modules_support_control_center_setting = ModulesSupportControlCenterSetting(self.runtime)
+        self.modules_experimental_control_center_setting = ModulesExperimentalControlCenterSetting(self.runtime)
+        self.applications_support_control_center_setting = ApplicationsSupportControlCenterSetting(self.runtime)
+        self.category_other_control_center_setting = CategoryOtherControlCenterSetting(self.runtime)
 
         self.blacklist_default = ["debian-xterm.desktop","debian-uxterm.desktop"]
         self.blacklist =  self.blacklist_default
@@ -179,10 +176,6 @@ class Base(Utils):
 
         # Pref Mode labels
         self.pref_category_configuration_label = _("Configuration")
-        self.pref_modules_support_label = _("Activate module support")
-        self.pref_applications_support_label = _("Activate applications support")
-        self.pref_show_category_other_label = _("Show category Other")
-        self.pref_enable_experimental_module_label = _("Enable experimental modules")
         self.pref_icon_view_icons_size = _("Icon size for the view")
 
         # UI Items
@@ -237,8 +230,7 @@ class Base(Utils):
     def load_settings (self):
         logging.info("Base.load_settings: enter function")
         """ Load settings from lx-control-center/settings.conf"""
-        if (self.keyfile_settings == None):
-            self.keyfile_settings = self.util.load_object("keyfile", os.path.join("lx-control-center", "settings.conf"))
+        self.keyfile_settings = self.runtime.support["lx_control_center_setting"][3]
 
         if(self.keyfile_settings != None):
             # Configuration
@@ -246,11 +238,11 @@ class Base(Utils):
             self.desktop_environments_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
             self.frontend_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "frontend", self.frontend_setting_default, "string")
             self.version_config = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config_default, "float")
-            self.modules_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "modules_support", self.modules_support_default, "boolean")
-            self.modules_experimental_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "modules_experimental_support", self.modules_experimental_support_default, "boolean")
-            self.applications_support = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "applications_support", self.applications_support_default, "boolean")
+            self.modules_support = self.modules_support_control_center_setting.get()
+            self.modules_experimental_support = self.modules_experimental_control_center_setting.get()
+            self.applications_support = self.applications_support_control_center_setting.get()
             self.categories_fixed = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "categories_fixed", self.categories_fixed_default, "boolean")
-            self.show_category_other = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "show_category_other", self.show_category_other_default, "boolean")
+            self.show_category_other = self.category_other_control_center_setting.get()
             self.blacklist = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration","blacklist", self.blacklist_default, "list")
             self.whitelist = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration","whitelist", self.whitelist_default, "list")
 
@@ -515,22 +507,15 @@ class Base(Utils):
 
     def save_settings(self):
         logging.info("Base.save_settings: enter function")
-        if (self.keyfile_settings == None):
-            self.keyfile_settings = self.util.load_object("ini", os.path.join("lx-control-center", "settings.conf"))
-        logging.debug("save_settings: loading %s as a keyfile" % os.path.join("settings.conf","lx-control-center"))
-
+        self.keyfile_settings = self.runtime.support["lx_control_center_setting"][3]
         # Configuration
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config, self.version_config_default, "float", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "modules_support", self.modules_support, self.modules_support_default, "boolean", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "modules_experimental_support", self.modules_experimental_support, self.modules_experimental_support_default, "boolean", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "applications_support", self.applications_support, self.applications_support_default, "boolean", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "whitelist", self.whitelist, self.whitelist_default, "list", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "show_category_other", self.show_category_other, self.show_category_other_default, "boolean")
 
         # Categories
         if (self.categories_fixed == False):
@@ -668,16 +653,25 @@ class Base(Utils):
     def on_icons_mode_menu_click(self, widget, data=None):
         logging.info("Base.on_icons_mode_menu_click: Clicked")
         self.mode = "main-UI"
+        self.load_settings()
+        self.triage_items()
+        self.generate_view()
         self.draw_ui()
 
     def on_edit_mode_menu_click(self, widget, data=None):
         logging.info("Base.on_edit_mode_menu_click: Clicked")
         self.mode = "edit-UI"
+        self.load_settings()
+        self.triage_items()
+        self.generate_view()
         self.draw_ui()
 
     def on_pref_mode_menu_click(self, widget, data=None):
         logging.info("Base.on_pref_mode_menu_click: Clicked")
         self.mode = "pref-UI"
+        self.load_settings()
+        self.triage_items()
+        self.generate_view()
         self.draw_ui()
 
     def build_module_view(self):
