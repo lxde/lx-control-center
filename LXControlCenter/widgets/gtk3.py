@@ -26,10 +26,12 @@ import logging
 import os
 import os.path
 
-from ..base import Base
+from LXControlCenter.base import Base
+from LXControlCenter.widgets.gtkcommon import GtkWidgets
 
-class Gtk3App(Base):
+class Gtk3App(Base, GtkWidgets):
     def __init__(self):
+        GtkWidgets.__init__(self, "GTK3")
         Base.__init__(self)
 
     def draw_ui(self):
@@ -136,25 +138,15 @@ class Gtk3App(Base):
 
         self.generate_view()
 
-    def create_table_conf(self):
-        grid = Gtk.Grid()
-        grid.set_column_homogeneous(False)
-        grid.set_row_homogeneous(False)
-        grid.set_column_spacing(20)
-        grid.set_row_spacing(20)
-        grid.set_margin_left(30)
-        grid.set_margin_right(30)
-        grid.set_margin_top(10)
-        grid.set_margin_bottom(10)
-        return grid
-
     def build_pref_view(self):
         #TODO Complete options
         self.clean_main_view()
     
         # Configuration
+        configuration_box = Gtk.HBox()
+        self.content_ui_vbox.pack_start(configuration_box, True, False, 0)
         configuration_frame = Gtk.Frame(label=self.pref_category_configuration_label)
-        self.content_ui_vbox.pack_start(configuration_frame, False, False, 0)
+        configuration_box.pack_start(configuration_frame, True, False, 0)
         configuration_grid = self.create_table_conf()
         configuration_frame.add(configuration_grid)
 

@@ -26,10 +26,12 @@ import logging
 import os
 import os.path
 
-from ..base import Base
+from LXControlCenter.base import Base
+from LXControlCenter.widgets.gtkcommon import GtkWidgets
 
-class Gtk2App(Base):
+class Gtk2App(Base, GtkWidgets):
     def __init__(self):
+        GtkWidgets.__init__(self, "GTK2")
         Base.__init__(self)
 
     def draw_ui(self):
@@ -153,15 +155,6 @@ class Gtk2App(Base):
         if (save == True):
             self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
         self.generate_view()
-
-    # Main table
-    def create_table_conf(self):
-        grid = Gtk.Table()
-        # GTK2 Specific
-        grid.set_homogeneous(False)
-        grid.set_col_spacings(20)
-        grid.set_row_spacings(20)
-        return grid
 
     def build_pref_view(self):
         #TODO Complete options
