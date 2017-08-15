@@ -417,6 +417,7 @@ class Gtk3App(Base):
 
         self.window_box = Gtk.VBox()
         window_scrolled.add(self.window_box)
+        window_scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         self.theme = Gtk.IconTheme.get_default()
 

@@ -442,6 +442,7 @@ class Gtk2App(Base):
         self.window_box = Gtk.VBox()
         # GTK2 Specific: add_with_viewport
         window_scrolled.add_with_viewport(self.window_box)
+        window_scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         self.theme = Gtk.IconTheme.get_default()
 
