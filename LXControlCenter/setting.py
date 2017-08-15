@@ -367,6 +367,19 @@ class IconsSizeControlCenterSetting(Setting):
         self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "UI", "icon_view_icons_size")
         self.set_settings_support()
 
+class FrontendControlCenterSetting(Setting):
+    def __init__(self, support):
+        Setting.__init__(self, support)
+        logging.info("FrontendControlCenterSetting.__init__: enter function")
+        self.name = "Frontend for Control Center"
+        self.display_name = _("Frontend (Restart needed)")
+        self.default_value = "Auto"
+        self.available_values["Auto"] = _('Automatic')
+        self.available_values["GTK3"] = _('GTK3')
+        self.available_values["GTK2"] = _('GTK2')
+        self.update_list(self.lx_control_center_setting, "lx_control_center_setting", True, "Configuration", "frontend")
+        self.set_settings_support()
+
 # Theme
 # GNOME / GTK: https://git.gnome.org/browse/gnome-tweak-tool/tree/gtweak/tweaks/tweak_group_appearance.py
 # LXSession: https://github.com/lxde/lxsession/blob/master/data/desktop.conf.example

@@ -68,8 +68,8 @@ class Base(Utils):
         self.desktop_environments_setting_default = ["Auto"]
         self.desktop_environments_setting = self.desktop_environments_setting_default
 
-        self.frontend_setting_default = "Auto"
-        self.frontend_setting = self.frontend_setting_default
+        self.frontend_control_center_setting = FrontendControlCenterSetting(self.runtime)
+
         self.frontend = "GTK3"
 
         self.version_config_default = 0.1
@@ -235,7 +235,7 @@ class Base(Utils):
             # Configuration
             self.keyword_categories_settings_list = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "desktop_categories", self.keyword_categories_settings_list_default, "list")
             self.desktop_environments_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "desktop_environments", self.desktop_environments_setting_default, "list")
-            self.frontend_setting = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "frontend", self.frontend_setting_default, "string")
+            self.frontend_setting = self.frontend_control_center_setting.get()
             self.version_config = self.util.get_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config_default, "float")
             self.modules_support = self.modules_support_control_center_setting.get()
             self.modules_experimental_support = self.modules_experimental_control_center_setting.get()
@@ -510,7 +510,6 @@ class Base(Utils):
         # Configuration
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_categories", self.keyword_categories_settings_list, self.keyword_categories_settings_list_default,"list", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","desktop_environments", self.desktop_environments_setting, self.desktop_environments_setting_default, "list", self.trigger_save_settings_file)
-        self.util.set_setting("keyfile", self.keyfile_settings, "Configuration","frontend", self.frontend_setting, self.frontend_setting_default, "string", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "version_config", self.version_config, self.version_config_default, "float", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "categories_fixed", self.categories_fixed, self.categories_fixed_default, "boolean", self.trigger_save_settings_file)
         self.util.set_setting("keyfile", self.keyfile_settings, "Configuration", "blacklist", self.blacklist, self.blacklist_default, "list", self.trigger_save_settings_file)

@@ -113,6 +113,7 @@ class Gtk2App(Base, GtkWidgets):
         conf_counter = self.add_switch(self.applications_support_control_center_setting, configuration_grid, conf_counter)
         conf_counter = self.add_switch(self.category_other_control_center_setting, configuration_grid, conf_counter)
         conf_counter = self.add_switch(self.modules_experimental_control_center_setting, configuration_grid, conf_counter)
+        conf_counter = self.add_combobox_text(self.frontend_control_center_setting, configuration_grid, conf_counter)
 
         ui_box = Gtk.HBox()
         self.content_ui_vbox.pack_start(ui_box, True, False, 0)

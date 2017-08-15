@@ -24,14 +24,16 @@ import argparse
 import gettext
 _ = gettext.gettext
 
-from LXControlCenter.utils import Utils
+from LXControlCenter.runtime import Runtime
+from LXControlCenter.setting import FrontendControlCenterSetting
 
 class Runner(object):
     def __init__(self):
-        self.util = Utils()
         self.loglevel_args = None
         self.logfile_args = None
         self.standalone_module = False
+        self.runtime = Runtime()
+        self.frontend_control_center_setting = FrontendControlCenterSetting(self.runtime)
 
     def get_args_parameters(self):
         parser = argparse.ArgumentParser(description='Launch LX Control Center')
@@ -56,9 +58,9 @@ class Runner(object):
             else:
                 logging.basicConfig(filename=self.logfile_args, level=numeric_level)
 
-    def frontend_generate(self, keyfile):
+    def frontend_generate(self):
         supported_frontend = ["GTK3", "GTK2", "Qt5", "webkitgtk2"]
-        frontend_setting = self.util.get_setting("keyfile", keyfile, "Configuration","frontend", None, "string")
+        frontend_setting = self.frontend_control_center_setting.get()
         frontend = None
         if (self.frontend_args != None):
             if (self.frontend_args in supported_frontend):
@@ -81,7 +83,7 @@ class Runner(object):
                 logging.warning(_("%s desktop environment not supported, please report it as a bug. Default to GTK3" % current_desktop))
                 frontend = 'GTK3'
         else:
-            frontend = self.frontend_setting
+            frontend = frontend_setting
 
         return frontend
 
@@ -92,8 +94,7 @@ class Runner(object):
         # Enable log
         self.set_log()
 
-        keyfile = self.util.load_object("ini", os.path.join("lx-control-center", "settings.conf"))
-        frontend = self.frontend_generate(keyfile)
+        frontend = self.frontend_generate()
         app = None
         if (frontend == "GTK2"):
             from LXControlCenter.widgets.gtk2 import Gtk2App
