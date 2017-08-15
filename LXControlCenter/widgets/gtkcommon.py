@@ -48,11 +48,13 @@ class GtkWidgets(object):
             grid.set_margin_right(30)
             grid.set_margin_top(10)
             grid.set_margin_bottom(10)
+            grid.set_size_request(self.window_size_w - 480, -1)
         else:
             grid = Gtk.Table()
             grid.set_homogeneous(False)
             grid.set_col_spacings(20)
             grid.set_row_spacings(20)
+            grid.set_size_request(self.window_size_w - 240, -1)
         return grid
 
     # Font selection
@@ -144,7 +146,7 @@ class GtkWidgets(object):
             else:
                 switch_widget = Gtk.ToggleButton("?")
                 logging.debug(" create_switch_conf: default = %s" % default_value)
-                switch_widget.set_size_request(30, 30)
+                switch_widget.set_size_request(60, 30)
                 if (default_value == True):
                     switch_widget.set_active(1)
                     switch_widget.set_label("ON")
@@ -181,4 +183,7 @@ class GtkWidgets(object):
             grid.attach(label, 0, 1, position, position +1, xpadding=30, ypadding=10)
             grid.attach(widget, 1, 2, position, position +1, xpadding=30, ypadding=10)
             label.set_alignment(0,0.5)
-            widget.set_alignment(0.5,0)
+            try:
+                widget.set_alignment(0.5,0)
+            except:
+                widget.set_alignment(0.5)
