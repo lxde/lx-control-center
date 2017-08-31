@@ -24,27 +24,11 @@ from PyQt5.QtGui import *
 
 import logging
 
-from .common import UI
+from ..base import Base
 
-class Qt5App(UI):
+class Qt5App(Base):
     def __init__(self):
-        UI.__init__(self)
-
-        self.app = QApplication(sys.argv)
-
-        self.window= QWidget()
-
-        self.window.setWindowTitle(self.window_title)
-        self.window.setWindowIcon(QIcon.fromTheme(self.window_icon))
-        self.window.resize(self.window_size_w, self.window_size_h)
-
-        self.grid = QGridLayout()
-
-        self.window.setLayout(self.grid)
-
-        #Function to launch at startup
-        self.generate_view()
-        self.draw_ui()
+        Base.__init__(self)
 
     def clean_main_view(self):
         for children in self.grid.children():
@@ -111,6 +95,35 @@ class Qt5App(UI):
         self.window.show()
 
     def main(self):
+        self.app = QApplication(sys.argv)
+
+        # Main WIndow
+        self.window = QWidget()
+        self.layout = QVBoxLayout(self.window)
+        self.scroll = QScrollArea()
+        self.window.setWindowTitle(self.window_title)
+        self.window.setWindowIcon(QIcon.fromTheme(self.window_icon))
+        self.window.resize(self.window_size_w, self.window_size_h)
+
+        # Content UI
+        self.widget = QWidget()
+        self.grid = QGridLayout()
+        self.vbox1 = QVBoxLayout()
+        self.vbox1.addLayout(self.grid)
+        self.widget.setLayout(self.vbox1)
+        self.widget.show()
+
+        #Function to launch at startup
+        self.init()
+        self.generate_view()
+        self.draw_ui()
+
+        # Add content Widget to ScrollArea, and ScrollArea to window layout
+        self.scroll.setWidget(self.widget)
+        self.scroll.setWidgetResizable(True)
+        self.layout.addWidget(self.scroll) 
+        self.window.show()
+
         sys.exit(self.app.exec_())
 
     def on_item_activated(self,item):
