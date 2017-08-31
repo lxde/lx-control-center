@@ -72,7 +72,9 @@ class Runner(object):
             current_desktop = os.getenv("XDG_CURRENT_DESKTOP")
             gtk2_list = ['LXDE']
             gtk3_list = ['GNOME']
-            qt5_list = ['KDE', 'LXQt']
+            #TODO Re-enable when Qt5 front will work better
+            #qt5_list = ['KDE', 'LXQt']
+            qt5_list = []
             if (current_desktop in gtk2_list):
                 frontend = 'GTK2'
             elif (current_desktop in gtk3_list):
