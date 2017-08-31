@@ -36,24 +36,24 @@ class GtkWidgets(object):
             from gi.repository import Gtk
 
     # Grid / Table
-    def create_table_conf(self):
+    def create_table_conf(self, spacing=20, margin_top=10, margin_side=30):
         grid = None
         if self.toolkit == "GTK3":
             grid = Gtk.Grid()
-            grid.set_column_homogeneous(False)
-            grid.set_row_homogeneous(False)
-            grid.set_column_spacing(20)
-            grid.set_row_spacing(20)
-            grid.set_margin_left(30)
-            grid.set_margin_right(30)
-            grid.set_margin_top(10)
-            grid.set_margin_bottom(10)
-            grid.set_size_request(self.window_size_w - 480, -1)
+            grid.set_column_homogeneous(True)
+            grid.set_row_homogeneous(True)
+            grid.set_column_spacing(spacing)
+            grid.set_row_spacing(spacing)
+            grid.set_margin_left(margin_side)
+            grid.set_margin_right(margin_side)
+            grid.set_margin_top(margin_top)
+            grid.set_margin_bottom(margin_top)
+            grid.set_size_request(self.window_size_w - 370, -1)
         else:
             grid = Gtk.Table()
             grid.set_homogeneous(False)
-            grid.set_col_spacings(20)
-            grid.set_row_spacings(20)
+            grid.set_col_spacings(spacing)
+            grid.set_row_spacings(spacing)
             grid.set_size_request(self.window_size_w - 240, -1)
         return grid
 
@@ -170,13 +170,72 @@ class GtkWidgets(object):
             widget.set_label("OFF")
             setting.set(False)
 
+    def add_list_box(self, setting, grid, position):
+        logging.info("gtkcommon.add_list_box: enter function")
+        if len(setting.support_list) > 0 or self.gtk_widgets_debug_mode == True:
+            #frame = Gtk.Frame(label="test")
+            #box.pack_start(frame, True, False, 0)
+            #content_box = Gtk.VBox()
+            #grid = self.create_table_conf()
+            #frame.add(grid)
+            #content_box.pack_start(grid, True, False, 0)
+
+            #frame_detail = Gtk.Frame()
+            #box.pack_start(frame_detail, True, False, 0)
+            #content_box_detail = Gtk.VBox()
+            #grid_detail = self.create_table_conf(spacing=0, margin_top=0, margin_side=0)
+            #frame_detail.add(grid_detail)
+            #content_box_detail.pack_start(grid_detail, True, False, 0)
+            normal_label = Gtk.Label(setting.display_name)
+            normal_widget = Gtk.Button.new_from_icon_name("gtk-add", Gtk.IconSize.BUTTON)
+            normal_widget.connect("clicked", self.on_list_box_add_detail, grid, setting)
+            self.attach_widget(0, normal_label, normal_widget, grid)
+            position = position + 1
+
+    def on_list_box_add_detail(self, widget, grid, setting):
+        default_value = setting.get()
+        position = 1
+        child = grid.get_child_at(0,1)
+        counter = len(default_value)
+
+        for num in range(1,8):
+            grid.remove_row(num)
+
+        #while child is None:
+        #    print("Test")
+        #    grid.remove_row(1)
+        #    child = grid.get_child_at(0,1)
+        #    if (child is None):
+        #        print("Test2")
+        #        break
+        for item in default_value:
+            label = Gtk.Label(item)
+            button = Gtk.Button.new_from_icon_name("gtk-remove", Gtk.IconSize.BUTTON)
+            self.attach_widget(position, label, button, grid)
+            position = position + 1
+        grid.show_all()
+
+
+        #if (len(grid_detail.get_children()) > 1):
+        #    for children in grid_detail.get_children():
+        #        grid_detail.remove(children)
+        #else:
+        #    position = 0
+        #    for item in default_value:
+        #        label = Gtk.Label(item)
+        #        widget = Gtk.Button.new_from_icon_name("gtk-remove", Gtk.IconSize.BUTTON)
+        #        self.attach_widget(position, label, widget, grid_detail)
+        #        position = position + 1
+        #    grid_detail.show_all()
+
     def attach_widget(self,position, label, widget, grid):
         if self.toolkit == "GTK3":
             # (0, 0, 1, 1)
             # (1, 0, 1, 1)
             grid.attach(label, 0, position, 1, 1)
             grid.attach(widget, 1, position, 1, 1)
-            label.set_alignment(0,0.5)
+            label.props.halign = Gtk.Align.START
+            widget.props.halign = Gtk.Align.END
         else:
             # (0, 1, 0, 1)
             # (1, 2, 0, 1)
@@ -186,4 +245,7 @@ class GtkWidgets(object):
             try:
                 widget.set_alignment(0.5,0)
             except:
-                widget.set_alignment(0.5)
+                try:
+                    widget.set_alignment(0.5)
+                except:
+                    logging.info("Widget can't be align. Pass")
