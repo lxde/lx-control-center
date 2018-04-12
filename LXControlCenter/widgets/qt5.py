@@ -54,6 +54,7 @@ class Qt5App(Base):
         for category in items_to_draw:
             groupBox = QGroupBox(category)
             groupGrid = QGridLayout()
+            groupGrid.setAlignment(Qt.AlignCenter)
             groupBox.setLayout(groupGrid)
             self.grid.addWidget(groupBox, row, 0)
             row = row + 1
@@ -68,16 +69,16 @@ class Qt5App(Base):
                 else:
                     pixbuf = QIcon.fromTheme(self.icon_fallback)
 
-                # Add Icon + Tooltip
-                pixmap = QPixmap(pixbuf.pixmap(QSize(self.icon_view_icons_size, self.icon_view_icons_size)))
-                image = QLabel()
-                image.setPixmap(pixmap)
-                image.setAlignment(Qt.AlignLeft)
+                # Add icon button
+                image = QToolButton()
+                image.setIcon(pixbuf)
+                image.setIconSize(QSize(self.icon_view_icons_size, self.icon_view_icons_size))
 
+                # Add text for icon
                 text = QLabel()
                 text.setText(i.name)
                 text.setWordWrap(True)
-                text.setAlignment(Qt.AlignLeft)
+                text.setAlignment(Qt.AlignCenter)
 
                 if (groupCol > self.icon_view_columns):
                     groupCol = 0
@@ -85,11 +86,11 @@ class Qt5App(Base):
 
                 iconview = QWidget()
                 vbox = QVBoxLayout()
-                vbox.addWidget(image)
-                vbox.addWidget(text)
+                vbox.addWidget(image, Qt.AlignCenter, Qt.AlignCenter)
+                vbox.addWidget(text, Qt.AlignCenter, Qt.AlignCenter)
                 iconview.setLayout(vbox)
 
-                groupGrid.addWidget(iconview, groupRow, groupCol)
+                groupGrid.addWidget(iconview, groupRow, groupCol, Qt.AlignLeft, Qt.AlignLeft)
                 groupCol = groupCol + 1
 
         self.window.show()
