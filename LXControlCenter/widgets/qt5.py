@@ -80,8 +80,8 @@ class Qt5App(Base):
                 text.setAlignment(Qt.AlignLeft)
 
                 if (groupCol > self.icon_view_columns):
+                    groupCol = 0
                     groupRow = groupRow + 1
-                    groupCol = groupCol - self.icon_view_columns
 
                 iconview = QWidget()
                 vbox = QVBoxLayout()
