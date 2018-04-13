@@ -49,6 +49,7 @@ class Runner(object):
 
     def set_log(self):
         """ Set log level by parsing"""
+        logging.getLogger('').handlers = []
         if (self.loglevel_args != None):
             numeric_level = getattr(logging, self.loglevel_args.upper(), None)
             if not isinstance(numeric_level, int):
