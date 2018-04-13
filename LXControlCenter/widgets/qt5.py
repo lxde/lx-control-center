@@ -24,6 +24,8 @@ from PyQt5.QtGui import *
 
 import logging
 
+from functools import partial
+
 from ..base import Base
 
 class Qt5App(Base):
@@ -73,6 +75,7 @@ class Qt5App(Base):
                 image = QToolButton()
                 image.setIcon(pixbuf)
                 image.setIconSize(QSize(self.icon_view_icons_size, self.icon_view_icons_size))
+                image.clicked.connect(partial(self.on_qt5_item_activated, i))
 
                 # Add text for icon
                 text = QLabel()
@@ -127,5 +130,5 @@ class Qt5App(Base):
 
         sys.exit(self.app.exec_())
 
-    def on_item_activated(self,item):
-          QMessageBox.information(self, "ListWidget", "You clicked: "+item.text())
+    def on_qt5_item_activated(self, item):
+        self.on_item_activated_common(item.path)
