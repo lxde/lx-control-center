@@ -17,28 +17,67 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from functools import partial
+import sys
 
 import logging
 
-from functools import partial
+# For access settings
+import os
+import os.path
 
-from ..base import Base
+from LXControlCenter.base import Base
 
 class Qt5App(Base):
     def __init__(self):
         Base.__init__(self)
 
+    def draw_ui(self):
+        logging.info("Qt5.draw_ui: enter function")
+        if (self.mode == "main-UI"):
+            if (self.standalone_module == None):
+                self.icon_view_button.setEnabled(False)
+                self.edit_view_button.setEnabled(True)
+                self.pref_view_button.setEnabled(True)
+            self.build_icon_view()
+        elif (self.mode == "edit-UI"):
+            if (self.standalone_module == None):
+                self.icon_view_button.setEnabled(True)
+                self.edit_view_button.setEnabled(False)
+                self.pref_view_button.setEnabled(True)
+            self.build_edit_view()
+        elif (self.mode == "pref-UI"):
+            if (self.standalone_module == None):
+                self.icon_view_button.setEnabled(True)
+                self.edit_view_button.setEnabled(True)
+                self.pref_view_button.setEnabled(False)
+            self.build_pref_view()
+        elif (self.mode == "module-UI"):
+            if (self.standalone_module == None):
+                self.icon_view_button.setEnabled(True)
+                self.edit_view_button.setEnabled(True)
+                self.pref_view_button.setEnabled(True)
+            self.build_module_view()
+        elif (self.mode == "edit-item-UI"):
+            if (self.standalone_module == None):
+                self.icon_view_button.setEnabled(True)
+                self.edit_view_button.setEnabled(True)
+                self.pref_view_button.setEnabled(True)
+        self.window.show()
+
+    def build_toolbar(self):
+        # Header
+        # Icon view - Edit View - Preferences - Search
+        self.icon_view_button = QPushButton()
+        self.edit_view_button = QPushButton()
+        self.pref_view_button = QPushButton()
+
     def clean_main_view(self):
         for children in self.grid.children():
             self.grid.removeItem(children)
-
-    def draw_ui(self):
-        if (self.mode == "main-UI"):
-            self.build_icon_view()
 
     def build_icon_view(self):
         self.clean_main_view()
@@ -117,6 +156,9 @@ class Qt5App(Base):
         self.widget.setLayout(self.vbox1)
         self.widget.show()
 
+        if (self.standalone_module == None):
+            self.build_toolbar()
+
         #Function to launch at startup
         self.init()
         self.generate_view()
@@ -126,7 +168,6 @@ class Qt5App(Base):
         self.scroll.setWidget(self.widget)
         self.scroll.setWidgetResizable(True)
         self.layout.addWidget(self.scroll) 
-        self.window.show()
 
         sys.exit(self.app.exec_())
 
