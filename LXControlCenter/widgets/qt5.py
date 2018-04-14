@@ -71,9 +71,24 @@ class Qt5App(Base):
     def build_toolbar(self):
         # Header
         # Icon view - Edit View - Preferences - Search
-        self.icon_view_button = QPushButton()
-        self.edit_view_button = QPushButton()
-        self.pref_view_button = QPushButton()
+        self.header_box = QHBoxLayout()
+        self.layout.addLayout(self.header_box)
+
+        self.search_box = QLineEdit()
+        self.search_box.textChanged.connect(self.on_search)
+        self.header_box.insertWidget(3, self.search_box, 0, Qt.AlignRight)
+
+        self.icon_view_button = QPushButton("Icon")
+        self.icon_view_button.clicked.connect(self.on_icons_mode_menu_click)
+        self.header_box.insertWidget(0, self.icon_view_button, 0, Qt.AlignLeft)
+
+        self.edit_view_button = QPushButton("Edit")
+        self.edit_view_button.clicked.connect(self.on_edit_mode_menu_click)
+        self.header_box.insertWidget(1, self.edit_view_button, 0, Qt.AlignLeft)
+
+        self.pref_view_button = QPushButton("Preferences")
+        self.pref_view_button.clicked.connect(self.on_pref_mode_menu_click)
+        self.header_box.insertWidget(2, self.pref_view_button, 0, Qt.AlignLeft) 
 
     def clean_main_view(self):
         for children in self.grid.children():
@@ -135,7 +150,10 @@ class Qt5App(Base):
                 groupGrid.addWidget(iconview, groupRow, groupCol, Qt.AlignLeft, Qt.AlignLeft)
                 groupCol = groupCol + 1
 
-        self.window.show()
+    def on_search(self, text):
+        logging.info("Qt5.on_search: enter function")
+        self.search_string = text
+        self.draw_ui()
 
     def main(self):
         self.app = QApplication(sys.argv)
