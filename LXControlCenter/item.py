@@ -163,24 +163,28 @@ class Item():
             self.deactivate_reasons.append(reason)
             
     def launch(self):
-        logging.info("launch: trying execute : %s" % self.execute_command)
+        logging.info("Item.launch: trying execute : %s" % self.execute_command)
         if (self.type == "application"):
+            logging.debug("Item.launch: trying to launch application and command : %s" % self.execute_command)
             self.util.launch_command(self.execute_command)
 
         elif (self.type == "module"):
+            logging.debug("Item.launch: trying to launch module")
             python_version = sys.version_info
             module_path = os.path.join(os.path.dirname(self.path),self.execute_command)
             if (python_version[0] == 2):
+                logging.debug("Item.launch: module launching, python2 detected, using imp")
                 import imp
                 self.module_spec = imp.load_source('lxcc_module', module_path)
             elif (python_version[0] == 3):
                 if(python_version[1] < 3.5):
+                    logging.debug("Item.launch: module launching, python3 and < 3.5 detected, using importlib.machinery")
                     from importlib.machinery import SourceFileLoader
                     self.module_spec = SourceFileLoader("lxcc_module", module_path).load_module()
                     self.module_spec.init(self.module_running_toolkit)
                 else:
+                    logging.debug("Item.launch: module launching, python3 and > 3.5 detected, using importlib.util")
                     import importlib.util
-                    logging.debug("launch: trying to import : %s" % module_path)
                     spec = importlib.util.spec_from_file_location("lxcc_module", module_path)
                     self.module_spec = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(self.module_spec)
