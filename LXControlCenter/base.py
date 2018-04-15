@@ -17,6 +17,7 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
+import sys
 import os.path
 import gettext
 
@@ -592,14 +593,27 @@ class Base(Utils):
     def filter_item_by_search(self, item):
         logging.info("Base.filter_item_by_search: enter function")
         match = False
+        python_version = sys.version_info
+        if (python_version[0] == 2):
+            if self.search_string is None:
+                logging.debug("Base.filter_item_by_search: search is None")
+                search = u""
+            else:
+                logging.debug("Base.filter_item_by_search: search is not None")
+                search = self.search_string.encode()
+        else:
+            search = self.search_string
         if (self.search_string == None):
-            logging.debug("Base.filter_item_by_search, no search")
+            if (python_version[0] != 2):
+                logging.debug("Base.filter_item_by_search, no search")
             match = True
-        elif (self.search_string in item.name.lower()):
-            logging.debug("Base.filter_item_by_search, search %s in name: match for %s with %s" % (self.search_string, item.path, item.name))
+        elif (search in item.name.lower()):
+            if (python_version[0] != 2):
+                logging.debug("Base.filter_item_by_search, search %s in name: match for %s with %s" % (search, item.path, item.name))
             match = True
-        elif (self.search_string in item.comment.lower()):
-            logging.debug("Base.filter_item_by_search, search %s in comment: match for %s with %s" % (self.search_string, item.path, item.comment))
+        elif (search in item.comment.lower()):
+            if (python_version[0] != 2):
+                logging.debug("Base.filter_item_by_search, search %s in comment: match for %s with %s" % (search, item.path, item.comment))
             match = True
         else:
             math = False
