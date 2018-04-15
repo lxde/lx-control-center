@@ -84,11 +84,13 @@ class Qt5App(Base):
 
         self.edit_view_button = QPushButton("Edit")
         self.edit_view_button.clicked.connect(self.on_edit_mode_menu_click)
-        self.header_box.insertWidget(1, self.edit_view_button, 0, Qt.AlignLeft)
+        #TODO Implement edit view
+        #self.header_box.insertWidget(1, self.edit_view_button, 0, Qt.AlignLeft)
 
         self.pref_view_button = QPushButton("Preferences")
         self.pref_view_button.clicked.connect(self.on_pref_mode_menu_click)
-        self.header_box.insertWidget(2, self.pref_view_button, 0, Qt.AlignLeft) 
+        #TODO Implement pref view
+        #self.header_box.insertWidget(2, self.pref_view_button, 0, Qt.AlignLeft)
 
     def clean_main_view(self):
         for i in reversed(range(self.content_ui_vbox.count())): 
