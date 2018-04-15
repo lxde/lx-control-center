@@ -23,6 +23,8 @@ from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
 
 import logging
+
+# For access settings
 import os
 import os.path
 
@@ -68,7 +70,6 @@ class Gtk3App(Base, GtkWidgets):
         self.window.show_all()
 
     def build_toolbar(self):
-
         # Header
         # Icon view - Edit View - Preferences - Search
         self.header_box = Gtk.HBox()
@@ -122,19 +123,6 @@ class Gtk3App(Base, GtkWidgets):
         ui_frame.add(ui_grid)
         ui_counter = 0
         ui_counter = self.add_spin_button(self.icons_size_control_center_setting, ui_grid, ui_counter, (0, 256, 2,0))
-
-    def build_edit_view(self):
-        logging.info("GTK3.build_edit_view: enter function")
-        self.clean_main_view()
-        # Update items for search filter
-        self.items_by_categories_generate()
-        self.build_generic_icon_view("all")
-
-    def build_icon_view(self):
-        self.clean_main_view()
-        # Generate the view again, to take the modifications of edit_view
-        self.generate_view()
-        self.build_generic_icon_view("visible")       
 
     def build_generic_icon_view(self, type_view):
         logging.info("GTK3.build_generic_icon_view: enter function")
@@ -220,18 +208,18 @@ class Gtk3App(Base, GtkWidgets):
 
 
     def on_item_activated(self, icon_view, tree_path):
-        logging.debug("on_item_activated: click activated")
+        logging.debug("GTK3.on_item_activated: click activated")
         model = icon_view.get_model()
         path = model[tree_path][2]
-        logging.debug("on_item_activated: path = %s" % path)
+        logging.debug("GTK3.on_item_activated: path = %s" % path)
         self.on_item_activated_common(path)
         icon_view.unselect_all()
 
     def on_item_edit_activated(self, icon_view, tree_path):
-        logging.debug("on_item_edit_activated: click activated")
+        logging.debug("GTK3.on_item_edit_activated: click activated")
         model = icon_view.get_model()
         path = model[tree_path][2]
-        logging.debug("on_item_edit_activated: path = %s" % path)
+        logging.debug("GTK3.on_item_edit_activated: path = %s" % path)
         self.build_edit_item_view(path)
         icon_view.unselect_all()
 

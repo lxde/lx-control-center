@@ -570,6 +570,25 @@ class Base(Utils):
         self.items_by_categories_generate()
         self.icon_view_columns_generate()
 
+    def build_generic_icon_view(self, type_view):
+        """ Re-implement me on a toolkit backend
+        """
+        pass
+
+    def build_icon_view(self):
+        logging.info("Base.build_icon_view: enter function")
+        self.clean_main_view()
+        # Generate the view again, to take the modifications of edit_view
+        self.generate_view()
+        self.build_generic_icon_view("visible")
+
+    def build_edit_view(self):
+        logging.info("Base.build_edit_view: enter function")
+        self.clean_main_view()
+        # Update items for search filter
+        self.items_by_categories_generate()
+        self.build_generic_icon_view("all")
+
     def filter_item_by_search(self, item):
         logging.info("Base.filter_item_by_search: enter function")
         match = False
