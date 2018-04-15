@@ -693,8 +693,8 @@ class Base(Utils):
     def build_module_view(self):
         logging.info("Base.build_module_view: enter function")
         self.clean_main_view()
-        module_class = self.module_activated.module_spec.LXCC_Module(self.toolkit)
-        self.content_ui_vbox.add(module_class.main_box)
+        self.module_class = self.module_activated.module_spec.LXCC_Module(self.toolkit)
+        self.activate_module_view()
 
     def on_item_activated_common(self, path):
         logging.info("Base.on_item_activated_common: enter function")

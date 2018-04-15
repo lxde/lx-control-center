@@ -96,6 +96,9 @@ class Gtk2App(Base, GtkWidgets):
         for children in self.content_ui_vbox.get_children():
             self.content_ui_vbox.remove(children)
 
+    def activate_module_view(self):
+        self.content_ui_vbox.add(self.module_class.main_box)
+
     def build_pref_view(self):
         #TODO Complete options
         self.clean_main_view()

@@ -206,6 +206,8 @@ class Gtk3App(Base, GtkWidgets):
                 if (self.theme.has_icon(self.items[i].icon) == False):
                     self.items[i].icon_type = "fallback"
 
+    def activate_module_view(self):
+        self.content_ui_vbox.add(self.module_class.main_box)
 
     def on_item_activated(self, icon_view, tree_path):
         logging.debug("GTK3.on_item_activated: click activated")
