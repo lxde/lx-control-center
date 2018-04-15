@@ -91,8 +91,8 @@ class Qt5App(Base):
         self.header_box.insertWidget(2, self.pref_view_button, 0, Qt.AlignLeft) 
 
     def clean_main_view(self):
-        for children in self.content_ui_vbox.children():
-            self.content_ui_vbox.removeItem(children)
+        for i in reversed(range(self.content_ui_vbox.count())): 
+            self.content_ui_vbox.itemAt(i).widget().setParent(None)
 
     def build_pref_view(self):
         #TODO
