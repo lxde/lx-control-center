@@ -10,5 +10,5 @@ X-LX-Control-Center-Depends=;
 X-LX-Control-Center-Version=0.1
 X-LX-Control-Center-API-Version=0.1
 X-LX-Control-Center-Application-Replaces=;
-X-LX-Control-Center-Toolkit=GTK3
+X-LX-Control-Center-Toolkit=GTK3;GTK2;Qt5;
 X-LX-Control-Center-Experimental=true

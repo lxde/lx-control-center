@@ -17,23 +17,56 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-# Import your current toolkit (must be specify in X-LX-Control-Toolkit of the desktop file).
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-
 # For logging, it can be removed if you don't use logging facility
 import os.path
 import logging
 
 # Init the LXCC_Module.
 class LXCC_Module(object):
-    def __init__(self):
+    def __init__(self, toolkit):
         logging.debug("LXCC_Module.__init__: Init module %s" % os.path.abspath(__file__))
 
-        # Create all your widget in __init__
-        # LXCC will attach self.main_box to the main window
-        self.main_box = Gtk.Box()
+        self.toolkit = toolkit
+        self.init()
 
-        self.test_label = Gtk.Label("This is a test label")
-        self.main_box.add(self.test_label)
+    def init(self):
+        global Gtk
+        if (self.toolkit == "GTK3"):
+            import gi
+            gi.require_version('Gtk', '3.0')
+            from gi.repository import Gtk
+            # LXCC will attach self.main_box to the main window
+            self.main_box = Gtk.Box()
+
+            self.test_label = Gtk.Label("This is a test label")
+            self.main_box.add(self.test_label)
+
+        elif(self.toolkit == "GTK2"):
+            import pygtk
+            pygtk.require('2.0')
+            import gtk
+            # LXCC will attach self.main_box to the main window
+            self.main_box = gtk.Box()
+
+            self.test_label = gtk.Label("This is a test label")
+            self.main_box.add(self.test_label)
+
+        else:
+            from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
+
+            # LXCC will attach self.main_box to the main window
+            self.main_box = QWidget()
+            self.layout = QVBoxLayout()
+            self.main_box.setLayout(self.layout)
+
+            self.test_label = QLabel("This is a test label")
+            self.layout.addWidget(self.test_label)
+
+    def debug(self):
+        """ Prints variables and other useful items for debug purpose"""
+        print("Test")
+
+# For testing purpose only
+if __name__ == "__main__":
+    app = LXCC_Module()
+    app.debug()
