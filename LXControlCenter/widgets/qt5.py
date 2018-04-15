@@ -94,13 +94,12 @@ class Qt5App(Base):
         for children in self.grid.children():
             self.grid.removeItem(children)
 
-    def build_icon_view(self):
+    def build_pref_view(self):
+        #TODO
         self.clean_main_view()
-        # Generate the view again, to take the modifications of edit_view
-        self.generate_view()
-        self.build_generic_icon_view("visible")
 
     def build_generic_icon_view(self, type_view):
+        logging.info("Qt5.build_generic_icon_view: enter function")
         items_to_draw = self.items_visible_by_categories
 
         if (type_view == "all"):
@@ -129,7 +128,11 @@ class Qt5App(Base):
                 image = QToolButton()
                 image.setIcon(pixbuf)
                 image.setIconSize(QSize(self.icon_view_icons_size, self.icon_view_icons_size))
-                image.clicked.connect(partial(self.on_qt5_item_activated, i))
+
+                if (self.mode == "main-UI"):
+                    image.clicked.connect(partial(self.on_item_activated, i))
+                else:
+                    image.clicked.connect(partial(self.on_item_edit_activated, i))
 
                 # Add text for icon
                 text = QLabel()
@@ -150,10 +153,36 @@ class Qt5App(Base):
                 groupGrid.addWidget(iconview, groupRow, groupCol, Qt.AlignLeft, Qt.AlignLeft)
                 groupCol = groupCol + 1
 
+    def on_item_activated(self, item):
+        logging.debug("Qt5.on_item_activated: click activated")
+        logging.debug("Qt5.on_item_activated: path = %s" % item.path)
+        self.on_item_activated_common(item.path)
+
+    def on_item_edit_activated(self, item):
+        logging.debug("Qt5.on_item_edit_activated: click activated")
+        logging.debug("Qt5.on_item_edit_activated: path = %s" % item.path)
+        self.build_edit_item_view(item.path)
+
+    def build_edit_item_view(self, path):
+        # TODO
+        self.clean_main_view()
+        self.mode = "edit-item-UI"
+        self.draw_ui()
+
+    def on_resize(self):
+        #TODO
+        # Since Qt doesn t have a resize signal ...
+        #Find a better ay that subclassing indo : https://stackoverflow.com/questions/43126721/pyqt-detect-resizing-in-widget-window-resized-signal
+        pass
+
     def on_search(self, text):
         logging.info("Qt5.on_search: enter function")
         self.search_string = text
         self.draw_ui()
+
+    def destroy(self, widget, data=None):
+        #TODO Since Qt doesn t have a close signal ...
+        self.util.save_object("keyfile", self.keyfile_settings, os.path.join("lx-control-center", "settings.conf"))
 
     def main(self):
         self.app = QApplication(sys.argv)
@@ -188,6 +217,3 @@ class Qt5App(Base):
         self.layout.addWidget(self.scroll) 
 
         sys.exit(self.app.exec_())
-
-    def on_qt5_item_activated(self, item):
-        self.on_item_activated_common(item.path)
