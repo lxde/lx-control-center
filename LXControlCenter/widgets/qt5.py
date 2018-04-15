@@ -91,8 +91,8 @@ class Qt5App(Base):
         self.header_box.insertWidget(2, self.pref_view_button, 0, Qt.AlignLeft) 
 
     def clean_main_view(self):
-        for children in self.grid.children():
-            self.grid.removeItem(children)
+        for children in self.content_ui_vbox.children():
+            self.content_ui_vbox.removeItem(children)
 
     def build_pref_view(self):
         #TODO
@@ -111,7 +111,7 @@ class Qt5App(Base):
             groupGrid = QGridLayout()
             groupGrid.setAlignment(Qt.AlignCenter)
             groupBox.setLayout(groupGrid)
-            self.grid.addWidget(groupBox, row, 0)
+            self.content_ui_vbox.addWidget(groupBox, row, 0)
             row = row + 1
             groupCol = 0
             groupRow = 0
@@ -152,6 +152,9 @@ class Qt5App(Base):
 
                 groupGrid.addWidget(iconview, groupRow, groupCol, Qt.AlignLeft, Qt.AlignLeft)
                 groupCol = groupCol + 1
+
+    def activate_module_view(self):
+        self.content_ui_vbox.addWidget(self.module_class.main_box)
 
     def on_item_activated(self, item):
         logging.debug("Qt5.on_item_activated: click activated")
@@ -197,9 +200,9 @@ class Qt5App(Base):
 
         # Content UI
         self.widget = QWidget()
-        self.grid = QGridLayout()
+        self.content_ui_vbox = QGridLayout()
         self.vbox1 = QVBoxLayout()
-        self.vbox1.addLayout(self.grid)
+        self.vbox1.addLayout(self.content_ui_vbox)
         self.widget.setLayout(self.vbox1)
         self.widget.show()
 
