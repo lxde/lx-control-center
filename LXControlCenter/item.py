@@ -188,4 +188,3 @@ class Item():
                     spec = importlib.util.spec_from_file_location("lxcc_module", module_path)
                     self.module_spec = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(self.module_spec)
-                    self.module_spec.init(self.module_running_toolkit)
