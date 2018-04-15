@@ -28,7 +28,8 @@ Package: python-lx-control-center
 Architecture: all
 Depends: ${misc:Depends},
 	     ${python2:Depends},
-         python-gtk2 | python-gi
+         python-gtk2 | python-gi,
+         python-psutil
 Description: Utility to apply settings on LXDE environement - python2 package
  The LX-Control-Center centralise all settings for an LXDE environement.
 
