@@ -66,6 +66,7 @@ For all versions :
 GTK2 frontend
  - python2
  - pygtk
+ - python2-psutil
 
 GTK3 frontend
  - python3
