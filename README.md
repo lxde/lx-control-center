@@ -69,13 +69,13 @@ GTK2 frontend
  - python2-psutil
 
 GTK3 frontend
- - python3
+ - python2 / python3
  - pygi
  - GLib GIR
  - GTK3 GIR
 
 Qt5 frontend
- - python3
+ - python2 / python3
  - pyqt5
 
 Webkit frontend
