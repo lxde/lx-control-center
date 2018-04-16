@@ -31,9 +31,9 @@ class GtkWidgets(object):
             gi.require_version('Gtk', '3.0')
             from gi.repository import Gtk
         else:
-            import gi
-            gi.require_version('Gtk', '2.0')
-            from gi.repository import Gtk
+            import pygtk
+            pygtk.require('2.0')
+            import gtk as Gtk
 
     # Grid / Table
     def create_table_conf(self, spacing=20, margin_top=10, margin_side=30):
@@ -102,7 +102,7 @@ class GtkWidgets(object):
     def on_spin_button_change(self, widget, setting):
         logging.debug("Save value: %s" % widget.get_value_as_int())
         setting.set(widget.get_value_as_int())
-    
+
     def add_combobox_text(self, setting, grid, position):
         logging.info("gtkcommon.add_combobox: enter function")
         if len(setting.support_list) > 0 or self.gtk_widgets_debug_mode == True:
@@ -113,7 +113,10 @@ class GtkWidgets(object):
             for item in setting.available_values:
                 store.append([index, item, setting.available_values[item]])
                 index = index + 1
-            combo = Gtk.ComboBox.new_with_model(store)
+            if self.toolkit == "GTK3":
+                combo = Gtk.ComboBox.new_with_model(store)
+            else:
+                combo = Gtk.ComboBox(store)
             renderer_text = Gtk.CellRendererText()
             combo.pack_start(renderer_text, True)
             combo.add_attribute(renderer_text, "text", 2)

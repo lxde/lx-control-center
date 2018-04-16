@@ -46,7 +46,7 @@ class LXCC_Module(object):
             pygtk.require('2.0')
             import gtk
             # LXCC will attach self.main_box to the main window
-            self.main_box = gtk.Box()
+            self.main_box = gtk.VBox()
 
             self.test_label = gtk.Label("This is a test label")
             self.main_box.add(self.test_label)

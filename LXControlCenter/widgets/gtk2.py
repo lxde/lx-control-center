@@ -17,10 +17,9 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-import gi
-gi.require_version('Gtk', '2.0')
-from gi.repository import Gtk
-from gi.repository.GdkPixbuf import Pixbuf
+import pygtk
+pygtk.require('2.0')
+import gtk as Gtk
 
 import logging
 import os
@@ -157,15 +156,18 @@ class Gtk2App(Base, GtkWidgets):
             frame.add(hbox)
 
             #Impossible to add a custom structure in liststore ...
-            liststore = Gtk.ListStore(Pixbuf, str, str)
-            iconview = Gtk.IconView.new()
+            #GTK2 Specific
+            liststore = Gtk.ListStore(Gtk.gdk.Pixbuf, str, str)
+            iconview = Gtk.IconView()
+
             iconview.set_model(liststore)
             iconview.set_pixbuf_column(0)
             iconview.set_text_column(1)
              #GTK2 Specific => Force width to avoid too much spacing
             iconview.set_item_width(self.icon_view_icons_size * 4)
             iconview.set_columns(self.icon_view_columns)
-            iconview.set_selection_mode(Gtk.SelectionMode.SINGLE)
+            #GTK2 Specific: Disable single click
+            #iconview.set_selection_mode(Gtk.SelectionMode.SINGLE)
 
             #GTK2 spcific => enable single selection click
             if (self.mode == "main-UI"):
@@ -182,9 +184,9 @@ class Gtk2App(Base, GtkWidgets):
             logging.debug("build_UI: item orientation = %s" % iconview.get_item_orientation())
 
             if (self.icon_force_size == True):
-                icon_lookup_flags = Gtk.IconLookupFlags.FORCE_SIZE
+                icon_lookup_flags = Gtk.ICON_LOOKUP_FORCE_SVG
             else:
-                icon_lookup_flags = Gtk.IconLookupFlags.GENERIC_FALLBACK
+                icon_lookup_flags = Gtk.ICON_LOOKUP_USE_BUILTIN
 
             self.define_icon_type_with_gtk_theme()
 
@@ -360,8 +362,10 @@ class Gtk2App(Base, GtkWidgets):
     def create_togglebutton(self, label, icon):
         button = Gtk.Button(label = label)
         button.set_size_request(200, -1)
-        icon_pixbuf = self.theme.get_default().load_icon(icon, 24, Gtk.IconLookupFlags.FORCE_SIZE)
-        icon_image = Gtk.Image.new_from_pixbuf(icon_pixbuf)
+        # GTK2 Specific
+        icon_pixbuf = self.theme.load_icon(icon, 24, 0)
+        icon_image = Gtk.image_new_from_pixbuf(icon_pixbuf)
+
         button.set_image(icon_image)
         button.set_sensitive(False)
         return button
@@ -390,9 +394,11 @@ class Gtk2App(Base, GtkWidgets):
         self.window_box = Gtk.VBox()
         # GTK2 Specific: add_with_viewport
         window_scrolled.add_with_viewport(self.window_box)
-        window_scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        # GTK2 Specific: Remove set_policy
+        #window_scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
-        self.theme = Gtk.IconTheme.get_default()
+        # GTK2 Specific
+        self.theme = Gtk.icon_theme_get_default()
 
         self.content_ui_vbox = Gtk.VBox()
         if (self.standalone_module == None):
